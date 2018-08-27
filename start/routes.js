@@ -22,6 +22,7 @@ const Env = use('Env')
 const Route = use('Route')
 const MqttClient = require('mqtt')
 
+
 // require('./kue')
 
 Route.match(['options'],'*',function * () {
@@ -42,6 +43,11 @@ Route.post('/ticket', 'TicketController.add')
 Route.post('/ticket/update', 'TicketController.update')
 Route.get('/ticket/:mobile', 'TicketController.get')
 Route.get('/ticket', 'TicketController.get_all')
+
+
+
+Route.post('/upload','AuthController.upload')
+Route.get('/file/:filename','AuthController.download')
 
 // Site Http Routes
 Route.get('/exchange', 'HttpExchangeController.list')
