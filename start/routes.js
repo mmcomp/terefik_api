@@ -22,7 +22,7 @@ const Env = use('Env')
 const Route = use('Route')
 const MqttClient = require('mqtt')
 
-require('./kue')
+// require('./kue')
 
 Route.match(['options'],'*',function * () {
   return 'allowed'
