@@ -75,6 +75,33 @@ class AuthController {
         theIp.save()
       }
     
+      console.log('Checking Mobile Number is Valid ', request.all()['mobile'])
+      if(request.all()['mobile'].length<10) {
+        return response.status(400).send({
+          status: 0,
+          messages: [{
+            code: 'MobileNotCurrect',
+            message: 'شماره موبایل صحیح نمی باشد'
+          }],
+          data: {}
+        })
+      }
+
+      if(request.all()['mobile'].indexOf('9')!=0 && request.all()['mobile'].indexOf('09')!=0) {
+        return response.status(400).send({
+          status: 0,
+          messages: [{
+            code: 'MobileNotCurrect',
+            message: 'شماره موبایل صحیح نمی باشد'
+          }],
+          data: {}
+        })
+      }
+      
+      if(request.all()['mobile'].indexOf('9')==0) {
+        request.all()['mobile'] = '0' + request.all()['mobile']
+      }
+
       const rules = {
         mobile: 'required|mobile'
       }

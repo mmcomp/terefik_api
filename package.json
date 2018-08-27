@@ -42,7 +42,7 @@
     "querystring": "^0.2.0",
     "randomatic": "^3.0.0",
     "raven": "^2.4.0",
-    "soap": "^0.23.0",
+    "soap": "^0.25.0",
     "util": "^0.10.4"
   },
   "devDependencies": {},
