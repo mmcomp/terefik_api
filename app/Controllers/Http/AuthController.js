@@ -628,7 +628,7 @@ class AuthController {
 
       let check = await Validations.check(request.all(), rules)
       if (check.err) {
-        // console.log('Error 1')
+        console.log('Error 1')
         return response.status(400).send({
           status: 0,
           messages: check.messages,
@@ -658,8 +658,8 @@ class AuthController {
       const user = await User.query().where('mobile', request.input('username')).where('token', request.input('password')).first()
       // console.log('USER:')
       // console.log(user)
-      if (!user || user.status !== 'active') {
-        // console.log('Error 2')
+      if (!user) {
+        console.log('Error 2')
         return response
           .status(401)
           .send({})
@@ -667,21 +667,21 @@ class AuthController {
 
       const unique = await User.query().where('client_id', request.input('clientid')).where('id', '!=', user.id).first()
       if (unique) {
-        // console.log('Error 3')
+        console.log('Error 3')
         return response
           .status(401)
           .send({})
       }
 
       user.client_id = request.input('clientid')
-      user.last_activity = Moment.now('YYYY-M-D HH:mm:ss')
+      // user.last_activity = Moment.now('YYYY-M-D HH:mm:ss')
       await user.save()
 
       return response.send({})
     } catch (error) {
       // log error
       // SentryException.captureException(error)
-
+      // console.log(error)
       return response.status(500).send({
         status: 0,
         messages: Messages.parse(['UnknownError']),
@@ -696,6 +696,7 @@ class AuthController {
     request,
     response
   }) {
+    console.log('MQTT ACL', request.all())
     try {
       const rules = {
         username: 'required',
@@ -722,7 +723,7 @@ class AuthController {
 
       const user = await User.query().where('mobile', request.input('username')).first()
 
-      if (!user || user.status !== 'active' || user.client_id !== request.input('clientid')) {
+      if (!user || user.client_id !== request.input('clientid')) {
         return response
           .status(400)
           .send({})
@@ -741,7 +742,7 @@ class AuthController {
     } catch (error) {
       // log error
       // SentryException.captureException(error)
-
+      // console.log(error)
       return response.status(500).send({
         status: 0,
         messages: Messages.parse(['UnknownError']),
