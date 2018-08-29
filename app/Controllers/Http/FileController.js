@@ -1,5 +1,8 @@
 'use strict'
 
+const Helpers = use('Helpers')
+const fs = use('fs')
+const readFile = Helpers.promisify(fs.readFile)
 
 const User = use('App/Models/User')
 
