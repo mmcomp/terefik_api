@@ -20,6 +20,10 @@ class UserCar extends Model {
   user () {
     return this.belongsTo('App/Models/User', 'user_id', 'id')
   }
+
+  cars () {
+    return this.hasOne('App/Models/Car', 'vehicle_id', 'id')
+  }
 }
 
 module.exports = UserCar

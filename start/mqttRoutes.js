@@ -20,6 +20,7 @@ const routes = {
 
   // Car
   'AddCar': 'Car/add',
+  'ListCar': 'Car/list',
 
   'ShowGameInfo': 'Game/info',
   'ShowMinesweeperInfo': 'Game/mineInfo',

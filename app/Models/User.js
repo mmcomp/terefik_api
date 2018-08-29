@@ -38,6 +38,12 @@ class User extends Model {
   }
 
   // Relations
+  cars() {
+    // return this.hasMany('App/Models/UserCar', 'id', 'user_id')
+    return this.manyThrough('App/Models/UserCar', 'cars')
+  }
+
+
   property () {
     return this.hasOne('App/Models/Property', 'id', 'user_id')
   }

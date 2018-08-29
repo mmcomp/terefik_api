@@ -44,6 +44,22 @@ class CarController {
       data: {}
     }]
   }
+
+  static async list(params, user) {
+    await user.loadMany(['cars'])
+    let userData = user.toJSON()
+    let cars = userData.cars
+
+    // console.log(user.toJSON())
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        cars: cars
+      }
+    }]
+  }
 }
 
 module.exports = CarController
