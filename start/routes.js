@@ -46,8 +46,8 @@ Route.get('/ticket', 'TicketController.get_all')
 
 
 
-Route.post('/upload','AuthController.upload')
-Route.get('/file/:filename','AuthController.download')
+Route.post('/upload','FileController.upload')
+Route.get('/file/:filename','FileController.download')
 
 // Site Http Routes
 Route.get('/exchange', 'HttpExchangeController.list')

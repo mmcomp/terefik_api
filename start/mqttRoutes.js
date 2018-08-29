@@ -15,6 +15,12 @@ const Time = Moment.moment()
 // لیست کلیه route های داخل سیستم که مشخص می کند هر عملیات مربوط به کدام controller و method است .
 // Route List
 const routes = {
+  // Parking Ranger
+  'RegisterParkingRanger': 'ParkingRanger/register',
+
+  // Car
+  'AddCar': 'Car/add',
+
   'ShowGameInfo': 'Game/info',
   'ShowMinesweeperInfo': 'Game/mineInfo',
   'ShowSmasherInfo': 'Game/smasherInfo',
@@ -146,6 +152,7 @@ module.exports = async(topic, message) => {
     request_log.user_id = user.id
 
     pubTopic = 'client_' + user.token + '/'
+    console.log(params.type, routes[params.type])
     if (!_.has(routes, params.type)) {
       request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
       request_log.response = JSON.stringify(Messages.parse(['RouteNotFound']))
