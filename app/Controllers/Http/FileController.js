@@ -59,8 +59,6 @@ class FileController {
         size: '2mb'
       })
   
-      // console.log('profilePic')
-      // console.log(profilePic)
       let filename = User.getToken()
       let ext = profilePic.clientName.split('.')[profilePic.clientName.split('.').length-1]
       filename = filename + '.' + ext
@@ -70,7 +68,7 @@ class FileController {
       })
   
       if (!profilePic.moved()) {
-        // return profilePic.error()
+
         return response.status(400).send({
           status: 0,
           messages: [{
@@ -84,9 +82,9 @@ class FileController {
       if(doc_type=='profile') {
         user.image_path = filename
         await user.save()
-      } else {
+      } else if(doc_type!='arrest') {
         let parkingRangerDoc = await ParkingRangerDoc.query().where('doc_type', doc_type).where('users_id', user.id).first()
-        // console.log(parkingRangerDoc)
+
         if(parkingRangerDoc) {
           parkingRangerDoc.details = (request.all()['details'])?request.all()['details']:''
           parkingRangerDoc.file_path = filename
@@ -100,7 +98,7 @@ class FileController {
 
         await parkingRangerDoc.save()
       }
-      // return 'File moved'
+
       return response.send({
         status: 1,
         messages: [],
