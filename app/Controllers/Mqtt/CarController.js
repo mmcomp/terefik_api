@@ -67,13 +67,16 @@ class CarController {
     }]
   }
 
-  static async check(params, user) {
+  static async arrest(params, user) {
     const rules = {
       number_2: 'required',
       number_ch: 'required',
       number_3: 'required',
       number_ir: 'required',
-      number_extra: 'required'
+      number_extra: 'required',
+      lon_gps: 'required',
+      lat_gps: 'required',
+      image_path: 'required'
     }
 
     let check = await Validations.check(params, rules)
@@ -110,29 +113,13 @@ class CarController {
       car.number_extra = params.number_extra
       await car.save()
 
-      return [{
-        status: 1,
-        messages: [],
-        data: {
-          owner: carOwner,
-          car_status: carStatus,
-          car_id: car.id
-        }
-      }]
+      return this._arrest(params, user)
     }
 
     carStatus = 'RegisteredByRanger'
     let userCar = await UserCar.query().where('vehicle_id', car.id).with('user').first()
     if(!userCar) {
-      return [{
-        status: 1,
-        messages: [],
-        data: {
-          owner: carOwner,
-          car_status: carStatus,
-          car_id: car.id
-        }
-      }]
+      return this._arrest(params, user)
     }
 
     carStatus = 'NotShielded'
@@ -150,59 +137,40 @@ class CarController {
       theOwner.is_sheild = 1
       await theOwner.save()
 
+      let settings = await Setting.get()
+      let checkFinish = Time(userCar.check_time).add(settings.check_timeout, 'minutes')
+
+      let checkDiff = checkFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+      let theStat = 0
+
+      if(checkDiff<0) {
+        // Reward Ranger
+        theStat = 1
+
+        userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
+        await userCar.save()
+      }
+
+
       return [{
-        status: 1,
+        status: theStat,
         messages: [],
         data: {
-          owner: carOwner,
-          car_status: carStatus,
-          car_id: car.id
+          car_status: carStatus
         }
       }]
     }
 
-    
+    userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
+    await userCar.save()
+
     theOwner.is_sheild = 0
     await theOwner.save()
 
-    return [{
-      status: 1,
-      messages: [],
-      data: {
-        owner: carOwner,
-        car_status: carStatus,
-        car_id: car.id
-      }
-    }]
+    return this._arrest(params, user)
   }
 
-  static async arrest(params, user) {
-    const rules = {
-      car_id: 'required',
-      lon_gps: 'required',
-      lat_gps: 'required',
-      image_path: 'required'
-    }
-
-    let check = await Validations.check(params, rules)
-    if (check.err) {
-      return [{
-        status: 0,
-        messages: check.messages,
-        data: {}
-      }]
-    }
-
-    if(user.is_parking_ranger!=4) {
-      return [{
-        status: 0,
-        messages: [{
-          code: 'NotRanger',
-          message: 'شما پارکیار نمی باشید'
-        }],
-        data: {}
-      }]
-    }
+  static async _arrest(params, user) {
 
     let rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
     if(rangerWork) {
@@ -248,6 +216,7 @@ class CarController {
           status: 1,
           messages: [],
           data: {
+            car_status: 'NotShielded'
           }
         }]
       }
@@ -260,6 +229,7 @@ class CarController {
         status: 1,
         messages: [],
         data: {
+          car_status: 'RegisteredByRanger'
         }
       }]
     }
@@ -275,6 +245,61 @@ class CarController {
       data: {
       }
     }]
+  }
+
+  static async around(params, user) {
+    const rules = {
+      lon_gps: 'required',
+      lat_gps: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    if(user.is_parking_ranger!=4) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'NotRanger',
+          message: 'شما پارکیار نمی باشید'
+        }],
+        data: {}
+      }]
+    }
+
+    try{
+      let settings = await Setting.get()
+      let results = await Car.getCarsAround(params.lon_gps, params.lat_gps, settings.arrest_lookup_distance)
+      let theCar, cars = []
+      for(let i = 0;i < results.length;i++) {
+          theCar = await Car.find(results[i].vehicle_id)
+          theCar = theCar.toJSON()
+          theCar['distance'] = parseInt(results[i].dis, 10)
+          cars.push(theCar)
+      }
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          founds: cars
+        }
+      }]
+    }catch(e){
+      return [{
+        status: 0,
+        messages: [{
+          code: 'SpatialError',
+          message: e.message
+        }],
+        data: {}
+      }]
+    }
   }
 }
 
