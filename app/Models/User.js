@@ -115,7 +115,20 @@ class User extends Model {
   // عملیات ثبت نام کاربر جدید که پس از تایید شماره موبایل اتفاق می افند.
   async register () {
     try {
-      this.save();
+      const setting = await Setting.get()
+
+      await this.save()
+      let property = new Property
+      
+      property.user_id = this.id
+      property.gasoline = setting.intial_gasoline
+      property.health_oil = setting.intial_health_oil
+      property.cleaning_soap = setting.intial_cleaning_soap
+      property.bronze_coin = setting.intial_bronze_coin
+      property.silver_coin = setting.intial_silver_coin
+      property.diamond = setting.intial_diamond
+
+      await property.save()
       /*
       const level = await Level.query().orderBy('score_min', 'ASC').with('necklace').with('fuge').first()
       const levelData = level.toJSON()

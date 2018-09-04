@@ -21,9 +21,13 @@ const routes = {
   // Car
   'AddCar': 'Car/add',
   'ListCar': 'Car/list',
-  'CarCheck': 'Car/check',
   'CarArrest': 'Car/arrest',
   'CarsAround': 'Car/around',
+  'RemoveCar': 'Car/remove',
+  'ArrestList': 'Car/arrestList',
+
+  // Discount
+  'GetDiscount': 'Discount/get',
 
   'ShowGameInfo': 'Game/info',
   'ShowMinesweeperInfo': 'Game/mineInfo',

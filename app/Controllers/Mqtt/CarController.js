@@ -56,8 +56,6 @@ class CarController {
     let userData = user.toJSON()
     let cars = userData.cars
 
-    // console.log(user.toJSON())
-
     return [{
       status: 1,
       messages: [],
@@ -113,6 +111,8 @@ class CarController {
       car.number_extra = params.number_extra
       await car.save()
 
+      params['car_id'] = car.id
+
       return this._arrest(params, user)
     }
 
@@ -167,6 +167,7 @@ class CarController {
     theOwner.is_sheild = 0
     await theOwner.save()
 
+    params['car_id'] = car.id
     return this._arrest(params, user)
   }
 
@@ -247,6 +248,36 @@ class CarController {
     }]
   }
 
+  static async arrestList(params, user) {
+    if(user.is_parking_ranger!=4) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'NotRanger',
+          message: 'شما پارکیار نمی باشید'
+        }],
+        data: {}
+      }]
+    }
+
+    let rangerWorks = await RangerWork.query().where('ranger_id', user.id).groupBy('vehicle_id').with('cars').fetch()
+
+    let cars = []
+    let jsonData = rangerWorks.toJSON()
+
+    for(let i = 0;i < jsonData.length;i++) {
+      cars.push(jsonData[i].cars)
+    }
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        cars: cars
+      }
+    }]
+  }
+
   static async around(params, user) {
     const rules = {
       lon_gps: 'required',
@@ -300,6 +331,41 @@ class CarController {
         data: {}
       }]
     }
+  }
+
+  static async remove(params, user) {
+    const rules = {
+      car_id: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let car = await Car.find(params.car_id)
+    if(car){
+      await car.delete()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {}
+      }]
+    }
+
+    return [{
+      status: 0,
+      messages: [{
+        code: "CarNotFound",
+        message: "خودرو مورد نظر پیدا نشد"
+      }],
+      data: {}
+    }]
   }
 }
 

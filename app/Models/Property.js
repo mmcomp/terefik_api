@@ -6,16 +6,9 @@ const Model = use('Model')
 
 class Property extends Model {
   static get table () {
-    return 'users_property'
+    return 'user_property'
   }
 
-  static get createdAtColumn () {
-    return null
-  }
-
-  static get updatedAtColumn () {
-    return null
-  }
 
   // Relations
   user () {

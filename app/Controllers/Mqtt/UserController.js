@@ -233,8 +233,21 @@ class UserController {
     }]
   }
 
-  // اطلاعات کاربر برای صفحه پروفایل و ویرایش اطلاعات کاربر
   static async profile (params, user) {
+    await user.loadMany(['property'])
+
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        profile: user.toJSON()
+      }
+    }]
+  }
+
+  // اطلاعات کاربر برای صفحه پروفایل و ویرایش اطلاعات کاربر
+  static async ـprofile (params, user) {
     const labels = await Label.all()
     let mainUser = user
     await user.loadMany(['transactions', 'bank', 'property', 'traps'])
