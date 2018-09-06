@@ -234,7 +234,7 @@ class UserController {
   }
 
   static async profile (params, user) {
-    await user.loadMany(['property'])
+    await user.loadMany(['property', 'terefik'])
 
 
     return [{
