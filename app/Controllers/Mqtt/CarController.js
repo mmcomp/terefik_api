@@ -204,7 +204,7 @@ class CarController {
         data: {}
       }]
     }
-
+    
     if(user.is_parking_ranger!=4) {
       return [{
         status: 0,
@@ -216,8 +216,12 @@ class CarController {
       }]
     }
 
-    let carOwner = {}
+    let carOwner = {}, rangerSilver = 0, isNotReDone = 1
+
     let carStatus = 'NotRegistered'
+
+    await user.loadMany(['property'])
+    let userData = user.toJSON()
 
     let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir).where('number_extra', params.number_extra).first()
 
@@ -232,9 +236,18 @@ class CarController {
 
       params['car_id'] = car.id
 
+      rangerSilver += isNotReDone * settings.silver_when_not_reported
+
+
+      await user.property().update({
+        silver_coin: userData.property.silver_coin + rangerSilver
+      })
+
       return this._arrest(params, user)
     }
 
+    params['car_id'] = car.id
+    
     carStatus = 'RegisteredByRanger'
     let userCar = await UserCar.query().where('vehicle_id', car.id).with('user').first()
     if(!userCar) {
@@ -268,8 +281,16 @@ class CarController {
 
         userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
         await userCar.save()
+      }else {
+        isNotReDone = 0
       }
 
+      rangerSilver += isNotReDone * settings.silver_when_not_reported
+
+
+      await user.property().update({
+        silver_coin: userData.property.silver_coin + rangerSilver
+      })
 
       return [{
         status: theStat,
@@ -290,13 +311,17 @@ class CarController {
     return this._arrest(params, user)
   }
 
-  static async _arrest(params, user) {
+  static async _arrest(params, user) {   
+    let settings = await Setting.get() 
+    
+    let userData = user.toJSON()
 
-    let rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
+    let isNotReDone = 1, rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
     if(rangerWork) {
       let settings = await Setting.get()
       let lastArrestTime = Time(rangerWork.created_at)
       if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
+        isNotReDone = 0
         return [{
           status: 0,
           messages: [{
@@ -307,6 +332,10 @@ class CarController {
         }]
       }
     }
+
+    await user.property().update({
+      silver_coin: userData.property.silver_coin + isNotReDone * settings.silver_when_not_reported
+    })
 
     rangerWork = new RangerWork
     rangerWork.ranger_id = user.id
@@ -328,7 +357,10 @@ class CarController {
         rangerWork.user_vehicle_id = userCar.id
         await rangerWork.save()
 
-        
+        await user.property().update({
+          silver_coin: userData.property.silver_coin + isNotReDone * settings.silver_when_not_shield
+        })
+
         theOwner.is_sheild = 0
         await theOwner.save()
 

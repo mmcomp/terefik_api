@@ -1,13 +1,9 @@
 'use strict'
 
 const Model = use('Model')
-const Level = use('App/Models/Level')
 const Property = use('App/Models/Property')
-const Transaction = use('App/Models/Transaction')
 const Setting = use('App/Models/Setting')
-const Puzzle = use('App/Models/Puzzle')
-const Necklace = use('App/Models/Necklace')
-const UserStat = use('App/Models/UserStat')
+const UserTerefik = use('App/Models/UserTerefik')
 
 const Randomatic = require('randomatic')
 const Messages = use('App/Libs/Messages/Messages')
@@ -83,9 +79,9 @@ class User extends Model {
         userTerefik = new UserTerefik
         userTerefik.ttype = ttype
         userTerefik.user_id = this.id
-        userTerefik.gasoline = setting.intial_terefik_gasoline
-        userTerefik.health = setting.intial_terefik_health
-        userTerefik.clean = setting.intial_terefik_clean
+        userTerefik.gasoline = setting.intial_terefiki_gasoline
+        userTerefik.health = setting.intial_terefiki_health
+        userTerefik.clean = setting.intial_terefiki_clean
         await userTerefik.save()
       }
     } catch (error) {
