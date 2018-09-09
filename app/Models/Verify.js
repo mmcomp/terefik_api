@@ -110,7 +110,6 @@ class Verify extends Model {
   static async check (mobile, code, type) {
     console.log('CHECKING')
     console.log('Code', code)
-    console.log('VCode', verify.code)
     
     let verify
     if(type) {
@@ -136,6 +135,7 @@ class Verify extends Model {
       }
     }
 
+    console.log('VCode', verify.code)
     if (code !== verify.code) {
       verify.retry++
       await verify.save()
