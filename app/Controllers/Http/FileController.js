@@ -13,8 +13,10 @@ class FileController {
     request,
     response
   }) {
+    console.log('File Upload Started')
     try{
       if(!request.file('the_file') || !request.all()['mobile'] || !request.all()['token']) {
+        console.log('InputError')
         return response.status(400).send({
           status: 0,
           messages: [{
@@ -26,6 +28,7 @@ class FileController {
       }
   
       if(request.all()['mobile'].indexOf('9')!=0 && request.all()['mobile'].indexOf('09')!=0 && request.all()['mobile'].indexOf('+989')!=0) {
+        console.log('MobileNotCurrect')
         return response.status(400).send({
           status: 0,
           messages: [{
