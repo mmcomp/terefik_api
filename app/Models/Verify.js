@@ -108,6 +108,10 @@ class Verify extends Model {
 
   // چک کردن کد وارد شده با کدی که برای کاربر از طریق sms ارسال شده است .
   static async check (mobile, code, type) {
+    console.log('CHECKING')
+    console.log('Code', code)
+    console.log('VCode', verify.code)
+    
     let verify
     if(type) {
       verify = await Verify.query().where('mobile', mobile).where('type', type).first()
@@ -131,8 +135,7 @@ class Verify extends Model {
         verify.retry = 0
       }
     }
-    console.log('Code', code)
-    console.log('VCode', verify.code)
+
     if (code !== verify.code) {
       verify.retry++
       await verify.save()
