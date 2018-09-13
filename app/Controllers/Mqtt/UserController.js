@@ -246,6 +246,53 @@ class UserController {
     }]
   }
 
+  static async path (params, user) {
+    await user.loadMany(['property'])
+    let userData = user.toJSON()
+    let path = []
+    try{
+      path = JSON.parse(userData.property.path)
+    }catch(e){
+
+    }
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        path: path
+      }
+    }]
+  }
+
+  static async setPath (params, user) {
+    const rules = {
+      path: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    await user.loadMany(['property'])
+
+    await user.property().update({
+      path: JSON.stringify(params.path)
+    })
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+      }
+    }]
+  }
+
   // اطلاعات کاربر برای صفحه پروفایل و ویرایش اطلاعات کاربر
   static async ـprofile (params, user) {
     const labels = await Label.all()

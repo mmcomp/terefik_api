@@ -25,52 +25,38 @@ class AttackController {
   static async find (params, user) {
     let lastTarget = (params && params.id)?params.id:-1
 
-    await user.loadMany(['property', 'level'])
+    await user.loadMany(['property'])
     let userData = user.toJSON()
     let settings = await Setting.get()
 
-    if ((_.has(params, 'change') && params.change===true && userData.property.ye < settings.attack_change_ye) ||
-      ((!_.has(params, 'change') || (_.has(params, 'change') && params.change===false)) && userData.property.ye < settings.attack_ye)) {
+    if ((_.has(params, 'change') && params.change===true && userData.property.gasoline < settings.attack_change_gasoline) ||
+      ((!_.has(params, 'change') || (_.has(params, 'change') && params.change===false)) && userData.property.gasoline < settings.attack_gasoline)) {
       return [{
         status: 0,
-        messages: Messages.parse(['yeNotEnough']),
+        messages: [{
+          code: "GasolineNotEnough",
+          message: "بنزین شما برای جستجو کافی نیست"
+        }],
         data: {
-          attack_cost: settings.attack_ye,
-          change_cost: settings.attack_change_ye
+          attack_cost: settings.attack_gasoline,
+          change_cost: settings.attack_change_gasoline
         }
       }]
     }
 
-    let shield_duration = /*(userData.shield_duration>0)?userData.shield_duration*60:*/settings.attack_shield
-    let shield_end = Moment.now('YYYY-M-D HH:mm:ss')
-    let new_sh = new Time(shield_end)
-    let nn = new_sh.subtract(shield_duration,'minute')
-    shield_end = nn.format('YYYY-MM-DD HH:mm:ss')
-    let last_activity_limit = Time(Moment.now('YYYY-M-D HH:mm:ss')).subtract(settings.attack_online,'minute')
-
     
-    let targets = await User.query().whereNot('id', user.id).whereNot('id', lastTarget)
+    let target = await User.query().whereNot('id', user.id).whereNot('id', lastTarget)
+    /*
       .where(function () {
         this.whereBetween('courage_stat', [userData.courage_stat - 30, userData.courage_stat + 30])
         .orWhereBetween('courage_stat', [userData.courage_stat - 70, userData.courage_stat + 70])
         .orWhereBetween('courage_stat', [userData.courage_stat - 100, userData.courage_stat + 100])
         .orWhereBetween('courage_stat', [userData.courage_stat - 100000, userData.courage_stat + 100000])
       })
-      .where('last_activity', '<', last_activity_limit.format('YYYY-MM-DD HH:mm:ss'))
-      .where(function () {
-        this.where('shield_at', '<', shield_end)
-        .orWhereNull('shield_at')
-      }).where('under_attack', 'no')
-      .orderByRaw('RAND()').with('property').with('level').with('antiques').with('antiques.antique')//.first()
+      */
+      .where('is_shield', 0)
+      .orderByRaw('RAND()').with('property').first()
     
-    // console.log('shield end')
-    // console.log(shield_end)
-    // console.log('All possible Targets :')
-    // console.log(targets)
-    
-    // let targets = await User.query().where('id',54).with('property').with('level').with('antiques').with('antiques.antique')
-
-    // console.log(targets)
     if (!targets) {
       return [{
         status: 0,
@@ -82,128 +68,66 @@ class AttackController {
       }]
     }
 
-    let targetTmp,targetsJson = targets
-    for(let i = 0;i < targetsJson.length;i++){      
-      if((targetsJson[i].shield_duration>0 && Time(targetsJson[i].shield_at).add(targetsJson[i].shield_duration,'hour').diff(Moment.now('YYYY-M-D HH:mm:ss'),'second')<0) || (targetsJson[i].shield_duration==0)){
-        targetTmp = targetsJson[i]
-        break
-      }
-    }
+    let currentUserGasoline = userData.property.gasoline
 
-    if(!targetTmp){
-      return [{
-        status: 0,
-        messages: Messages.parse(['TargetNotFound']),
-        data: {
-          attack_cost: settings.attack_ye,
-          change_cost: settings.attack_change_ye
-        }
-      }]
-    }
-
-    let target = await User.query().where('id',targetTmp.id).with('property').with('level').with('antiques').with('antiques.antique').with('traps.trap').first()
-
-    // console.log(target)
-    if (!target) {
-      return [{
-        status: 0,
-        messages: Messages.parse(['TargetNotFound']),
-        data: {
-          attack_cost: settings.attack_ye,
-          change_cost: settings.attack_change_ye
-        }
-      }]
-    }
-
-    let currentUserYellow = userData.property.ye
-    
     const log = new Log()
     log.type = 'attack_find'
     log.type_id = target.id
     log.user_id = user.id
     log.before_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3
+      gasoline: userData.property.gasoline
     })
 
     if (_.has(params, 'change') && params.change===true) {
-      currentUserYellow -= settings.attack_change_ye
+      currentUserGasoline -= settings.attack_change_gasoline
       await user.property().update({
-        ye: userData.property.ye - settings.attack_change_ye
+        ye: userData.property.gasoline - settings.attack_change_gasoline
       })
     } else {
-      currentUserYellow -= settings.attack_ye
+      currentUserGasoline -= settings.attack_gasoline
       await user.property().update({
-        ye: userData.property.ye - settings.attack_ye
+        ye: userData.property.gasoline - settings.attack_gasoline
       })
     }
 
     log.after_state = JSON.stringify({
-      ye: currentUserYellow,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3
+      gasoline: currentUserYellow
     })
     await log.save()
 
     let targetData = target.toJSON()
 
-    let trapLevel = 0, trapId, trap;
-    let trapPath = JSON.parse(targetData.property.path)
-
-    for(let i in trapPath){
-      trapId = trapPath[i].id
-      trap = await Trap.query().where('id', trapId).first()
-      if(trap) {
-        trapLevel += (trap.hardness + 1)
-      }
+    try{
+      targetData.property.path = JSON.parse(targetData.property.path)
+    }catch(e){
+      targetData.property.path = []
     }
-
-    let antiques = []
-    targetData.antiques.forEach(ant => {
-      antiques.push({
-        name: ant.antique.name,
-        description: ant.antique.description,
-        image: ant.antique.image,
-        value: ant.antique.score_first
-      })
-    })
 
     let data = {
       id: targetData.id,
       nickname: targetData.nickname,
-      avatar: targetData.avatar,
-      cup: targetData.courage_stat,
-      level: targetData.level.name,
-      traps: trapPath.length,//targetData.property.path_traps_count,
-      trap_level: trapLevel,
-      antiques: antiques,
-      attack_cost: settings.attack_ye,
-      change_cost: settings.attack_change_ye,
-      attack_redo_coin: settings.attack_redo_coin,
-      my_yellow: currentUserYellow
+      traps: targetData.property.path.length,
+      attack_cost: settings.attack_gasoline,
+      change_cost: settings.attack_change_gasoline,
+      my_gasoline: currentUserGasoline
     }
 
-    // Energy Yellow
-    data['yellow'] = _.min([
-      _.round((settings.loot_ye/100) * targetData.property.ye),
-      targetData.property.ye >= settings.loot_ye_max ? settings.loot_ye_max : targetData.property.ye
+    // Gasoline
+    data['gasoline'] = _.min([
+      _.round((settings.loot_gasoline/100) * targetData.property.gasoline),
+      targetData.property.gasoline >= settings.loot_gasoline_max ? settings.loot_gasoline_max : targetData.property.gasoline
     ])
 
-    // Energy Blue
-    data['blue'] = _.min([
-      _.round((settings.loot_be/100) * targetData.property.be),
-      targetData.property.be >= settings.loot_be_max ? settings.loot_be_max : targetData.property.be
+    // Health
+    data['health'] = _.min([
+      _.round((settings.loot_health/100) * targetData.property.health),
+      targetData.property.health >= settings.loot_health_max ? settings.loot_health_max : targetData.property.health
     ])
 
-    // Elixir
-    data['elixir'] = _.min([
-      _.round((settings.loot_elixir/100) * targetData.property.elixir_1),
-      targetData.property.elixir_1 >= settings.loot_elixir_max ? settings.loot_elixir_max : targetData.property.elixir_1
+    // Clean
+    data['clean'] = _.min([
+      _.round((settings.loot_clean/100) * targetData.property.clean),
+      targetData.property.clean >= settings.loot_clean_max ? settings.loot_clean_max : targetData.property.clean
     ])
 
     return [{
