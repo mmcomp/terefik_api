@@ -7,7 +7,6 @@ const Setting = use('App/Models/Setting')
 const GameSession = use('App/Models/GameSession')
 const UserAntique = use('App/Models/UserAntique')
 const Log = use('App/Models/Log')
-const Trap = use('App/Models/Trap')
 
 const Redis = use('Redis')
 const Randomatic = require('randomatic')
@@ -21,7 +20,6 @@ const hasha = require('hasha')
 const md5 = require('md5');
 
 class AttackController {
-  // یافتن حریف برای حمله
   static async find (params, user) {
     let lastTarget = (params && params.id)?params.id:-1
 
@@ -105,7 +103,8 @@ class AttackController {
 
     let data = {
       id: targetData.id,
-      nickname: targetData.nickname,
+      nickname: targetData.fname + ' ' + targetData.lname,
+      image_path: targetData.image_path,
       traps: targetData.property.path.length,
       attack_cost: settings.attack_gasoline,
       change_cost: settings.attack_change_gasoline,
@@ -137,7 +136,6 @@ class AttackController {
     }]
   }
 
-  // حمله به حریف یافت شده
   static async attack (params, user) {
     await user.loadMany(['property'])
     let userData = user.toJSON()
@@ -156,26 +154,10 @@ class AttackController {
       }]
     }
     const theTarget = await User.query().where('id', params.id)
-    let theTargetData = theTarget
-    let shield_duration = /*(theTargetData.shield_duration>0)?theTargetData.shield_duration*60:*/settings.attack_shield
-    let shield_end = Moment.now('YYYY-M-D HH:mm:ss')
-    let new_sh = new Time(shield_end)
-    let nn = new_sh.subtract(shield_duration,'minute')
-    shield_end = nn.format('YYYY-MM-DD HH:mm:ss')
-    let last_activity_limit = Time(Moment.now('YYYY-M-D HH:mm:ss')).subtract(settings.attack_online,'minute')
     
     const target = await User.query().where('id', params.id)
-    .where(function () {
-      this.whereBetween('courage_stat', [userData.courage_stat - 10, userData.courage_stat + 10])
-      .orWhereBetween('courage_stat', [userData.courage_stat - 20, userData.courage_stat + 20])
-      .orWhereBetween('courage_stat', [userData.courage_stat - 30, userData.courage_stat + 30])
-      .orWhereBetween('courage_stat', [userData.courage_stat - 1000, userData.courage_stat + 1000])
-    })//.where('last_activity', '<', last_activity_limit.format('YYYY-MM-DD HH:mm:ss'))
-    .where(function () {
-      this.where('shield_at', '<', shield_end)
-      .orWhereNull('shield_at')
-    })//.where('under_attack', 'no')
-    .with('property').with('antiques').with('antiques.antique').first()
+    .where('is_sheild', 0)
+    .with('property').first()
 
     if (!target) {
       return [{
@@ -185,36 +167,7 @@ class AttackController {
       }]
     }
 
-    if(target.last_activity>=last_activity_limit.format('YYYY-MM-DD HH:mm:ss')){
-      return [{
-        status: 0,
-        messages: [{"code":"UserOnline","message":'کاربر مورد نظر آنلاین شد'}],
-        data: {}
-      }]
-    }
 
-    if(target.under_attack=='on'){
-      return [{
-        status: 0,
-        messages: [{"code":"UserUnderAttack","message":'کاربر مورد نظر مورد حمله قرار گرفت'}],
-        data: {}
-      }]
-    }
-
-    target.shield_duration = 0;
-    await target.save()
-
-    if(params.reattack && params.reattack==true){
-      if(user.coin<settings.attack_redo_coin){
-        return [{
-          status: 0,
-          messages: [{"code":"CoinNotEnougth","message":'میزان سکه شما برای حمله مجدد کافی نیست'}],
-          data: {}
-        }]
-      }
-      user.coin -= settings.attack_redo_coin
-      user.save()
-    }
 
     let targetData = target.toJSON()
     let stageKey = Randomatic('Aa', 30)
@@ -238,28 +191,27 @@ class AttackController {
     target.under_attack = 'yes'
     await target.save()
 
-    var ts = stageKey;//Math.round((new Date()).getTime() / 1000);
-    let encryptedPath = hasha(ts + '|' + targetData.property.path + '|' + md5(ts + '|' + targetData.property.path), {
-      algorithm: 'sha256'
-    }).toUpperCase()
+    try{
+      targetData.property.path = JSON.parse(targetData.property.path)
+    }catch(e) {
+      targetData.property.path = []
+    }
 
     return [{
       status: 1,
       messages: [],
       data: {
         session: stageKey,
-        path: JSON.parse(targetData.property.path),
-        // path: encryptedPath,
+        path: targetData.property.path,
         user: {
           id: targetData.id,
-          nickname: targetData.nickname,
-          avatar: targetData.avatar
+          name: targetData.fname + ' ' + targetData.lname,
+          image_path: targetData.image_path
         }
       }
     }]
   }
 
-  // اعلام پایان حمله توسط کلاینت و اهدای جایزه کاربر
   static async finish (params, user) {
     const rules = {
       session: 'required',
@@ -276,10 +228,8 @@ class AttackController {
       }]
     }
 
-    await user.loadMany(['property','level','antiques'])
+    await user.loadMany(['property'])
     let userData = user.toJSON()
-
-    const log = new Log()
 
     let gameSession = await GameSession.query().where('user_id', user.id).where('session_id', params.session).where('type', 'attack').first()
     if (!gameSession) {
@@ -309,20 +259,16 @@ class AttackController {
     await Redis.del(gameSession.session_id)
 
     let award = {
-      elixir: 0,
-      yellow: 0,
-      blue: 0,
-      antique: []
+      gasoline: 0,
+      health_oil: 0,
+      cleaning_soap: 0
     }
 
     if (winHash.toUpperCase() != params.hash) {
-      user.game_lose++
-      user.courage('sub', 1)
-      await user.property().update({
-        lose_attack: userData.property.lose_attack+1
-      })
-
-      await user.save()
+      if(user.experience_score > 0){
+        user.experience_score--
+        await user.save()
+      }
 
       award['win'] = false
       award['revenge'] = gameSession.type != 'attack'
@@ -336,198 +282,54 @@ class AttackController {
         message: JSON.stringify(award)
       })
 
-      userDefence.unread_messages++
       userDefence.under_attack = 'no'
-
-      await userDefence.property().update({
-        rade_total: userDefenceData.property.rade_total+1
-      })
-
       await userDefence.save()
 
       return [{
         status: 0,
         messages: [],
         data: {
-          courage: 1,
-          attack_redo_coin : settings.attack_redo_coin,
-          id: userDefence.id,
-          nickname: userDefence.nickname,
-          avatar: userDefence.avatar
         }
       }]
-    }else{
-      userDefenceRadeSucceed++
     }
 
 
-    log.type = 'under_attack'
-    log.type_id = gameSession.id
-    log.user_id = userDefenceData.id
-    log.before_state = JSON.stringify({
-      ye: userDefenceData.property.ye,
-      be: userDefenceData.property.be,
-      elixir_1: userDefenceData.property.elixir_1,
-      elixir_2: userDefenceData.property.elixir_2,
-      elixir_3: userDefenceData.property.elixir_3
-    })
 
     // Energy Yellow
-    award['yellow'] = _.min([
-      _.round((settings.loot_ye/100) * userDefenceData.property.ye),
-      userDefenceData.property.ye >= settings.loot_ye_max ? settings.loot_ye_max : userDefenceData.property.ye
+    award['gasoline'] = _.min([
+      _.round((settings.loot_gasoline/100) * userDefenceData.property.gasoline),
+      userDefenceData.property.gasoline >= settings.loot_gasoline_max ? settings.loot_gasoline_max : userDefenceData.property.gasoline
     ])
 
     // Energy Blue
-    award['blue'] = _.min([
-      _.round((settings.loot_be/100) * userDefenceData.property.be),
-      userDefenceData.property.be >= settings.loot_be_max ? settings.loot_be_max : userDefenceData.property.be
+    award['health_oil'] = _.min([
+      _.round((settings.loot_health/100) * userDefenceData.property.health_oil),
+      userDefenceData.property.health_oil >= settings.loot_health_max ? settings.loot_health_max : userDefenceData.property.health_oil
     ])
 
     // Elixir
-    award['elixir'] = _.min([
-      _.round((settings.loot_elixir/100) * userDefenceData.property.elixir_1),
-      userDefenceData.property.elixir_1 >= settings.loot_elixir_max ? settings.loot_elixir_max : userDefenceData.property.elixir_1
+    award['cleaning_soap'] = _.min([
+      _.round((settings.loot_cleaning/100) * userDefenceData.property.cleaning_soap),
+      userDefenceData.property.cleaning_soap >= settings.loot_cleaning_max ? settings.loot_cleaning_max : userDefenceData.property.cleaning_soap
     ])
 
 
-    log.after_state = JSON.stringify({
-      ye: userDefenceData.property.ye,
-      be: userDefenceData.property.be,
-      elixir_1: userDefenceData.property.elixir_1,
-      elixir_2: userDefenceData.property.elixir_2,
-      elixir_3: userDefenceData.property.elixir_3
-    })
-    await log.save()
-
     await userDefence.property().update({
-      ye: userDefenceData.property.ye - award.yellow > 0 ? userDefenceData.property.ye - award.yellow : 0,
-      be: userDefenceData.property.be - award.blue > 0 ? userDefenceData.property.be - award.blue : 0,
-      elixir_1: userDefenceData.property.elixir_1 - award.elixir > 0 ? userDefenceData.property.elixir_1 - award.elixir : 0,
-      rade_total: userDefenceData.property.rade_total+1,
-      rade_succeed: userDefenceRadeSucceed
+      gasoline: userDefenceData.property.gasoline - award.gasoline > 0 ? userDefenceData.property.gasoline - award.gasoline : 0,
+      health_oil: userDefenceData.property.health_oil - award.health_oil > 0 ? userDefenceData.property.health_oil - award.health_oil : 0,
+      cleaning_soap: userDefenceData.property.cleaning_soap - award.cleaning_soap > 0 ? userDefenceData.property.cleaning_soap - award.cleaning_soap : 0
     })
 
     userDefence.under_attack = 'no'
-    userDefence.shield_at = Time()/*.add(settings.attack_shield, 'minutes')*/.format('YYYY-M-D HH:mm:ss')
-    userDefence.elixir_lost_attack += award.elixir
-    userDefence.blue_lost_attack += award.blue
-
     await userDefence.save()
 
-    user.score += settings.attack_score
-    
-    // Antique
-    let antique
-    var tmplevelJson = userData.level
-    if(tmplevelJson.antique_count > userData.antiques.length) {
-      console.log('Count OK.')
-      antique = await UserAntique.query().where('user_id', userDefence.id).orderByRaw('RAND()').with('antique').first()
-      if (antique) {
-        let antiqueData = antique.toJSON()
-        award['antique'] = antique.antique_id
-
-        const readyAt = await UserAntique.calculateReadyAt(antiqueData.antique)
-
-        antique.user_id = user.id
-        antique.status = 'working'
-        antique.ready_at = readyAt
-        await antique.save()
-        user.score += antiqueData.antique.score_first
-      }
-    }
-
-    let levels = await Level.query().where('score_min','<=',user.score).where('score_max','>=',user.score).first()
-
-    if(levels){
-      tmplevelJson = levels.toJSON()
-    }
-    // console.log(tm)
-    tmplevelJson.score = user.score
-    tmplevelJson.blue = tmplevelJson.be
-    tmplevelJson.yellow = tmplevelJson.ye
-    let levelUp = {
-      status: false,
-      yellow: 0,
-      blue: 0
-    }
-    if(user.level_id<tmplevelJson.id){
-      let oldLevel = await Level.query().where('id', user.level_id).first()
-      oldLevel.users--
-      oldLevel.save()
-      let newLevel = await Level.query().where('id', tmplevelJson.id).first()
-      if(isNaN(parseInt(newLevel.user, 10))) {
-        newLevel.user = 0
-      }
-      newLevel.users++
-      newLevel.save()
-
-      user.level_id = tmplevelJson.id
-      levelUp = {
-        status: true,
-        yellow: tmplevelJson.ye,
-        blue: tmplevelJson.be,
-        message: tmplevelJson.levelup_message
-      }
-
-      log.type = 'levelup'
-      log.type_id = user.level_id
-      log.user_id = user.id
-      log.before_state = JSON.stringify({
-        ye: userData.property.ye,
-        be: userData.property.be,
-        elixir_1: userData.property.elixir_1,
-        elixir_2: userData.property.elixir_2,
-        elixir_3: userData.property.elixir_3
-      })
-      log.after_state = JSON.stringify({
-        ye: tmplevelJson.ye+userData.property.ye,
-        be: tmplevelJson.be+userData.property.be,
-        elixir_1: userData.property.elixir_1,
-        elixir_2: userData.property.elixir_2,
-        elixir_3: userData.property.elixir_3
-      })
-      await log.save()
-
-    }
-
-
-    award['level'] = tmplevelJson
-    award['level_up'] = levelUp
-
-    log.type = 'attack_finish'
-    log.type_id = GameSession.id
-    log.user_id = user.id
-    log.before_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3
-    })
-    log.after_state = JSON.stringify({
-      ye: award.yellow+userData.property.ye,
-      be: award.blue+userData.property.be,
-      elixir_1: award.elixir+userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3
-    })
-    await log.save()
-
     await user.property().update({
-      ye: userData.property.ye + award.yellow + levelUp.yellow,
-      be: userData.property.be + award.blue + levelUp.blue,
-      elixir_1: userData.property.elixir_1 + award.elixir,
-      success_attack: userData.property.success_attack+1
+      gasoline: userData.property.gasoline + award.gasoline,
+      health_oil: userData.property.health_oil + award.health_oil,
+      cleaning_soap: userData.property.cleaning_soap + award.cleaning_soap,
+      experience_score: userDefenceData.property.experience_score + settings.attack_score
     })
 
-    user.elixir_reward += award.elixir
-    user.blue_reward += award.blue + levelUp.blue
-
-    user.game_success++
-    user.courage('add', 1)
-    await user.save()
-    await user.awardStat(award)
     // Messages
 
     award['win'] = true
@@ -543,21 +345,11 @@ class AttackController {
     })
 
     
-    if (award['antique'] && antique) {
-      let antiqueTmpData = antique.toJSON()
-      award['antique'] = [{
-        name: antiqueTmpData.antique.name,
-        image: antiqueTmpData.antique.image
-      }]
-    }
-
-
     award['score'] = settings.attack_score
-    award['courage'] = 1
 
     award['id'] = userDefence.id
-    award['nickname'] = userDefence.nickname
-    award['avatar'] = userDefence.avatar
+    award['nickname'] = userDefence.fname + ' ' + userDefence.lname
+    award['image_path'] = userDefence.image_path
 
     await gameSession.delete()
 
@@ -568,7 +360,6 @@ class AttackController {
     }]
   }
 
-  // کنسل کردن حمله در حین حمله
   static async cancel (params, user) {
     const rules = {
       session: 'required'
@@ -609,7 +400,6 @@ class AttackController {
     }]
   }
 
-  // انتقام گیری از شخصی که قبل به کاربر حمله موفقیت آمیز انجام داده .
   static async revenge (params, user) {
     const rules = {
       id: 'required'
@@ -711,7 +501,6 @@ class AttackController {
     }]
   }
 
-  // ارسال استیکر پس از حمله موفقیت آمیز برای حریف
   static async sticker (params, user) {
     const rules = {
       session: 'required',
