@@ -190,7 +190,8 @@ module.exports = async(topic, message) => {
       if (_.has(params, 'client')) {
         result[0]['client'] = params['client']
       }
-      result[0]['pid'] = process.pid
+      // result[0]['pid'] = process.pid
+      result[0]['type'] = params.type
       request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
       request_log.response = pubTopic + params.type + ':' + JSON.stringify(result[0])
       await request_log.save()
@@ -203,7 +204,8 @@ module.exports = async(topic, message) => {
       if (_.has(params, 'client')) {
         result[1]['client'] = params['client']
       }
-      result[1]['pid'] = process.pid
+      // result[1]['pid'] = process.pid
+      result[0]['type'] = params.type
       request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
       request_log.response = pubTopic + result[0] + ':' + JSON.stringify(result[1])
       await request_log.save()
