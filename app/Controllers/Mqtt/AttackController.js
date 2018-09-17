@@ -54,10 +54,10 @@ class AttackController {
         .orWhereBetween('courage_stat', [userData.courage_stat - 100000, userData.courage_stat + 100000])
       })
       */
-      .where('is_shield', 0)
+      .where('is_sheild', 0)
       .orderByRaw('RAND()').with('property').first()
     
-    if (!targets) {
+    if (!target) {
       return [{
         status: 0,
         messages: Messages.parse(['TargetNotFound']),
@@ -81,17 +81,17 @@ class AttackController {
     if (_.has(params, 'change') && params.change===true) {
       currentUserGasoline -= settings.attack_change_gasoline
       await user.property().update({
-        ye: userData.property.gasoline - settings.attack_change_gasoline
+        gasoline: userData.property.gasoline - settings.attack_change_gasoline
       })
     } else {
       currentUserGasoline -= settings.attack_gasoline
       await user.property().update({
-        ye: userData.property.gasoline - settings.attack_gasoline
+        gasoline: userData.property.gasoline - settings.attack_gasoline
       })
     }
 
     log.after_state = JSON.stringify({
-      gasoline: currentUserYellow
+      gasoline: currentUserGasoline
     })
     await log.save()
 
