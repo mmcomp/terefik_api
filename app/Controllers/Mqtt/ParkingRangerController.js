@@ -31,7 +31,7 @@ class ParkingRangerController {
         data: {}
       }]
     }
-
+/*
     if(user.is_parking_ranger!=0) {
       return [{
         status: 0,
@@ -42,7 +42,7 @@ class ParkingRangerController {
         data: {}
       }]
     }
-
+*/
     user.fname = params.first_name
     user.lname = params.last_name
     user.national_code = params.national_code
