@@ -185,6 +185,8 @@ class CarController {
   }
 
   static async arrest(params, user) {
+    let settings = await Setting.get() 
+
     const rules = {
       number_2: 'required',
       number_ch: 'required',
