@@ -76,6 +76,14 @@ class Verify extends Model {
         type: 'verify'
       }])
       console.log('SMS to ', mobile.replace('+98','0'))
+      
+      // No Sms
+      return {
+        err: false,
+        messages: []
+      }
+
+      /*
       const response = await axios({
         method: 'post',
         url: Env.get('SMS_URL'),
@@ -100,6 +108,7 @@ class Verify extends Model {
         err: true,
         messages: ['UnknownError']
       }
+      */
     }catch(error){
       console.log('Verify Send Error')
       console.log(error)
