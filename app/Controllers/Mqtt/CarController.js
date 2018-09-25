@@ -318,6 +318,12 @@ class CarController {
     
     let userData = user.toJSON()
 
+    let loot = {
+      silver_coin: 0,
+      gasoline: 0,
+      health: 0,
+      cleaning: 0
+    }
     let isNotReDone = 1, rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
     if(rangerWork) {
       let settings = await Setting.get()
@@ -345,6 +351,8 @@ class CarController {
     rangerWork.lon_gps = params.lon_gps
     rangerWork.lat_gps = params.lat_gps
     rangerWork.image_path = params.image_path
+    rangerWork.silver_coin = isNotReDone * settings.silver_when_not_reported
+    loot.silver_coin = rangerWork.silver_coin
 
     let driver, userCar = await UserCar.query().where('vehicle_id', params.car_id).with('user').first()
     if(userCar) {
@@ -353,15 +361,26 @@ class CarController {
   
       let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
 
-      let theOwner = await User.find(driver.id)
+      let theOwner = await User.query().where('id', driver.id).with('property').first()
+      let theOwnerData = theOwner.toJSON()
 
       if(shieldDiff<=0) {
         rangerWork.user_vehicle_id = userCar.id
-        await rangerWork.save()
 
         await user.property().update({
           silver_coin: userData.property.silver_coin + isNotReDone * settings.silver_when_not_shield
         })
+
+        rangerWork.silver_coin += settings.silver_when_not_shield
+        rangerWork.gasoline = settings.arrest_loot * theOwnerData.property.gasoline / 100
+        rangerWork.health = settings.arrest_loot * theOwnerData.property.health_oil / 100
+        rangerWork.cleaning = settings.arrest_loot * theOwnerData.property.cleaning_soap / 100
+        await rangerWork.save()
+
+        loot.silver_coin = rangerWork.silver_coin
+        loot.gasoline = rangerWork.gasoline
+        loot.health = rangerWork.health
+        loot.cleaning = rangerWork.cleaning
 
         theOwner.is_sheild = 0
         await theOwner.save()
@@ -370,7 +389,8 @@ class CarController {
           status: 1,
           messages: [],
           data: {
-            car_status: 'NotShielded'
+            car_status: 'NotShielded',
+            loot: loot
           }
         }]
       }
@@ -383,7 +403,8 @@ class CarController {
         status: 1,
         messages: [],
         data: {
-          car_status: 'RegisteredByRanger'
+          car_status: 'RegisteredByRanger',
+          loot: loot
         }
       }]
     }

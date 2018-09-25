@@ -215,7 +215,8 @@ class AttackController {
   static async finish (params, user) {
     const rules = {
       session: 'required',
-      hash: 'required'
+      hash: 'required',
+      stars: 'required'
     }
 
     let settings = await Setting.get()
@@ -327,7 +328,8 @@ class AttackController {
       gasoline: userData.property.gasoline + award.gasoline,
       health_oil: userData.property.health_oil + award.health_oil,
       cleaning_soap: userData.property.cleaning_soap + award.cleaning_soap,
-      experience_score: userDefenceData.property.experience_score + settings.attack_score
+      experience_score: userDefenceData.property.experience_score + settings.attack_score,
+      stars : userDefenceData.property.stars + params.stars
     })
 
     // Messages
