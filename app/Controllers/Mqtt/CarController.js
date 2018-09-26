@@ -140,6 +140,7 @@ class CarController {
     for(let i = 0;i < cars.length;i++) {
       car = await Car.find(cars[i].vehicle_id)
       cars[i]['car'] = car.toJSON()
+      car[i]['shield_end'] = Time(car[i].shield_start).add(car[i].shield_duration, 'minutes').format("YYYY-MM-DD HH:mm:ss")
     }
 
     return [{
