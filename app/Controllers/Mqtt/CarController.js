@@ -133,14 +133,12 @@ class CarController {
   }
 
   static async shieldList(params, user) {
-    // await user.loadMany(['car'])
-    // let userData = user.toJSON()
-    // let cars = userData.car, car
-    let cars = [], userCars = await UserCar.query().where('user_id', user.id).with('cars').fetch()
+    let shieldDiff = 0, cars = [], userCars = await UserCar.query().where('user_id', user.id).with('cars').fetch()
     userCars = userCars.toJSON()
 
     for(let i = 0;i < userCars.length;i++) {
-      if(Time().diff(Time(userCars[i].shield_start).add(userCars[i].shield_duration, 'minutes'), 'seconds')>0) {
+      shieldDiff = Time().diff(Time(userCars[i].shield_start).add(userCars[i].shield_duration, 'minutes'), 'seconds')
+      if(shieldDiff<0) {
         userCars[i]['shield_end'] = Time(userCars[i].shield_start).add(userCars[i].shield_duration, 'minutes').format("YYYY-MM-DD HH:mm:ss")
         cars.push(userCars[i])
       }
