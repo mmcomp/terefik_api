@@ -334,7 +334,7 @@ class CarController {
           status: 0,
           messages: [{
             code: "AlreadyArrested",
-            message: "خودرو به تازگی ثبت شده است"
+            message: "این خودرو قبلا گزارش شده است"
           }],
           data: {}
         }]
