@@ -26,13 +26,14 @@ const routes = {
   'RemoveCar': 'Car/remove',
   'ArrestList': 'Car/arrestList',
   'ShieldCar': 'Car/shield',
+  'ShieldList': 'Car/shieldList',
 
   // Discount
   'GetDiscount': 'Discount/get',
 
   // Settings
   'GetSettings': 'Setting/get',
-
+/*
   'ShowGameInfo': 'Game/info',
   'ShowMinesweeperInfo': 'Game/mineInfo',
   'ShowSmasherInfo': 'Game/smasherInfo',
@@ -42,13 +43,13 @@ const routes = {
   'GameContinue': 'Game/gameContinue',
   'SmasherFinish': 'Game/smasherFinish',
   'MineSweeperFinish': 'Game/mineSweeperFinish',
-
+*/
   // Profile
   'UserGet': 'User/get',
   'UserProfile': 'User/profile',
   'GetUserPath' : 'User/path',
   'SetUserPath' : 'User/setPath',
-
+/*
   // 'UserBuyAvatar': 'User/profileBuyAvatar',
   'UserProfilePublicSet': 'User/profilePublicSet',
   'UserProfileSet': 'User/profileSet',
@@ -117,7 +118,7 @@ const routes = {
 
   // Notifications
   'NotificationList': 'Notification/list',
-
+*/
   'Test': 'Test/test'
 }
 

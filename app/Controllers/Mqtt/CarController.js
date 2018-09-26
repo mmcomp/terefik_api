@@ -132,6 +132,25 @@ class CarController {
     }]
   }
 
+  static async shieldList(params, user) {
+    await user.loadMany(['car'])
+    let userData = user.toJSON()
+    let cars = userData.car, car
+
+    for(let i = 0;i < cars.length;i++) {
+      car = await Car.find(cars[i].vehicle_id)
+      cars[i]['car'] = car.toJSON()
+    }
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        cars: cars
+      }
+    }]
+  }
+
   static async add(params, user) {
     const rules = {
       color_id: 'required',

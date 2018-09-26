@@ -26,8 +26,11 @@ class User extends Model {
 
   // Relations
   cars() {
-    // return this.hasMany('App/Models/UserCar', 'id', 'user_id')
     return this.manyThrough('App/Models/UserCar', 'cars')
+  }
+
+  car() {
+    return this.hasMany('App/Models/UserCar', 'id', 'user_id')
   }
 
   terefik() {
