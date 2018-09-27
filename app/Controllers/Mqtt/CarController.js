@@ -139,9 +139,10 @@ class CarController {
     for(let i = 0;i < userCars.length;i++) {
       shieldDiff = Time().diff(Time(userCars[i].shield_start).add(userCars[i].shield_duration, 'minutes'), 'seconds')
       if(shieldDiff<0) {
-        userCars[i]['shield_end'] = Time(userCars[i].shield_start).add(userCars[i].shield_duration, 'minutes').format("YYYY-MM-DD HH:mm:ss")
+        userCars[i]['shield_end'] = Time(userCars[i].shield_start).add(userCars[i].shield_duration, 'minutes').valueOf()//format("YYYY-MM-DD HH:mm:ss")
         cars.push(userCars[i])
       }
+      userCars[i].shield_start = Time(userCars[i].shield_start).valueOf()
     }
 
     return [{
