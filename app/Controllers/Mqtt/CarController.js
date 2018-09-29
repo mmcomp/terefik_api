@@ -209,6 +209,13 @@ class CarController {
   static async arrest(params, user) {
     let settings = await Setting.get() 
 
+    let loot = {
+      silver_coin: 0,
+      gasoline: 0,
+      health: 0,
+      cleaning: 0
+    }
+
     const rules = {
       number_2: 'required',
       number_ch: 'required',
@@ -316,11 +323,14 @@ class CarController {
         silver_coin: userData.property.silver_coin + rangerSilver
       })
 
+      loot.silver_coin = rangerSilver
+
       return [{
         status: 1,
         messages: [],
         data: {
-          car_status: carStatus
+          car_status: carStatus,
+          loot: loot
         }
       }]
     }
