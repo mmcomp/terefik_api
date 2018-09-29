@@ -317,7 +317,7 @@ class CarController {
       })
 
       return [{
-        status: theStat,
+        status: 1,
         messages: [],
         data: {
           car_status: carStatus
