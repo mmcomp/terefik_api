@@ -385,9 +385,9 @@ class CarController {
 
       let theOwner = await User.query().where('id', driver.id).with('property').first()
       let theOwnerData = theOwner.toJSON()
-      console.log('Shield Start')
-      console.log(userCar.shield_start, !userCar.shield_start)
-      if(shieldDiff<=0 || userCar.shield_start==null) {
+      // console.log('Shield Start')
+      // console.log(userCar.shield_start, !userCar.shield_start)
+      if(shieldDiff<=0 || userCar.shield_start=='Invalid date') {
         rangerWork.user_vehicle_id = userCar.id
 
         await user.property().update({
