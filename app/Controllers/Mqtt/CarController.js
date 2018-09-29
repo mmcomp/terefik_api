@@ -386,7 +386,7 @@ class CarController {
       let theOwner = await User.query().where('id', driver.id).with('property').first()
       let theOwnerData = theOwner.toJSON()
 
-      if(shieldDiff<=0) {
+      if(shieldDiff<=0 || !userCar.shield_start) {
         rangerWork.user_vehicle_id = userCar.id
 
         await user.property().update({
@@ -436,7 +436,7 @@ class CarController {
     return [{
       status: 0,
       messages: [{
-        code: "CarShielded",
+        code: "Shielded",
         message: "خودرو شیلد می باشد"
       }],
       data: {
