@@ -4,6 +4,11 @@
 const Model = use('Model')
 
 class RangerWork extends Model {
+  static boot () {
+    super.boot()
+    this.addHook('beforeCreate', 'ArrestZoneHook.zoneDetect')
+  }
+
   static get table () {
     return 'insector_work'
   }

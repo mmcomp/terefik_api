@@ -408,7 +408,6 @@ class CarController {
         rangerWork.gasoline = settings.arrest_loot * theOwnerData.property.gasoline / 100
         rangerWork.health = settings.arrest_loot * theOwnerData.property.health_oil / 100
         rangerWork.cleaning = settings.arrest_loot * theOwnerData.property.cleaning_soap / 100
-        await rangerWork.save()
 
         loot.silver_coin = rangerWork.silver_coin
         loot.gasoline = rangerWork.gasoline
@@ -417,6 +416,20 @@ class CarController {
 
         theOwner.is_sheild = 0
         await theOwner.save()
+
+        try{
+          await rangerWork.save()
+        }catch(e){
+          return [{
+            status: 0,
+            messages: [{
+              code: "ZoneNotAllowd",
+              message: "شما به این ناحیه دسترسی ندارید"
+            }],
+            data: {
+            }
+          }]
+        }
 
         return [{
           status: 1,
@@ -430,7 +443,19 @@ class CarController {
       theOwner.is_sheild = 1
       await theOwner.save()
     }else {
-      await rangerWork.save()
+      try{
+        await rangerWork.save()
+      }catch(e){
+        return [{
+          status: 0,
+          messages: [{
+            code: "ZoneNotAllowd",
+            message: "شما به این ناحیه دسترسی ندارید"
+          }],
+          data: {
+          }
+        }]
+      }
 
       return [{
         status: 1,
