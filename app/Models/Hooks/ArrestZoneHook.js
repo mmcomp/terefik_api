@@ -18,11 +18,11 @@ ArrestZoneHook.zoneDetect = async (rangerWork) => {
             console.log('Zone Found')
             console.log(res[0][0].id)
             rangerWork.zone_id = res[0][0].id
-        }else {
-            throw new Error('Zone Not Allowd')
-        }
+        }/*else {
+            throw new Error('Zone Not Allowed')
+        }*/
     
-    }else {
-        throw new Error('Zone Not Allowd')
-    }
+    }/*else {
+        throw new Error('Zone Not Allowed')
+    }*/
 }

@@ -417,13 +417,14 @@ class CarController {
         theOwner.is_sheild = 0
         await theOwner.save()
 
-        try{
-          await rangerWork.save()
-        }catch(e){
+
+        await rangerWork.save()
+
+        if(rangerWork.zone_id==0) {
           return [{
             status: 0,
             messages: [{
-              code: "ZoneNotAllowd",
+              code: "ZoneNotAllowed",
               message: "شما به این ناحیه دسترسی ندارید"
             }],
             data: {
@@ -443,19 +444,20 @@ class CarController {
       theOwner.is_sheild = 1
       await theOwner.save()
     }else {
-      try{
-        await rangerWork.save()
-      }catch(e){
+      await rangerWork.save()
+
+      if(rangerWork.zone_id==0) {
         return [{
           status: 0,
           messages: [{
-            code: "ZoneNotAllowd",
+            code: "ZoneNotAllowed",
             message: "شما به این ناحیه دسترسی ندارید"
           }],
           data: {
           }
         }]
       }
+
 
       return [{
         status: 1,
