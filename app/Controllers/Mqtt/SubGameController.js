@@ -13,12 +13,16 @@ const _ = require('lodash')
 class SubGameController {
   static async index (params, user) {
     let subGames = await SubGame.all()
-
+    subGames = subGames.toJSON()
+    for(let i = 0;i < subGames.length;i++) {
+      subGames[i].icon_path = Env.get('SITE_URL') + subGames[i].icon_path
+      subGames[i].file_path = Env.get('SITE_URL') + subGames[i].file_path
+    }
     return [{
       status: 1,
       messages: [],
       data: {
-        sub_games: subGames.toJSON()
+        sub_games: subGames
       }
     }]
   }
