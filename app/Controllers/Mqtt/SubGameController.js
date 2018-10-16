@@ -17,6 +17,8 @@ class SubGameController {
     for(let i = 0;i < subGames.length;i++) {
       subGames[i].icon_path = Env.get('SITE_URL') + subGames[i].icon_path
       subGames[i].file_path = Env.get('SITE_URL') + subGames[i].file_path
+      delete subGames[i].updated_at
+      delete subGames[i].created_at
     }
     return [{
       status: 1,
