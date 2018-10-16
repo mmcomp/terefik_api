@@ -49,6 +49,9 @@ const routes = {
   'UserProfile': 'User/profile',
   'GetUserPath' : 'User/path',
   'SetUserPath' : 'User/setPath',
+
+  // Sub Game
+  'GetSubGames' : 'SubGame/index',
 /*
   // 'UserBuyAvatar': 'User/profileBuyAvatar',
   'UserProfilePublicSet': 'User/profilePublicSet',
