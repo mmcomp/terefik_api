@@ -18,8 +18,7 @@ class ProductController {
       'gasoline': [],
       'water': []
     }
-    console.log('Params')
-    console.log(params)
+
     if(!params || !params.filter) {
       params = {
         filter: [
@@ -54,7 +53,7 @@ class ProductController {
         random = 'RAND()'
       }
 
-      let products = await Product.query().where('type', type).where('status', 'active').orderByRaw(random).offset(params.page).limit(params.limit).fetch()
+      let products = await Product.query().where('type', type).where('status', 'active')/*.orderByRaw(random).offset(params.page).limit(params.limit)*/.fetch()
 
       for (const product of products.toJSON()) {
         let available = true
