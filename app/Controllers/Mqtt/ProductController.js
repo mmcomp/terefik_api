@@ -29,7 +29,7 @@ class ProductController {
             type: 'clean'
           },
           {
-            type: 'clean'
+            type: 'gasoline'
           },
           {
             type: 'water'
@@ -53,7 +53,7 @@ class ProductController {
         random = 'RAND()'
       }
       console.log('Getting ' + type + ' produts')
-      let products = await Product.query().where('type', type).where('status', 'active')/*.orderByRaw(random).offset(params.page).limit(params.limit)*/.fetch()
+      let products = await Product.query().where('id', '>', 0).fetch()//.where('type', type).where('status', 'active')/*.orderByRaw(random).offset(params.page).limit(params.limit)*/.fetch()
       console.log(products.toJSON())
 
       for (const product of products.toJSON()) {
