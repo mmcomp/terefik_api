@@ -18,7 +18,8 @@ class ProductController {
       'gasoline': [],
       'water': []
     }
-
+    console.log('Params')
+    console.log(params)
     if(!params.filter) {
       params.filter = [
         {
