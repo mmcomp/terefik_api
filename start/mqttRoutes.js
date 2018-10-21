@@ -52,6 +52,14 @@ const routes = {
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',
+
+  // Stores
+  'StoreList': 'Store/list',
+  'StoreBuy': 'Store/buy',
+
+  // Products
+  'ProductList': 'Product/list',
+  'BuyProduct': 'Product/buy',
 /*
   // 'UserBuyAvatar': 'User/profileBuyAvatar',
   'UserProfilePublicSet': 'User/profilePublicSet',
@@ -85,14 +93,6 @@ const routes = {
   // Antiques
   'AntiquesList': 'Antique/list',
   'AntiquesRemoval': 'Antique/removal',
-
-  // Stores
-  'StoreList': 'Store/list',
-  'StoreBuy': 'Store/buy',
-
-  // Products
-  'ProductList': 'Product/list',
-  'BuyProduct': 'Product/buy',
 
   // Attack
   'AttackFind': 'Attack/find',
