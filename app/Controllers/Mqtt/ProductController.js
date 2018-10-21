@@ -20,21 +20,23 @@ class ProductController {
     }
     console.log('Params')
     console.log(params)
-    if(!params.filter) {
-      params.filter = [
-        {
-          type: 'health'
-        },
-        {
-          type: 'clean'
-        },
-        {
-          type: 'clean'
-        },
-        {
-          type: 'water'
-        }        
-      ]
+    if(!params || !params.filter) {
+      params = {
+        filter: [
+          {
+            type: 'health'
+          },
+          {
+            type: 'clean'
+          },
+          {
+            type: 'clean'
+          },
+          {
+            type: 'water'
+          }        
+        ]
+      }
     }
 
     for (const record of params.filter) {
