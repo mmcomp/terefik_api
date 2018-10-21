@@ -52,8 +52,9 @@ class ProductController {
       if (record['random']) {
         random = 'RAND()'
       }
-
+      console.log('Getting ' + type + ' produts')
       let products = await Product.query().where('type', type).where('status', 'active')/*.orderByRaw(random).offset(params.page).limit(params.limit)*/.fetch()
+      console.log(products.toJSON())
 
       for (const product of products.toJSON()) {
         let available = true
