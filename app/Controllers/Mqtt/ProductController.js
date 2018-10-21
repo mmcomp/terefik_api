@@ -64,7 +64,6 @@ class ProductController {
           product_id: product.id,
           product_name: product.name,
           description: product.description,
-          price_type: product.price_type,
           price: product.price,
           image: product.image
         }
