@@ -21,6 +21,11 @@ class CarWashController {
 
     let terefikis = []
     for(let i = 0;i < userData.terefik.length;i++) {
+      try{
+        userData.terefik[i].filth_layers = JSON.parse(userData.terefik[i].filth_layers)
+      }catch(e){
+        userData.terefik[i].filth_layers = []
+      }
       terefikis.push(
         {
           terefiki_type: userData.terefik[i].ttype,
