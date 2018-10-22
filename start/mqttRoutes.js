@@ -60,6 +60,9 @@ const routes = {
   // Products
   'ProductList': 'Product/list',
   'BuyProduct': 'Product/buy',
+
+  // CarWash
+  'UserGetTerefikis': 'CarWash/getTerefikis',
 /*
   // 'UserBuyAvatar': 'User/profileBuyAvatar',
   'UserProfilePublicSet': 'User/profilePublicSet',
