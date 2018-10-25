@@ -39,6 +39,7 @@ Route.get('/push', async () => {
   let notification = new Notification
   notification.title = 'سلام'
   notification.message = 'حالت خوبه'
+  notification.type = 'user_arrest'
   await notification.save()
   return 'sent'
 })
