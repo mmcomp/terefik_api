@@ -37,7 +37,7 @@ Route.get('/', ({
 
 Route.get('/push_saleh', async () => {
   let notification = new Notification
-  notification.title = 'سلام'
+  notification.title = 'سلام صالح'
   notification.message = 'حالت خوبه'
   notification.type = 'user_arrest'
   notification.users_id = 5
