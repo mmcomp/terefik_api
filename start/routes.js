@@ -40,6 +40,7 @@ Route.get('/push', async () => {
   notification.title = 'سلام'
   notification.message = 'حالت خوبه'
   notification.type = 'user_arrest'
+  notification.users_id = 5
   await notification.save()
   return 'sent'
 })
