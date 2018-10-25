@@ -7,6 +7,8 @@ const RangerWork = use('App/Models/RangerWork')
 const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
 const UserTerefik = use('App/Models/UserTerefik')
+const Notification = use('App/Models/Notification')
+const Env = use('Env')
 
 const DiscountController = use('App/Controllers/Mqtt/DiscountController')
 
@@ -417,6 +419,11 @@ class CarController {
         theOwner.is_sheild = 0
         await theOwner.save()
 
+        let notification = new Notification
+        notification.title = Env.get('PUSH_USER_ARREST_TTILE')
+        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
+        notification.users_id = theOwner.id
+        await notification.save()
 
         await rangerWork.save()
 

@@ -49,6 +49,7 @@ const routes = {
   'UserProfile': 'User/profile',
   'GetUserPath' : 'User/path',
   'SetUserPath' : 'User/setPath',
+  'SetPusheID' : 'User/pusheId',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',

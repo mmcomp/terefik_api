@@ -22,8 +22,6 @@ const Time = Moment.moment()
 const _ = require('lodash')
 
 class UserController {
-  // دریافت اطلاعات اولیه و کلی کاربر
-  // api که در اولین صفحه کلبه فراخوانی می شود
   static async get (params, user) {
     await user.loadMany(['property', 'level', 'fuge', 'fuge.fuge', 'puzzles', 'notifications', 'antiques'])
     let userData = user.toJSON()
@@ -924,6 +922,41 @@ class UserController {
         user_coin: user.coin
       }
     }]
+  }
+
+  static async pusheId (params, user) {
+    try{
+      const rules = {
+        pushe_id: 'required'
+      }
+  
+      let check = await Validations.check(params, rules)
+      if (check.err) {
+        return [{
+          status: 0,
+          messages: check.messages,
+          data: {}
+        }]
+      }
+
+      user.pushe_id = params.pushe_id
+      await user.save()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {}
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "SystemError",
+          message: e.message
+        }],
+        data: {}
+      }]
+    }
   }
 }
 

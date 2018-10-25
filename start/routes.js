@@ -21,7 +21,7 @@ const Env = use('Env')
 
 const Route = use('Route')
 const MqttClient = require('mqtt')
-
+// const Notification = use('App/Models/Notification')
 
 // require('./kue')
 
@@ -34,6 +34,15 @@ Route.get('/', ({
 }) => {
   return 'Api is working ...'
 })
+
+// Route.get('/push', async () => {
+  // let notification = new Notification
+  // notification.title = 'سلام'
+  // notification.message = 'حالت خوبه'
+  // notification.users_id = 3
+  // await notification.save()
+  // return await Notification.send([], 'به به', 'چه خوووب')
+// })
 
 // All Http Routes
 Route.post('/signin', 'AuthController.signin')
