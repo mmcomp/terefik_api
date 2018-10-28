@@ -43,6 +43,45 @@ class CarWashController {
       }
     }]
   }
+
+  static async washedTerefiki(params, user) {
+    const rules = {
+      terefiki_type: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let userTerefiki = await userTerefik.query().where('user_id', user.id).where('ttype', terefiki_type).first()
+    if(!userTerefiki) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "TerefikiNotFound",
+          message: "ترفیکی مورد نظر یافت نشد"
+        }],
+        data: {
+        }
+      }]
+    }
+
+    userTerefiki.clean = 1
+    await userTerefiki.save()
+
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+      }
+    }]
+  }
 }
 
 module.exports = CarWashController
