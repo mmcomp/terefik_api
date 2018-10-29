@@ -72,6 +72,12 @@ class CarWashController {
     }
 
     userTerefiki.clean = 1
+    if(params.water) {
+      userTerefiki.water = params.water
+    }
+    if(params.coke) {
+      userTerefiki.coke = params.coke
+    }
     await userTerefiki.save()
 
 
