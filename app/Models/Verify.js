@@ -94,7 +94,7 @@ class Verify extends Model {
         Password: Env.get('SMS_PASSWORD'),
         PhoneNumber: Env.get('SMS_NUMBER'),
         RecNumber: mobile.replace('+98','0'),
-        MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
+        MessageBody: 'پیام',//Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
         Smsclass: 1
       })
       console.log('Response : "' + response.data + '"  status = ' + response.status)
