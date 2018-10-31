@@ -925,6 +925,7 @@ class UserController {
   }
 
   static async pusheId (params, user) {
+    console.log('Pushe id Setting', params)
     try{
       const rules = {
         pushe_id: 'required'

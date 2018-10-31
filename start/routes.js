@@ -101,7 +101,7 @@ exec('service emqttd start', (err, stdout, stderr) => {
   if (err){
     console.log(err)
   }
-  
+*/
   // Mqtt Connection
   let client = MqttClient.connect(Env.get('SERVER_MQTT'), {
     username: Env.get('SERVER_USERNAME'),
@@ -115,7 +115,7 @@ exec('service emqttd start', (err, stdout, stderr) => {
     console.log('MQTT connected ...')
   })
   client.on('message', require('./mqttRoutes'))
-
+/*
   console.log(stdout)
   console.log(stderr)
 });

@@ -709,6 +709,7 @@ class AuthController {
 
       let check = await Validations.check(request.all(), rules)
       if (check.err) {
+        console.log('Er1')
         return response.status(400).send({
           status: 0,
           messages: check.messages,
@@ -726,6 +727,7 @@ class AuthController {
       const user = await User.query().where('mobile', request.input('username')).first()
 
       if (!user || user.client_id !== request.input('clientid')) {
+        console.log('Client Id Error')
         return response
           .status(400)
           .send({})
@@ -737,7 +739,7 @@ class AuthController {
       //     .status(200)
       //     .send({})
       // }
-
+      console.log('ACL OK')
       return response
         //.status(400)
         .send({})
