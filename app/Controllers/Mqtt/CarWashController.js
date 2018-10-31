@@ -2,6 +2,7 @@
 
 const Car = use('App/Models/Car')
 const User = use('App/Models/User')
+const Property = use('App/Models/Property')
 const UserCar = use('App/Models/UserCar')
 const RangerWork = use('App/Models/RangerWork')
 const Setting = use('App/Models/Setting')
@@ -46,7 +47,10 @@ class CarWashController {
 
   static async washedTerefiki(params, user) {
     const rules = {
-      terefiki_type: 'required'
+      terefiki_type: 'required',
+      water: 'required',
+      coke: 'required',
+      soap: 'required'
     }
 
     let check = await Validations.check(params, rules)
@@ -71,16 +75,59 @@ class CarWashController {
       }]
     }
 
+    let userProperty = await Property.query().where('user_id', user.id).first()
+    if(!userProperty) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UserPropertyError",
+          message: "اطلاعات کاربر ناقص می باشد"
+        }],
+        data: {
+        }
+      }]
+    }
+
+    if(userProperty.water < params.water) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotEnoughWater",
+          message: "آب کافی نیست"
+        }],
+        data: {
+        }
+      }]
+    }
+    if(userProperty.coke < params.coke) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotEnoughCoke",
+          message: "نوشابه کافی نیست"
+        }],
+        data: {
+        }
+      }]
+    }
+    if(userProperty.cleaning_soap < params.soap) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotEnoughSoap",
+          message: "صابون کافی نیست"
+        }],
+        data: {
+        }
+      }]
+    }
+    userProperty.water -= params.water
+    userProperty.coke -= params.coke
+    userProperty.cleaning_soap -= params.soap
+    await userProperty.save()
     userTerefiki.clean = 1
-    if(params.water) {
-      userTerefiki.water = params.water
-    }
-    if(params.coke) {
-      userTerefiki.coke = params.coke
-    }
     await userTerefiki.save()
-
-
+    
     return [{
       status: 1,
       messages: [],
