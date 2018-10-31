@@ -89,7 +89,7 @@ class Verify extends Model {
           Smsclass: 1
         }//)
       })
-      console.log(response.data)
+      console.log(response)
       
       if (response.status === 200) {
         return {
