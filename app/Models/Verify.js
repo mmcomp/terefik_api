@@ -80,21 +80,21 @@ class Verify extends Model {
       const response = await axios({
         method: 'post',
         url: Env.get('SMS_URL'),
-        data: /*querystring.stringify(*/{
+        data: querystring.stringify({
           UserName: Env.get('SMS_USERNAME'),
           Password: Env.get('SMS_PASSWORD'),
           PhoneNumber: Env.get('SMS_NUMBER'),
           RecNumber: mobile.replace('+98','0'),
           MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
           Smsclass: 1
-        }//)
+        })
       })
       console.log('Data', {
         UserName: Env.get('SMS_USERNAME'),
         Password: Env.get('SMS_PASSWORD'),
         PhoneNumber: Env.get('SMS_NUMBER'),
         RecNumber: mobile.replace('+98','0'),
-        MessageBody: 'پیام',//Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
+        MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
         Smsclass: 1
       })
       console.log('Response : "' + response.data + '"  status = ' + response.status)
