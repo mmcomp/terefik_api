@@ -97,7 +97,7 @@ class Verify extends Model {
         MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
         Smsclass: 1
       })
-      console.log('Response : "' + response + '"')
+      console.log('Response : "' + response.data + '"  status = ' + response.status)
       
       if (response.status === 200) {
         return {
