@@ -89,7 +89,15 @@ class Verify extends Model {
           Smsclass: 1
         }//)
       })
-      console.log(response)
+      console.log('Data', {
+        UserName: Env.get('SMS_USERNAME'),
+        Password: Env.get('SMS_PASSWORD'),
+        PhoneNumber: Env.get('SMS_NUMBER'),
+        RecNumber: mobile.replace('+98','0'),
+        MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
+        Smsclass: 1
+      })
+      console.log('Response : "' + response + '"')
       
       if (response.status === 200) {
         return {
