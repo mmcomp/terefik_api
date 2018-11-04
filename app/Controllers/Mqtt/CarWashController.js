@@ -17,6 +17,7 @@ const _ = require('lodash')
 
 class CarWashController {
   static async getTerefikis(params, user) {
+    let settings = await Setting.get()
     await user.loadMany(['terefik'])
     let userData = user.toJSON()
 
@@ -40,7 +41,10 @@ class CarWashController {
       status: 1,
       messages: [],
       data: {
-        terefikis: terefikis
+        terefikis: terefikis,
+        water_per_second: settings.water_per_second,
+        coke_per_second: settings.coke_per_second,
+        soap_per_second: settings.soap_per_second
       }
     }]
   }
