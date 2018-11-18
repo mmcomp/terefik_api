@@ -33,6 +33,9 @@ const routes = {
 
   // Settings
   'GetSettings': 'Setting/get',
+
+  // Tasks
+  'GetTasks' : 'Task/get',
 /*
   'ShowGameInfo': 'Game/info',
   'ShowMinesweeperInfo': 'Game/mineInfo',
