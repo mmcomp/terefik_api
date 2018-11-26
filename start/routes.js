@@ -66,7 +66,7 @@ Route.get('/ticket', 'TicketController.get_all')
 
 
 Route.post('/upload','FileController.upload')
-Route.get('/file/:filename','FileController.download')
+Route.any('/file/:filename','FileController.download')
 
 // Site Http Routes
 Route.get('/exchange', 'HttpExchangeController.list')
