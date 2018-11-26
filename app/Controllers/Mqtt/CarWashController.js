@@ -125,6 +125,7 @@ class CarWashController {
         }
       }]
     }
+    console.log('User Property Id', userProperty.id)
     userProperty.water -= params.water
     userProperty.coke -= params.coke
     userProperty.cleaning_soap -= params.soap
