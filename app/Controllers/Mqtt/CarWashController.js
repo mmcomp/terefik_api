@@ -66,7 +66,7 @@ class CarWashController {
       }]
     }
 
-    let userTerefiki = await UserTerefik.query().where('user_id', user.id).where('ttype', terefiki_type).first()
+    let userTerefiki = await UserTerefik.query().where('user_id', user.id).where('ttype', params.terefiki_type).first()
     if(!userTerefiki) {
       return [{
         status: 0,
