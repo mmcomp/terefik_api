@@ -7,7 +7,7 @@ const Time = Moment.moment()
 const UserTerefikHook = exports = module.exports = {}
 
 UserTerefikHook.filth = async (userTerefiks) => {
-    console.log('Cal Filth')
+    console.log('Call Filth')
     // console.log(userTerefiks.length, userTerefiks[0].id)
     let userTerefik
     for(let i = 0;i < userTerefiks.length;i++) {

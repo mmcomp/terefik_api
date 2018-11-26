@@ -131,6 +131,7 @@ class CarWashController {
     userProperty.cleaning_soap -= params.soap
     await userProperty.save()
     userTerefiki.clean = 1
+    userTerefiki.filth_layers = '[]'
     await userTerefiki.save()
     
     return [{
