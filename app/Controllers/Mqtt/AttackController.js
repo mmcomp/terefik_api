@@ -1,11 +1,10 @@
 'use strict'
 
 const User = use('App/Models/User')
-const Level = use('App/Models/Level')
+const UserTerefik = use('App/Models/UserTerefik')
 const Message = use('App/Models/Message')
 const Setting = use('App/Models/Setting')
 const GameSession = use('App/Models/GameSession')
-const UserAntique = use('App/Models/UserAntique')
 const Log = use('App/Models/Log')
 
 const Redis = use('Redis')
@@ -142,7 +141,8 @@ class AttackController {
     let settings = await Setting.get()
 
     const rules = {
-      id: 'required'
+      id: 'required',
+      terefiki_id: 'required'
     }
 
     let check = await Validations.check(params, rules)
@@ -153,7 +153,19 @@ class AttackController {
         data: {}
       }]
     }
-    const theTarget = await User.query().where('id', params.id)
+    let userTerefik = await UserTerefik.find(params.terefiki_id)
+    if(!userTerefik) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "TerefikiNotFound",
+          message: "ترفیکی مورد نظر پیدا نشد"
+        }],
+        data: {}
+      }]
+    }
+    console.log('Flithing')
+    await userTerefik.filthy(settings.attack_start_clean_lose)
     
     const target = await User.query().where('id', params.id)
     .where('is_sheild', 0)
