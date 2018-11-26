@@ -67,6 +67,7 @@ const routes = {
 
   // CarWash
   'UserGetTerefikis': 'CarWash/getTerefikis',
+  'WashedTerefiki':'CarWash/washedTerefiki',
 /*
   // 'UserBuyAvatar': 'User/profileBuyAvatar',
   'UserProfilePublicSet': 'User/profilePublicSet',
