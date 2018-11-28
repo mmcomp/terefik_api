@@ -74,6 +74,9 @@ const routes = {
   'AttackFinish': 'Attack/finish',
   'Attack': 'Attack/attack',
 
+  // Experience Level
+  'LevelList': 'ExperienceLevel/index',
+
 /*
   // 'UserBuyAvatar': 'User/profileBuyAvatar',
   'UserProfilePublicSet': 'User/profilePublicSet',

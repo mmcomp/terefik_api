@@ -6,12 +6,10 @@ const Setting = use('App/Models/Setting')
 const UserTerefik = use('App/Models/UserTerefik')
 
 const Randomatic = require('randomatic')
-const Messages = use('App/Libs/Messages/Messages')
-const Moment = use('App/Libs/Moment')
 const Logger = use('Logger')
-const _ = require('lodash')
 
 class User extends Model {
+
   static get table () {
     return 'users'
   }
@@ -59,7 +57,6 @@ class User extends Model {
     return rank++
   }
 
-  // عملیات ثبت نام کاربر جدید که پس از تایید شماره موبایل اتفاق می افند.
   async register () {
     try {
       const setting = await Setting.get()
