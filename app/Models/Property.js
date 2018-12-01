@@ -18,6 +18,14 @@ class Property extends Model {
   user () {
     return this.belongsTo('App/Models/User', 'user_id', 'id')
   }
+
+  experience () {
+    return this.hasOne('App/Models/ExperienceLevel', 'experience_level', 'id')
+  }
+
+  inspector () {
+    return this.hasOne('App/Models/InspectorLevel', 'inspector_level', 'id')
+  }
 }
 
 module.exports = Property
