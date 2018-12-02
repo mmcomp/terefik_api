@@ -11,6 +11,8 @@ UserHook.loadExperienceLevel = async (property) => {
     let insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
     if(insLevel) {
         if(property.inspector_level < insLevel.id) {
+            properties.silver_coin += properties.silver_coin * insLevel.level_order / 100
+            
             let notification = new Notification
             notification.title = Env.get('PUSH_USER_INSPECT_LEVEL_TTILE')
             notification.message = Env.get('PUSH_USER_INSPECT_LEVEL_MESSAGE')
@@ -22,6 +24,11 @@ UserHook.loadExperienceLevel = async (property) => {
     let expLevel = await ExperienceLevel.query().where('min', '<=', property.experience_score).where('max', '>=', property.experience_score).first()
     if(expLevel) {
         if(property.experience_level < expLevel.id) {
+            property.gasoline += property.gasoline * expLevel.level_order / 100
+            property.health_oil += property.health_oil * expLevel.level_order / 100
+            property.cleaning_soap += property.cleaning_soap * expLevel.level_order / 100
+            property.water += property.water * expLevel.level_order / 100
+
             let notification = new Notification
             notification.title = Env.get('PUSH_USER_EXPERIENCE_LEVEL_TTILE')
             notification.message = Env.get('PUSH_USER_EXPERIENCE_LEVEL_MESSAGE')
@@ -44,6 +51,8 @@ UserHook.loadExperienceLevels = async (properties) => {
         let insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
         if(insLevel) {
             if(property.inspector_level < insLevel.id) {
+                properties.silver_coin += properties.silver_coin * insLevel.level_order / 100
+
                 let notification = new Notification
                 notification.title = Env.get('PUSH_USER_ARREST_TTILE')
                 notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
@@ -55,6 +64,11 @@ UserHook.loadExperienceLevels = async (properties) => {
         let expLevel = await ExperienceLevel.query().where('min', '<=', property.experience_score).where('max', '>=', property.experience_score).first()
         if(expLevel) {
             if(property.experience_level < expLevel.id) {
+                property.gasoline += property.gasoline * expLevel.level_order / 100
+                property.health_oil += property.health_oil * expLevel.level_order / 100
+                property.cleaning_soap += property.cleaning_soap * expLevel.level_order / 100
+                property.water += property.water * expLevel.level_order / 100
+
                 let notification = new Notification
                 notification.title = Env.get('PUSH_USER_EXPERIENCE_LEVEL_TTILE')
                 notification.message = Env.get('PUSH_USER_EXPERIENCE_LEVEL_MESSAGE')
