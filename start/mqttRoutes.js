@@ -36,23 +36,16 @@ const routes = {
 
   // Tasks
   'GetTasks' : 'Task/get',
-/*
-  'ShowGameInfo': 'Game/info',
-  'ShowMinesweeperInfo': 'Game/mineInfo',
-  'ShowSmasherInfo': 'Game/smasherInfo',
-  'CreateGameLand': 'Game/create',
-  'PointClickPlace': 'Game/play',
-  'GameCancel': 'Game/cancel',
-  'GameContinue': 'Game/gameContinue',
-  'SmasherFinish': 'Game/smasherFinish',
-  'MineSweeperFinish': 'Game/mineSweeperFinish',
-*/
+
   // Profile
-  'UserGet': 'User/get',
   'UserProfile': 'User/profile',
   'GetUserPath' : 'User/path',
   'SetUserPath' : 'User/setPath',
   'SetPusheID' : 'User/pusheId',
+  'ExperienceLeaderBoard': 'User/expLeader',
+  'FinanceLeaderBoard': 'User/finLeader',
+  'OntimeLeaderBoard': 'User/timLeader',
+  'InspectorLeaderBoard': 'User/insLeader',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',
@@ -77,68 +70,6 @@ const routes = {
   // Experience Level
   'LevelList': 'ExperienceLevel/index',
 
-/*
-  // 'UserBuyAvatar': 'User/profileBuyAvatar',
-  'UserProfilePublicSet': 'User/profilePublicSet',
-  'UserProfileSet': 'User/profileSet',
-  'UserProfileVerify': 'User/profileVerify',
-  'UserProfileNoVerify': 'User/profileNoVerify',
-  'UserBuyAvatar': 'User/buyAvatar',
-  'AvatarList': 'User/avatarList',
-  'UserDepoLoseGift': 'User/loseGift',
-  'UserDepoFlushBlue': 'User/flushBlueGift',
-  'UserDepoFlushYellow': 'User/flushYellowGift',
-  'UserCoin': 'User/coin',
-
-  // Lands
-  'UserPathInfo': 'Land/show',
-  'UserPathStore': 'Land/store',
-
-  // Fuges
-  'FugeInfo': 'Fuge/info',
-  'FugeBoost': 'Fuge/boost',
-  'FugeFill': 'Fuge/fill',
-  'FugeRemoval': 'Fuge/removal',
-  'FugeUpgrade': 'Fuge/upgrade',
-
-  // Leaderboard
-  'LeaderBoard': 'LeaderBoard/list',
-
-  // Settings
-  'SetPuzzle': 'User/puzzle',
-
-  // Antiques
-  'AntiquesList': 'Antique/list',
-  'AntiquesRemoval': 'Antique/removal',
-
-  // Attack
-  'AttackFind': 'Attack/find',
-  'AttackFinish': 'Attack/finish',
-  'AttackRevenge': 'Attack/revenge',
-  'AttackSticker': 'Attack/sticker',
-  'Attack': 'Attack/attack',
-
-  // Contacts
-  'ContactList': 'Contact/list',
-  'ContactSend': 'Contact/send',
-
-  // Exchanges
-  'ExchangeList': 'Exchange/list',
-  'ExchangeDetail': 'Exchange/detail',
-  'ExchangeBuy': 'Exchange/buy',
-  'ExchangeCodes': 'Exchange/codes',
-
-  // Shield
-  'ShieldList': 'Shield/list',
-  'ShieldBuy': 'Shield/buy',
-
-  // Messages
-  'MessageList': 'Message/list',
-  'MessageAttacker': 'Message/user',
-
-  // Notifications
-  'NotificationList': 'Notification/list',
-*/
   'Test': 'Test/test'
 }
 

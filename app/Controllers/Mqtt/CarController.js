@@ -356,7 +356,8 @@ class CarController {
       silver_coin: 0,
       gasoline: 0,
       health: 0,
-      cleaning: 0
+      cleaning: 0,
+      is_out: false
     }
     let isNotReDone = 1, rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
     if(rangerWork) {
@@ -375,10 +376,6 @@ class CarController {
       }
     }
 
-    await user.property().update({
-      silver_coin: userData.property.silver_coin + isNotReDone * settings.silver_when_not_reported
-    })
-
     rangerWork = new RangerWork
     rangerWork.ranger_id = user.id
     rangerWork.vehicle_id = params.car_id
@@ -386,7 +383,7 @@ class CarController {
     rangerWork.lat_gps = params.lat_gps
     rangerWork.image_path = params.image_path
     rangerWork.silver_coin = isNotReDone * settings.silver_when_not_reported
-    loot.silver_coin = rangerWork.silver_coin
+    
 
     let driver, userCar = await UserCar.query().where('vehicle_id', params.car_id).with('user').first()
     if(userCar) {
@@ -402,19 +399,11 @@ class CarController {
       if(shieldDiff<=0 || userCar.shield_start=='Invalid date') {
         rangerWork.user_vehicle_id = userCar.id
 
-        await user.property().update({
-          silver_coin: userData.property.silver_coin + isNotReDone * settings.silver_when_not_shield
-        })
 
         rangerWork.silver_coin += settings.silver_when_not_shield
         rangerWork.gasoline = settings.arrest_loot * theOwnerData.property.gasoline / 100
         rangerWork.health = settings.arrest_loot * theOwnerData.property.health_oil / 100
         rangerWork.cleaning = settings.arrest_loot * theOwnerData.property.cleaning_soap / 100
-
-        loot.silver_coin = rangerWork.silver_coin
-        loot.gasoline = rangerWork.gasoline
-        loot.health = rangerWork.health
-        loot.cleaning = rangerWork.cleaning
 
         theOwner.is_sheild = 0
         await theOwner.save()
@@ -428,16 +417,25 @@ class CarController {
         await rangerWork.save()
 
         if(rangerWork.zone_id==0) {
-          return [{
-            status: 0,
-            messages: [{
-              code: "ZoneNotAllowed",
-              message: "شما به این ناحیه دسترسی ندارید"
-            }],
-            data: {
-            }
-          }]
+          rangerWork.silver_coin = rangerWork.silver_coin * settings.arrest_outofzone_loot_percent /100
+          rangerWork.gasoline = settings.arrest_outofzone_loot_percent * theOwnerData.property.gasoline / 100
+          rangerWork.health = settings.arrest_outofzone_loot_percent * theOwnerData.property.health_oil / 100
+          rangerWork.cleaning = settings.arrest_outofzone_loot_percent * theOwnerData.property.cleaning_soap / 100
+          loot.is_out = true
         }
+
+        loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
+        loot.gasoline = parseInt(rangerWork.gasoline, 10)
+        loot.health = parseInt(rangerWork.health, 10)
+        loot.cleaning = parseInt(rangerWork.cleaning, 10)
+
+        await user.property().update({
+          silver_coin: userData.property.silver_coin + loot.silver_coin,
+          gasoline : userData.property.gasoline + loot.gasoline,
+          health_oil: userData.property.health_oil + loot.health,
+          cleaning_soap : userData.property.cleaning_soap + loot.cleaning
+        })
+
 
         return [{
           status: 1,
@@ -454,17 +452,15 @@ class CarController {
       await rangerWork.save()
 
       if(rangerWork.zone_id==0) {
-        return [{
-          status: 0,
-          messages: [{
-            code: "ZoneNotAllowed",
-            message: "شما به این ناحیه دسترسی ندارید"
-          }],
-          data: {
-          }
-        }]
+        loot.is_out = true
+        rangerWork.silver_coin = rangerWork.silver_coin * settings.arrest_outofzone_loot_percent /100
       }
 
+      loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
+
+      await user.property().update({
+        silver_coin: userData.property.silver_coin + loot.silver_coin
+      })
 
       return [{
         status: 1,
