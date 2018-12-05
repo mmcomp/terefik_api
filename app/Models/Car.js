@@ -23,6 +23,10 @@ class Car extends Model {
         results = results[0]
         return results
     }
+
+    usercar() {
+        return this.hasOne('App/Models/UserCar', 'id', 'vehicle_id')
+    }
 }
 
 module.exports = Car

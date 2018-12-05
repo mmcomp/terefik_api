@@ -195,9 +195,22 @@ class CarController {
   }
 
   static async list(params, user) {
-    await user.loadMany(['cars'])
+    await user.loadMany(['cars.usercar'])
     let userData = user.toJSON()
-    let cars = userData.cars
+    let cars = userData.cars, car, shieldFinish, shieldDiff
+    for(let i=0;i<cars.length;i++) {
+      car = cars[i]
+      shieldDiff = null
+      if(car.usercar) {
+        shieldFinish = Time(car.usercar.shield_start).add(car.usercar.shield_duration, 'minutes')
+        shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+        if(shieldDiff<0) {
+          shieldDiff = null
+        }
+      }
+      delete cars[i].usercar
+      cars[i].shield_diff = shieldDiff
+    }
 
     return [{
       status: 1,
