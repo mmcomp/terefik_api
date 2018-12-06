@@ -1,6 +1,7 @@
 'use strict'
 
 const User = use('App/Models/User')
+const Property = use('App/Models/Property')
 const UserTerefik = use('App/Models/UserTerefik')
 const Message = use('App/Models/Message')
 const Setting = use('App/Models/Setting')
@@ -20,14 +21,45 @@ const md5 = require('md5');
 
 class AttackController {
   static async find (params, user) {
+    let settings = await Setting.get()
+
     let lastTarget = (params && params.id)?params.id:-1
+    if(!params || !params.terefiki_id) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "TerefikieNeeded",
+          message: "ترفیکی می بایست معرفی شود"
+        }],
+        data: {
+          attack_cost: settings.attack_gasoline,
+          change_cost: settings.attack_change_gasoline
+        }
+      }]
+    }
+    let theTrefiki = await UserTerefik.find(params.terefiki_id)
+    if(!theTrefiki) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "TerefikieNotFound",
+          message: "ترفیکی مورد نظر پیدا نشد"
+        }],
+        data: {
+          attack_cost: settings.attack_gasoline,
+          change_cost: settings.attack_change_gasoline
+        }
+      }]
+    }
 
     await user.loadMany(['property'])
     let userData = user.toJSON()
-    let settings = await Setting.get()
 
-    if ((_.has(params, 'change') && params.change===true && userData.property.gasoline < settings.attack_change_gasoline) ||
-      ((!_.has(params, 'change') || (_.has(params, 'change') && params.change===false)) && userData.property.gasoline < settings.attack_gasoline)) {
+    let neededGasoline = (_.has(params, 'change') && params.change===true)?settings.attack_change_gasoline/100:settings.attack_gasoline/100
+    console.log('User Tank:', userData.property.gasoline)
+    console.log('Terefiki Gasoline:', theTrefiki.gasoline)
+    console.log('Needed Gasoline:', neededGasoline)
+    if(neededGasoline > userData.property.gasoline + theTrefiki.gasoline) {
       return [{
         status: 0,
         messages: [{
@@ -41,91 +73,110 @@ class AttackController {
       }]
     }
 
-    
-    let target = await User.query().whereNot('id', user.id).whereNot('id', lastTarget)
-    /*
-      .where(function () {
-        this.whereBetween('courage_stat', [userData.courage_stat - 30, userData.courage_stat + 30])
-        .orWhereBetween('courage_stat', [userData.courage_stat - 70, userData.courage_stat + 70])
-        .orWhereBetween('courage_stat', [userData.courage_stat - 100, userData.courage_stat + 100])
-        .orWhereBetween('courage_stat', [userData.courage_stat - 100000, userData.courage_stat + 100000])
+    const log = new Log()
+    log.type = 'attack_find'
+    log.user_id = user.id
+    log.before_state = JSON.stringify({
+      gasoline: theTrefiki.gasoline
+    })
+
+    let useTank = false
+
+    if(theTrefiki.gasoline < neededGasoline) {
+      let buckRemain = Math.min(1 - theTrefiki.gasoline, userData.property.gasoline)
+      console.log('Using Tank', buckRemain)
+      
+      await user.property().update({
+        gasoline: userData.property.gasoline - buckRemain
       })
-      */
-      .where('is_sheild', 0)
-      .orderByRaw('RAND()').with('property').first()
+
+      userData.property.gasoline -= buckRemain
+
+      theTrefiki.gasoline += buckRemain
+      await theTrefiki.save()
+      console.log('Now User Tank:', userData.property.gasoline)
+      console.log('Now Terefiki Gasoline:', theTrefiki.gasoline)
+      useTank = true
+    }
+
+    let NotShields = await User.query().where('is_sheild', 0).pluck('id')
+    
+    let target = await Property.query().whereNot('user_id', user.id).whereNot('user_id', lastTarget)
+      .where(function () {
+        this.whereBetween('experience_score', [userData.property.experience_score - 30, userData.property.experience_score + 30])
+        .orWhereBetween('experience_score', [userData.property.experience_score - 70, userData.property.experience_score + 70])
+        .orWhereBetween('experience_score', [userData.property.experience_score - 100, userData.property.experience_score + 100])
+        .orWhereBetween('experience_score', [userData.property.experience_score - 100000, userData.property.experience_score + 100000])
+      })
+      .whereIn('user_id', NotShields)
+      .orderByRaw('RAND()').with('user').first()
     
     if (!target) {
       return [{
         status: 0,
         messages: Messages.parse(['TargetNotFound']),
         data: {
-          attack_cost: settings.attack_ye,
-          change_cost: settings.attack_change_ye
+          attack_cost: settings.attack_gasoline,
+          change_cost: settings.attack_change_gasoline
         }
       }]
     }
 
-    let currentUserGasoline = userData.property.gasoline
+    let currentUserGasoline = theTrefiki.gasoline//userData.property.gasoline
 
-    const log = new Log()
-    log.type = 'attack_find'
-    log.type_id = target.id
-    log.user_id = user.id
-    log.before_state = JSON.stringify({
-      gasoline: userData.property.gasoline
-    })
 
     if (_.has(params, 'change') && params.change===true) {
-      currentUserGasoline -= settings.attack_change_gasoline
-      await user.property().update({
-        gasoline: userData.property.gasoline - settings.attack_change_gasoline
-      })
+      currentUserGasoline -= settings.attack_change_gasoline/100
     } else {
-      currentUserGasoline -= settings.attack_gasoline
-      await user.property().update({
-        gasoline: userData.property.gasoline - settings.attack_gasoline
-      })
+      currentUserGasoline -= settings.attack_gasoline/100
     }
+
+    theTrefiki.gasoline = currentUserGasoline
+    await theTrefiki.save()
 
     log.after_state = JSON.stringify({
       gasoline: currentUserGasoline
     })
-    await log.save()
 
     let targetData = target.toJSON()
+    log.type_id = targetData.user.id
+
+    await log.save()
+
+
 
     try{
-      targetData.property.path = JSON.parse(targetData.property.path)
+      targetData.path = JSON.parse(targetData.property.path)
     }catch(e){
-      targetData.property.path = []
+      targetData.path = []
     }
 
     let data = {
-      id: targetData.id,
-      nickname: targetData.fname + ' ' + targetData.lname,
-      image_path: targetData.image_path,
-      traps: targetData.property.path.length,
+      id: targetData.user.id,
+      nickname: targetData.user.fname + ' ' + targetData.user.lname,
+      image_path: targetData.user.image_path,
+      traps: targetData.path.length,
       attack_cost: settings.attack_gasoline,
       change_cost: settings.attack_change_gasoline,
-      my_gasoline: currentUserGasoline
+      used_tank: useTank
     }
 
     // Gasoline
     data['gasoline'] = _.min([
-      _.round((settings.loot_gasoline/100) * targetData.property.gasoline),
-      targetData.property.gasoline >= settings.loot_gasoline_max ? settings.loot_gasoline_max : targetData.property.gasoline
+      _.round((settings.loot_gasoline/100) * targetData.gasoline),
+      targetData.gasoline >= settings.loot_gasoline_max ? settings.loot_gasoline_max : targetData.gasoline
     ])
 
     // Health
     data['health'] = _.min([
-      _.round((settings.loot_health/100) * targetData.property.health),
-      targetData.property.health >= settings.loot_health_max ? settings.loot_health_max : targetData.property.health
+      _.round((settings.loot_health/100) * targetData.health),
+      targetData.health >= settings.loot_health_max ? settings.loot_health_max : targetData.health
     ])
 
     // Clean
     data['clean'] = _.min([
-      _.round((settings.loot_clean/100) * targetData.property.clean),
-      targetData.property.clean >= settings.loot_clean_max ? settings.loot_clean_max : targetData.property.clean
+      _.round((settings.loot_clean/100) * targetData.clean),
+      targetData.clean >= settings.loot_clean_max ? settings.loot_clean_max : targetData.clean
     ])
 
     return [{
