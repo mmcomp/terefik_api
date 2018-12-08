@@ -46,6 +46,7 @@ const routes = {
   'FinanceLeaderBoard': 'User/finLeader',
   'OntimeLeaderBoard': 'User/timLeader',
   'InspectorLeaderBoard': 'User/insLeader',
+  'InspectorWorkLeaderBoard': 'User/insWorkLeader',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',

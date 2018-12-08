@@ -2,6 +2,10 @@
 
 const Validations = use('App/Libs/Validations')
 const Property = use('App/Models/Property')
+const InspectorDailyReport = use('App/Models/InspectorDailyReport')
+
+const Moment = use('App/Libs/Moment')
+const Time = Moment.moment()
 
 class UserController {
   static async profile (params, user) {
@@ -210,6 +214,38 @@ class UserController {
         messages: [],
         data: {
           inspector_leaders: leads
+        }
+      }]
+    }catch(e){
+      return [{
+        status: 0,
+        messages: [{
+          code: "UnknowError",
+          message: JSON.stringify(e)
+        }],
+        data: {}
+      }]
+    }
+  }
+
+  static async insWorkLeader (params, user) {
+    try{
+      let yesterday = Time().subtract(1, 'day').format('YYYY-MM-DD')
+      let users = await InspectorDailyReport.query().whereRaw("created_at like '" + yesterday + " %'").with('user').orderBy('report_count', 'desc').limit(50).fetch()
+      users = users.toJSON()
+      let leads = []
+
+      for(let theUser of users) {
+        leads.push({
+          image_path: theUser.user.image_path,
+          score: theUser.report_count
+        })
+      }
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          inspector_work_leaders: leads
         }
       }]
     }catch(e){
