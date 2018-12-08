@@ -71,6 +71,10 @@ const routes = {
   // Experience Level
   'LevelList': 'ExperienceLevel/index',
 
+  //Lottery
+  'LotteryList': 'Lottery/list',
+  'LotteryRequest': 'Lottery/inRequest',
+  
   'Test': 'Test/test'
 }
 
