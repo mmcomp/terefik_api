@@ -158,7 +158,9 @@ class AttackController {
       traps: targetData.path.length,
       attack_cost: settings.attack_gasoline,
       change_cost: settings.attack_change_gasoline,
-      used_tank: useTank
+      used_tank: useTank,
+      terefiki_gasoline: theTrefiki.gasoline,
+      user_gasoline: userData.property.gasoline
     }
 
     // Gasoline
