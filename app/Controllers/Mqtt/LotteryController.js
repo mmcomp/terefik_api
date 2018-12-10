@@ -12,12 +12,12 @@ class LotteryController {
         userLotteries: []
       }
       if(user.is_parking_ranger==0){
-        lotteries.userLotteries = await Lottery.query().with('awards').whereIn('type', ['users', 'norangers']).where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00')).where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59')).orderBy('created_at', 'DESC').fetch()
+        lotteries.userLotteries = await Lottery.query().with('awards').whereIn('type', ['users', 'norangers']).where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.orderBy('created_at', 'DESC').fetch()
         lotteries.userLotteries = lotteries.userLotteries.toJSON()
       }else {
-        lotteries.userLotteries = await Lottery.query().with('awards').where('type', 'users').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00')).where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59')).orderBy('created_at', 'DESC').fetch()
+        lotteries.userLotteries = await Lottery.query().with('awards').where('type', 'users').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.orderBy('created_at', 'DESC').fetch()
         lotteries.userLotteries = lotteries.userLotteries.toJSON()
-        lotteries['rangerLotteries'] = await Lottery.query().with('awards').where('type', 'rangers').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00')).where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59')).orderBy('created_at', 'DESC').fetch()
+        lotteries['rangerLotteries'] = await Lottery.query().with('awards').where('type', 'rangers').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.orderBy('created_at', 'DESC').fetch()
         lotteries.rangerLotteries = lotteries.rangerLotteries.toJSON()
         for(let i = 0;i < lotteries.rangerLotteries.length;i++) {
           lottery = lotteries.rangerLotteries[i]
@@ -26,6 +26,7 @@ class LotteryController {
             lotteries.rangerLotteries[i]['is_in'] = true
           }
           lotteries.rangerLotteries[i]['is_in'] = false
+          lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')<=0)
         }
       }
 
@@ -36,6 +37,7 @@ class LotteryController {
           lotteries.userLotteries[i]['is_in'] = true
         }
         lotteries.userLotteries[i]['is_in'] = false
+        lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')<=0)
       }
 
       return [{
