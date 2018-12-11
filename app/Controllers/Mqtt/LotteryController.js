@@ -127,6 +127,9 @@ class LotteryController {
       userLottery.in_chance = params.amount
       await userLottery.save()
 
+      lottery.status = 'haveuser'
+      await lottery.save()
+
       return [{
         status: 1,
         messages: [],
