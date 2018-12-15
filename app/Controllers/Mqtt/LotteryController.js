@@ -4,6 +4,7 @@ const Lottery = use('App/Models/Lottery')
 const UserLotteryAward = use('App/Models/UserLotteryAward')
 const Validations = use('App/Libs/Validations')
 const Moment = use('App/Libs/Moment')
+const Time = Moment.moment()
 
 class LotteryController {
   static async list (params, user) {
