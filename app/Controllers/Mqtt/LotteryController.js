@@ -89,7 +89,7 @@ class LotteryController {
         }]
       }
 
-      let userLottery = await UserLotteryAward.query().where('user_id', user.id).where('lottery_id', lottery.id).first()
+      let userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
       if(userLottery) {
         return [{
           status: 0,
