@@ -48,6 +48,7 @@ class LotteryController {
         }
       }]
     }catch(e){
+      console.log(e);
       return [{
         status: 0,
         messages: [{
