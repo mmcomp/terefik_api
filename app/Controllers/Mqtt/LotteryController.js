@@ -122,7 +122,7 @@ class LotteryController {
 
 
       userLottery = new UserLotteryAward
-      userLottery.user_id = user.id
+      userLottery.users_id = user.id
       userLottery.lottery_id = lottery.id
       userLottery.in_chance = params.amount
       await userLottery.save()
