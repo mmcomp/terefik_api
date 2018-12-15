@@ -102,8 +102,8 @@ class LotteryController {
       }
 
       let min_chance = 0
-      lottery = lottery.toJSON()
-      for(let award of lottery.awards) {
+      let lotteryData = lottery.toJSON()
+      for(let award of lotteryData.awards) {
         // if(min_chance>0) {
           min_chance = Math.min(min_chance, award.min_chance)
         // }else {
