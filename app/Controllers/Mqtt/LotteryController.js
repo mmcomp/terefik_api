@@ -77,7 +77,7 @@ class LotteryController {
         }]
       }
 
-      let lottery = await Lottery.where('id', params.lottery_id).with('awards').first()
+      let lottery = await Lottery.query().where('id', params.lottery_id).with('awards').first()
       if(!lottery) {
         return [{
           status: 0,
