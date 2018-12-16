@@ -3,11 +3,28 @@
 const Product = use('App/Models/Product')
 const Transaction = use('App/Models/Transaction')
 
+const Setting = use('App/Models/Setting')
 const Validations = use('App/Libs/Validations')
 const Messages = use('App/Libs/Messages/Messages')
 const _ = use('lodash')
 class ProductController {
-  // دریافت لیست محصولات
+  static async gallonList (params, user) {
+    let settings = await Setting.get()
+
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        gasline_gallon_price: settings.gasline_gallon_price,
+        oil_gallon_price: settings.oil_gallon_price,
+        soap_gallon_price: settings.soap_gallon_price,
+        water_gallon_price: settings.water_gallon_price,
+        coke_gallon_price: settings.coke_gallon_price
+      }
+    }]
+  }
+
   static async list (params, user) {
     await user.loadMany(['property'])
     let userData = user.toJSON()
@@ -83,7 +100,6 @@ class ProductController {
     }]
   }
 
-  // خرید محصول جدید
   static async buy (params, user) {
     let rules = {
       id: 'required|integer'
