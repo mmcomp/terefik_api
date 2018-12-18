@@ -59,6 +59,7 @@ const routes = {
   'ProductGallonPrice': 'Product/gallonList',
   'ProductList': 'Product/list',
   'BuyProduct': 'Product/buy',
+  'BuyProductGallon': 'Product/buyGallon',
 
   // CarWash
   'UserGetTerefikis': 'CarWash/getTerefikis',

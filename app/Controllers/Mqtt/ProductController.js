@@ -2,6 +2,7 @@
 
 const Product = use('App/Models/Product')
 const Transaction = use('App/Models/Transaction')
+const Property = use('App/Models/Property')
 
 const Setting = use('App/Models/Setting')
 const Validations = use('App/Libs/Validations')
@@ -180,6 +181,71 @@ class ProductController {
 
     user.coin = user.coin - product.price
     await user.save()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {}
+    }]
+  }
+
+  static async buyGallon (params, user) {
+    let settings = await Setting.get()
+
+    let rules = {
+      type: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    if(params.type!='gasoline' && params.type!='health_oil' && params.type!='cleaning_soap' && params.type!='water' && params.type!='coke'){
+      return [{
+        status: 0,
+        messages: [{
+          code: "TypeRequired",
+          message: "مقدار تایپ صحیح نمی باشد"
+        }],
+        data: {}
+      }]
+    }
+    
+    let userProperty = await Property.query().where('user_id', user.id).first()
+    if(!userProperty) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UserNotFound",
+          message: "اطلاعات کاربر ناقص می باشد"
+        }],
+        data: {}
+      }]
+    }
+
+    let othetType = params.type
+    if(othetType=='health_oil') {
+      othetType = 'oil'
+    }else if(othetType=='cleaning_soap') {
+      othetType = 'soap'
+    }
+
+    let neededProperty = 1 - (userProperty[params.type] % 1)
+    let price = Math.ceil(settings[othetType+'_gallon_price'] * neededProperty)
+    if(userProperty.bronze_coin >= price) {
+      userProperty.bronze_coin -= price
+      userProperty[params.type] = parseInt(userProperty[params.type], 10) + 1
+      await userProperty.save()
+    }else {
+      userProperty[params.type] += userProperty.bronze_coin / settings[othetType+'_gallon_price']
+      userProperty.bronze_coin = 0
+      await userProperty.save()
+    }
 
     return [{
       status: 1,
