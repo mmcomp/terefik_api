@@ -4,6 +4,7 @@ const Car = use('App/Models/Car')
 const User = use('App/Models/User')
 const UserCar = use('App/Models/UserCar')
 const RangerWork = use('App/Models/RangerWork')
+const Property = use('App/Models/Property')
 const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
 const UserTerefik = use('App/Models/UserTerefik')
@@ -105,7 +106,8 @@ class CarController {
     await transaction.save()
 
     await user.property().update({
-      bronze_coin: userData.property.bronze_coin - totalPay
+      bronze_coin: userData.property.bronze_coin - totalPay,
+      diamond: userData.property.diamond + settings.diamond_earn_on_shielding
     })
 
     if(discountPercent < 1) {
@@ -421,9 +423,13 @@ class CarController {
         theOwner.is_sheild = 0
         await theOwner.save()
 
+        let userProperty = await  Property.query().where('user_id', theOwner.id).first()
+        userProperty.diamond -= settings.diamond_lose_on_arrest
+        await userProperty.save()
+
         let notification = new Notification
         notification.title = Env.get('PUSH_USER_ARREST_TTILE')
-        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
+        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE').replace('|diamond_count|', settings.diamond_lose_on_arrest)
         notification.users_id = theOwner.id
         await notification.save()
 
@@ -459,8 +465,6 @@ class CarController {
           }
         }]
       }
-      theOwner.is_sheild = 1
-      await theOwner.save()
     }else {
       await rangerWork.save()
 
