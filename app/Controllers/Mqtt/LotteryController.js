@@ -2,6 +2,8 @@
 
 const Lottery = use('App/Models/Lottery')
 const UserLotteryAward = use('App/Models/UserLotteryAward')
+const Property = use('App/Models/Property')
+
 const Validations = use('App/Libs/Validations')
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -122,7 +124,48 @@ class LotteryController {
         }]
       }
 
+      let userProperty = await Property.query().where('user_id', user_id).fisrt()
+      if(!userProperty) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "UserNotFound",
+            message: "اطلاعات کاربر ناقص می باشد"
+          }],
+          data: {}
+        }]
+      }
 
+      if(user.is_parking_ranger==4) {
+        if(userProperty.silver_coin < params.amount) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "SilverCoinNotEnough",
+              message: "میزان سکه نقره شما کافی نیست"
+            }],
+            data: {}
+          }]
+        }
+
+        userProperty.silver_coin -= params.amount
+        await userProperty.save()
+      }else {
+        if(userProperty.diamond < params.amount) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "SilverCoinNotEnough",
+              message: "میزان الماس شما کافی نیست"
+            }],
+            data: {}
+          }]
+        }
+
+        userProperty.diamond -= params.amount
+        await userProperty.save()
+      }
+      
       userLottery = new UserLotteryAward
       userLottery.users_id = user.id
       userLottery.lottery_id = lottery.id
