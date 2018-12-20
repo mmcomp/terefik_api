@@ -266,13 +266,14 @@ class AttackController {
       status: 1,
       messages: [],
       data: {
+        id: targetData.id,
         session: stageKey,
-        path: targetData.property.path,
-        user: {
-          id: targetData.id,
-          name: targetData.fname + ' ' + targetData.lname,
-          image_path: targetData.image_path
-        }
+        path: targetData.property.path//,
+        // user: {
+        //   id: targetData.id,
+        //   name: targetData.fname + ' ' + targetData.lname,
+        //   image_path: targetData.image_path
+        // }
       }
     }]
   }
