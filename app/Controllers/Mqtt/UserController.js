@@ -9,7 +9,7 @@ const Time = Moment.moment()
 
 class UserController {
   static async profile (params, user) {
-    await user.loadMany(['property.experience', 'property.inspector', 'terefik'])
+    await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'trap.trap'])
 
 
     return [{

@@ -39,6 +39,9 @@ class User extends Model {
     return this.hasOne('App/Models/Property', 'id', 'user_id')
   }
 
+  trap() {
+    return this.hasMany('App/Models/UserTrap', 'id', 'user_id')
+  }
   // transactions () {
   //   return this.hasMany('App/Models/Transaction', 'id', 'user_id')
   // }

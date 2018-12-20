@@ -6,15 +6,7 @@ const Model = use('Model')
 
 class UserTrap extends Model {
   static get table () {
-    return 'users_traps'
-  }
-
-  static get createdAtColumn () {
-    return null
-  }
-
-  static get updatedAtColumn () {
-    return null
+    return 'user_traps'
   }
 
   // Relations
