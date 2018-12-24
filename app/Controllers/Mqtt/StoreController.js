@@ -82,7 +82,7 @@ class StoreBoardController {
       }]
     }
 
-    var bankType = (params.bank_type)?params.bank_type:'mellat';
+    var bankType = (params.bank_type)?params.bank_type:'saman';
 
     var transaction = new Transaction()
     transaction.user_id = user.id
