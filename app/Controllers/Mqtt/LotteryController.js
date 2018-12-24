@@ -25,10 +25,10 @@ class LotteryController {
         for(let i = 0;i < lotteries.rangerLotteries.length;i++) {
           lottery = lotteries.rangerLotteries[i]
           userLottery = await UserLotteryAward.query().where('user_id', user.id).where('lottery_id', lottery.id).first()
+          lotteries.rangerLotteries[i]['is_in'] = false
           if(userLottery) {
             lotteries.rangerLotteries[i]['is_in'] = true
           }
-          lotteries.rangerLotteries[i]['is_in'] = false
           lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')<=0)
         }
       }
@@ -36,10 +36,10 @@ class LotteryController {
       for(let i = 0;i < lotteries.userLotteries.length;i++) {
         lottery = lotteries.userLotteries[i]
         userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
+        lotteries.userLotteries[i]['is_in'] = false
         if(userLottery) {
           lotteries.userLotteries[i]['is_in'] = true
         }
-        lotteries.userLotteries[i]['is_in'] = false
         lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')<=0)
       }
 
