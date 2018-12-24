@@ -17,7 +17,7 @@ class ProductController {
       status: 1,
       messages: [],
       data: {
-        gasline_gallon_price: settings.gasline_gallon_price,
+        gasoline_gallon_price: settings.gasoline_gallon_price,
         oil_gallon_price: settings.oil_gallon_price,
         soap_gallon_price: settings.soap_gallon_price,
         water_gallon_price: settings.water_gallon_price,
