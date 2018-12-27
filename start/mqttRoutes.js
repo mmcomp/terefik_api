@@ -69,6 +69,7 @@ const routes = {
   'AttackFind': 'Attack/find',
   'AttackFinish': 'Attack/finish',
   'Attack': 'Attack/attack',
+  'RefuelTerefiki': 'Attack/refuel',
 
   // Experience Level
   'LevelList': 'ExperienceLevel/index',

@@ -428,9 +428,9 @@ class AttackController {
     }]
   }
 
-  static async cancel (params, user) {
+  static async refuel (params, user) {
     const rules = {
-      session: 'required'
+      terefiki_id: 'required'
     }
 
     let check = await Validations.check(params, rules)
@@ -442,164 +442,60 @@ class AttackController {
       }]
     }
 
-    let gameSession = await GameSession.query().where('type', 'attack').where('user_id', user.id).where('session_id', params.session).first()
-    if (!gameSession) {
+    let userTerefik = await UserTerefik.find(params.terefiki_id)
+    if(!userTerefik) {
       return [{
         status: 0,
-        messages: Messages.parse(['GameNotFound']),
+        messages: [{
+          code: "TerefikiNotFound",
+          message: "ترفیکی مورد نظر پیدا نشد"
+        }],
         data: {}
       }]
     }
 
-    await User.query().where('id', gameSession.user_defence).update({
-      under_attack: 'no'
-    })
+    let neededGasoline = (userTerefik.gasoline >= 1)?0:(1 - userTerefik.gasoline)
 
-    await gameSession.delete()
-
-    user.game_lose++
-    user.courage('sub', 1)
-    await user.save()
-
-    return [{
-      status: 1,
-      messages: [],
-      data: {}
-    }]
-  }
-
-  static async revenge (params, user) {
-    const rules = {
-      id: 'required'
-    }
-
-    let check = await Validations.check(params, rules)
-    if (check.err) {
+    if(neededGasoline==0) {
+      if(userTerefik.gasoline > 1) {
+        userTerefik.gasoline = 1
+        await userTerefik.save()
+      }
       return [{
         status: 0,
-        messages: check.messages,
+        messages: [{
+          code: "AlreadyFilled",
+          message: "باک ترفیکی مورد نظر پر می باشد"
+        }],
         data: {}
       }]
     }
 
-    let message = await Message.query().where('type', 'attack').where('id', params.id).where('user_id', user.id).first()
-
-    if (!message) {
+    let userProperty = await Property.query().where('user_id', user.id).first()
+    if(!userProperty) {
       return [{
         status: 0,
-        messages: Messages.parse(['TargetNotFound']),
+        messages: [{
+          code: "UserNotFound",
+          message: "کاربر مورد نظر پیدا نشد"
+        }],
         data: {}
       }]
     }
 
-    const settings = await Setting.get()
-    const target = await User.query().where('id', message.sender_id)
-    .with('property').with('antiques').with('antiques.antique').first()
+    let toUse = Math.min(userProperty.gasoline, neededGasoline)
+    userProperty.gasoline -= toUse
+    await userProperty.save()
 
-    if (!target) {
-      return [{
-        status: 0,
-        messages: Messages.parse(['UserNotFound']),
-        data: {}
-      }]
-    }
-    let targetData = target.toJSON()
-    let shield = 0
-
-    if (targetData.shield_at && Time(targetData.shield_at).diff(Time().format('YYYY-M-D HH:mm:ss'), 'seconds') > 0) {
-      shield = Time(targetData.shield_at).diff(Time().format('YYYY-M-D HH:mm:ss'), 'seconds')
-    }
-
-    if (shield) {
-      return [{
-        status: 0,
-        message: Messages.parse(['UnderSheild']),
-        data: {}
-      }]
-    }
-
-    if (targetData.under_attack == 'yes') {
-      return [{
-        status: 0,
-        message: Messages.parse(['UnderAttack']),
-        data: {}
-      }]
-    }
-
-    let stageKey = Randomatic('Aa', 30)
-    stageKey = 'attack_' + stageKey
-
-    let session = new GameSession()
-    session.user_id = user.id
-    session.type = 'revenge'
-    session.user_defence = targetData.id
-    session.depo_type = 'none'
-    session.session_id = stageKey
-    await session.save()
-
-    await Redis.select(1)
-    await Redis.hmset(stageKey, [
-      'user',
-      user.id
-    ])
-    await Redis.expire(stageKey, 120)
-    await message.delete()
-
-    target.under_attack = 'yes'
-    await target.save()
-
-    var ts = stageKey;//Math.round((new Date()).getTime() / 1000);
-    let encryptedPath = hasha(ts + '|' + targetData.property.path + '|' + md5(ts + '|' + targetData.property.path), {
-      algorithm: 'sha256'
-    }).toUpperCase()
+    userTerefik.gasoline += toUse
+    await userTerefik.save()
 
     return [{
       status: 1,
       messages: [],
       data: {
-        session: stageKey,
-        path: JSON.parse(targetData.property.path),
-        // path: encryptedPath,
-        user: {
-          id: targetData.id,
-          nickname: targetData.nickname,
-          avatar: targetData.avatar
-        }
+        fueled_amount: toUse
       }
-    }]
-  }
-
-  static async sticker (params, user) {
-    const rules = {
-      session: 'required',
-      sticker: 'required'
-    }
-
-    let check = await Validations.check(params, rules)
-    if (check.err) {
-      return [{
-        status: 0,
-        messages: check.messages,
-        data: {}
-      }]
-    }
-
-    let message = await Message.query().where('type', 'attack').where('sender_id', user.id).where('sticker_id', 0).where('session', params.session).first()
-    if (!message) {
-      return [{
-        status: 0,
-        message: Messages.parse(['GameNotFound']),
-        data: {}
-      }]
-    }
-
-    message.sticker_id = params.sticker
-    await message.save()
-
-    return [{
-      status: 1,
-      messages: [],
-      data: {}
     }]
   }
 }
