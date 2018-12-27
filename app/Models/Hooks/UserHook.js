@@ -3,6 +3,7 @@
 const ExperienceLevel = use('App/Models/ExperienceLevel')
 const InspectorLevel = use('App/Models/InspectorLevel')
 const Notification = use('App/Models/Notification')
+const Env = use('Env')
 
 const UserHook = exports = module.exports = {}
 
