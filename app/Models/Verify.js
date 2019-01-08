@@ -76,20 +76,23 @@ class Verify extends Model {
         type: 'verify'
       }])
       console.log('SMS to ', mobile.replace('+98','0'))
-
-      const response = await axios({
-        method: 'post',
-        url: Env.get('SMS_URL'),
-        data: querystring.stringify({
-          UserName: Env.get('SMS_USERNAME'),
-          Password: Env.get('SMS_PASSWORD'),
-          PhoneNumber: Env.get('SMS_NUMBER'),
-          RecNumber: mobile.replace('+98','0'),
-          MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
-          Smsclass: 1
+      try{
+        const response = await axios({
+          method: 'post',
+          url: Env.get('SMS_URL'),
+          data: querystring.stringify({
+            UserName: Env.get('SMS_USERNAME'),
+            Password: Env.get('SMS_PASSWORD'),
+            PhoneNumber: Env.get('SMS_NUMBER'),
+            RecNumber: mobile.replace('+98','0'),
+            MessageBody: Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
+            Smsclass: 1
+          })
         })
-      })
-      console.log(response.data)
+        console.log(response.data)  
+      }catch(e) {
+        console.log('Error', e)
+      }
       
       if (response.status === 200) {
         return {
