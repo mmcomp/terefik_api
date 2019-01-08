@@ -76,8 +76,9 @@ class Verify extends Model {
         type: 'verify'
       }])
       console.log('SMS to ', mobile.replace('+98','0'))
+      let response
       try{
-        const response = await axios({
+       response = await axios({
           method: 'post',
           url: Env.get('SMS_URL'),
           data: querystring.stringify({
