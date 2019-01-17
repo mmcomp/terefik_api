@@ -56,6 +56,12 @@ class CarController {
       }]
     }
 
+    let extraDiamond = 0
+    let rangerWork = await RangerWork.query().where('user_vehicle_id', userCar.id).where('created_at', '<=', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtrack(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss')).first()
+    if(rangerWork) {
+      extraDiamond = settings.diamond_earn_on_reshielding
+    }
+
     let shieldFinish = Time(userCar.shield_start).add(userCar.shield_duration, 'minutes')
     
     let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
@@ -107,7 +113,7 @@ class CarController {
 
     await user.property().update({
       bronze_coin: userData.property.bronze_coin - totalPay,
-      diamond: userData.property.diamond + settings.diamond_earn_on_shielding
+      diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond
     })
 
     if(discountPercent < 1) {
