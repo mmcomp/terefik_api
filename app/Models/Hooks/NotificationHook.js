@@ -30,9 +30,17 @@ NotificationHook.send = async (notification) => {
                     data['filter'] = {
                         pushe_id: [theUser.pushe_id]
                     }
-                }else{
-                    return false
                 }
+                let pubTopic = 'client_' + theUser.token + '/ArrestNotification'
+                let messageData = {
+                    status: 1,
+                    messages: [],
+                    data: {
+                        message: notification.message
+                    }
+                }
+
+                Mqtt.publish(pubTopic, JSON.stringify(messageData))
             }else {
                 return false
             }
