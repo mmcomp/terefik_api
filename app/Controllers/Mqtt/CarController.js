@@ -89,7 +89,7 @@ class CarController {
 
     discountPercent = (100 - discountPercent)/100
 
-    let totalPay = parseInt(settings.unit_to_bronze_coin * units * discountPercent, 10)
+    let totalPay = Math.ceil(settings.unit_to_bronze_coin * units * discountPercent, 10)
 
     if(totalPay > userData.property.bronze_coin) {
       return [{
