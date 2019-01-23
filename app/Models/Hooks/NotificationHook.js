@@ -37,7 +37,8 @@ NotificationHook.send = async (notification) => {
                     messages: [],
                     data: {
                         message: notification.message
-                    }
+                    },
+                    type: ArrestNotification,
                 }
 
                 Mqtt.publish(pubTopic, JSON.stringify(messageData))
