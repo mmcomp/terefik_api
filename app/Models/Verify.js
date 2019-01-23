@@ -70,15 +70,11 @@ class Verify extends Model {
         // console.log('verify saved')
       }
 
-      await UserSms.createMany([{
-        user_id: -1,
-        message: mobile + ' | ' + Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
-        type: 'verify'
-      }])
+
       console.log('SMS to ', mobile.replace('+98','0'))
-      let response
+      let response, sms_res = 'NoAnswer'
       try{
-       response = await axios({
+        response = await axios({
           method: 'post',
           url: Env.get('SMS_URL'),
           data: querystring.stringify({
@@ -90,11 +86,24 @@ class Verify extends Model {
             Smsclass: 1
           })
         })
-        console.log(response.data)  
+        // console.log(response.data)  
+        if(response && response.data) {
+          sms_res = 'Normal :' + response.data
+        }else if(response){
+          sms_res = 'Anormal :' + JSON.stringify(response)
+        }
       }catch(e) {
         console.log('Error', e)
+        sms_res = 'Error :' + JSON.stringify(e)
       }
-      
+
+      await UserSms.createMany([{
+        user_id: -1,
+        message: mobile + ' | ' + Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
+        type: 'verify',
+        sms_res: sms_res,
+      }])
+
       if (response.status === 200) {
         return {
           err: false,
