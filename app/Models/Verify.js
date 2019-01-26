@@ -73,6 +73,8 @@ class Verify extends Model {
 
       console.log('SMS to ', mobile.replace('+98','0'))
       let response, sms_res = 'NoAnswer'
+      /*
+      
       try{
         response = await axios({
           method: 'post',
@@ -96,10 +98,24 @@ class Verify extends Model {
         console.log('Error', e)
         sms_res = 'Error :' + JSON.stringify(e)
       }
+      */
+      console.log('URL', 'https://api.kavenegar.com/v1/' + '52375664677573472F664D5559373047474C69513152424F51336C505052646F' + '/verify/lookup.json?receptor=' + mobile.replace('+98','0')
+      + '&token=' + verifyCode + '&template=verifytref&')
+      try{
+        response = await axios({
+          method: 'get',
+          url: 'https://api.kavenegar.com/v1/' + Env.get('SMS_KAVENEGAR_API_KEY') + '/verify/lookup.json?receptor=' + mobile.replace('+98','0')
+          + '&token=' + verifyCode + '&template=' + Env.get('SMS_KAVENEGAR_TEMPLATE') + '&',
+        })
+        console.log('SMS OK', response.data)
+      }catch(e){  
+        console.log('SMS NOK', e.response.data)
+        sms_res = e.response.data.return.status + ':' + e.response.data.return.message
+      }
 
       await UserSms.createMany([{
         user_id: -1,
-        message: mobile + ' | ' + Env.get('SMS_' + type.toUpperCase() + '_TEXT') + ' : ' + verifyCode,
+        message: mobile + ' | ' + verifyCode,
         type: 'verify',
         sms_res: sms_res,
       }])
