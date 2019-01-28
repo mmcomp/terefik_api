@@ -466,6 +466,7 @@ class CarController {
           gasoline: -1*loot.gasoline,
           health: -1*loot.health,
           cleaning: -1*loot.cleaning,
+          diamond: -1*settings.diamond_lose_on_arrest,
         })
         await notification.save()
 
