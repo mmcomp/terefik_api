@@ -378,8 +378,8 @@ class CarController {
       gasoline: 0,
       health: 0,
       cleaning: 0,
-      is_out: false
     }
+    let is_out = false
     let isNotReDone = 1, rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
     if(rangerWork) {
       let settings = await Setting.get()
@@ -433,14 +433,6 @@ class CarController {
         userProperty.diamond -= settings.diamond_lose_on_arrest
         await userProperty.save()
 
-        let notification = new Notification
-        notification.title = Env.get('PUSH_USER_ARREST_TTILE')
-        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE').replace('|diamond_count|', settings.diamond_lose_on_arrest)
-                                .replace('|recharge_time|', settings.reshielding_time)
-                                .replace('|diamond_recharge|', settings.diamond_earn_on_reshielding)
-        notification.users_id = theOwner.id
-        await notification.save()
-
         await rangerWork.save()
 
         if(rangerWork.zone_id==0) {
@@ -448,7 +440,7 @@ class CarController {
           rangerWork.gasoline = settings.arrest_outofzone_loot_percent * theOwnerData.property.gasoline / 100
           rangerWork.health = settings.arrest_outofzone_loot_percent * theOwnerData.property.health_oil / 100
           rangerWork.cleaning = settings.arrest_outofzone_loot_percent * theOwnerData.property.cleaning_soap / 100
-          loot.is_out = true
+          is_out = true
         }
 
         loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
@@ -464,11 +456,25 @@ class CarController {
         })
 
 
+        let notification = new Notification
+        notification.title = Env.get('PUSH_USER_ARREST_TTILE')
+        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE').replace('|diamond_count|', settings.diamond_lose_on_arrest)
+                                .replace('|recharge_time|', settings.reshielding_time)
+                                .replace('|diamond_recharge|', settings.diamond_earn_on_reshielding)
+        notification.users_id = theOwner.id
+        notification.data = JSON.stringify({
+          gasoline: -1*loot.gasoline,
+          health: -1*loot.health,
+          cleaning: -1*loot.cleaning,
+        })
+        await notification.save()
+
         return [{
           status: 1,
           messages: [],
           data: {
             car_status: 'NotShielded',
+            in_out : is_out,
             loot: loot
           }
         }]
@@ -477,7 +483,7 @@ class CarController {
       await rangerWork.save()
 
       if(rangerWork.zone_id==0) {
-        loot.is_out = true
+        is_out = true
         rangerWork.silver_coin = rangerWork.silver_coin * settings.arrest_outofzone_loot_percent /100
       }
 
@@ -492,6 +498,7 @@ class CarController {
         messages: [],
         data: {
           car_status: 'RegisteredByRanger',
+          in_out : is_out,
           loot: loot
         }
       }]

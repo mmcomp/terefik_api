@@ -32,11 +32,18 @@ NotificationHook.send = async (notification) => {
                     }
                 }
                 let pubTopic = 'client_' + theUser.token + '/ArrestNotification'
+                let data = {}
+                try{
+                    data = JSON.parse(notification.data)
+                }catch(e) {
+
+                }
                 let messageData = {
                     status: 1,
                     messages: [],
                     data: {
-                        message: notification.message
+                        message: notification.message,
+                        loot: data,
                     },
                     type: 'ArrestNotification',
                 }
