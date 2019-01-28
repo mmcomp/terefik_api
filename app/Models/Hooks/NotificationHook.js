@@ -49,6 +49,8 @@ NotificationHook.send = async (notification) => {
                 }
 
                 Mqtt.publish(pubTopic, JSON.stringify(messageData))
+                console.log('Sent Arrent Mqtt Notification ')
+                console.log(theUser.mobile ,messageData)
             }else {
                 return false
             }
