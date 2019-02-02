@@ -192,6 +192,7 @@ class CarController {
         number_ch: params.number_ch,
         number_ir: params.number_ir,
       }).first()
+      console.log('CAR', car)
       if(!car) {
         car = new Car
         for(let i in params) {
@@ -199,6 +200,7 @@ class CarController {
         }
         await car.save()  
       }
+      console.log('CAR AGAIN', car)
       console.log('vehicle_id', car.id, '|', 'user_id', user.id)
       let userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
       if(!userCar) {
