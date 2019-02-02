@@ -202,25 +202,25 @@ class CarController {
       }
       // console.log('CAR AGAIN', car)
       // console.log('vehicle_id', car.id, '|', 'user_id', user.id)
-      let userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
-      if(!userCar) {
-        userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
+      // let userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
+      // if(!userCar) {
+        let userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
         if(!userCar) {
           userCar = new UserCar
           userCar.user_id = user.id
           userCar.vehicle_id = car.id
           await userCar.save()    
         }
-      }else {
-        return [{
-          status: 0,
-          messages: [{
-            code: "CarBelongsToOther",
-            message: "این خودرو به نام شخص دیگری ثبت است"
-          }],
-          data: {}
-        }]      
-      }
+      // }else {
+      //   return [{
+      //     status: 0,
+      //     messages: [{
+      //       code: "CarBelongsToOther",
+      //       message: "این خودرو به نام شخص دیگری ثبت است"
+      //     }],
+      //     data: {}
+      //   }]      
+      // }
   
       return [{
         status: 1,
