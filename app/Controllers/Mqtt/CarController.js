@@ -184,16 +184,40 @@ class CarController {
       }]
     }
 
-    let car = new Car
-    for(let i in params) {
-      car[i] = params[i]
-    }
-    await car.save()
 
-    let userCar = new UserCar
-    userCar.user_id = user.id
-    userCar.vehicle_id = car.id
-    await userCar.save()
+    let car = Car.query().where({
+      number_2: params.number_2,
+      number_3: params.number_3,
+      number_ch: params.number_ch,
+      number_ir: params.number_ir,
+    }).first()
+    if(!car) {
+      car = new Car
+      for(let i in params) {
+        car[i] = params[i]
+      }
+      await car.save()  
+    }
+
+    let userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
+    if(!userCar) {
+      userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
+      if(!userCar) {
+        userCar = new UserCar
+        userCar.user_id = user.id
+        userCar.vehicle_id = car.id
+        await userCar.save()    
+      }
+    }else {
+      return [{
+        status: 0,
+        messages: [{
+          code: "CarBelongsToOther",
+          message: "این خودرو به نام شخص دیگری ثبت است"
+        }],
+        data: {}
+      }]      
+    }
 
     return [{
       status: 1,
