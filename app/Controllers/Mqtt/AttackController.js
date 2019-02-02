@@ -268,7 +268,9 @@ class AttackController {
       data: {
         id: targetData.id,
         session: stageKey,
-        path: targetData.property.path//,
+        path: targetData.property.path,
+        reattack_cost: settings.reattack_cost,
+        //,
         // user: {
         //   id: targetData.id,
         //   name: targetData.fname + ' ' + targetData.lname,
@@ -276,6 +278,34 @@ class AttackController {
         // }
       }
     }]
+  }
+
+  static async reattack (params, user) {
+    let userProp = await Property.query().where('user_id', user.id).first()
+    if(!userProp) {
+      return [{
+        status: 0,
+        messages: Messages.parse(['UserNotFound']),
+        data: {}
+      }]
+    }
+
+    let settings = await Setting.get()
+    if(userProp.bronze_coin<settings.reattack_cost) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotEnoughBronze",
+          message: "سکه برنز شما برای حمله مجدد کافی نیست",
+        }],
+        data: {}
+      }]
+    }
+    userProp.bronze_coin -= settings.reattack_cost
+    await userProp.save()
+
+    let attackResult = await AttackController.attack(params, user)
+    return attackResult
   }
 
   static async finish (params, user) {
@@ -312,7 +342,7 @@ class AttackController {
 
     const userDefence = await User.query().where('id', gameSession.user_defence).with('property').first()
     let userDefenceData = userDefence.toJSON()
-    let userDefenceRadeSucceed = userDefenceData.property.rade_succeed
+    // let userDefenceRadeSucceed = userDefenceData.property.rade_succeed
 
     const winHash = hasha('win' + Env.get('ATTACK_SESSION') + params.session, {
       algorithm: 'sha256'
@@ -349,8 +379,8 @@ class AttackController {
         message: JSON.stringify(award)
       })
 
-      userDefence.under_attack = 'no'
-      await userDefence.save()
+      // userDefence.under_attack = 'no'
+      // await userDefence.save()
 
       return [{
         status: 0,
@@ -387,8 +417,8 @@ class AttackController {
       cleaning_soap: userDefenceData.property.cleaning_soap - award.cleaning_soap > 0 ? userDefenceData.property.cleaning_soap - award.cleaning_soap : 0
     })
 
-    userDefence.under_attack = 'no'
-    await userDefence.save()
+    // userDefence.under_attack = 'no'
+    // await userDefence.save()
 
     await user.property().update({
       gasoline: userData.property.gasoline + award.gasoline,
