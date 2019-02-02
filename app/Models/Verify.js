@@ -120,7 +120,7 @@ class Verify extends Model {
         sms_res: sms_res,
       }])
 
-      if (response.status === 200) {
+      if (response && response.status === 200) {
         return {
           err: false,
           messages: []
