@@ -165,65 +165,78 @@ class CarController {
   }
 
   static async add(params, user) {
-    const rules = {
-      color_id: 'required',
-      model_id: 'required',
-      number_2: 'required',
-      number_ch: 'required',
-      number_3: 'required',
-      number_ir: 'required',
-      number_extra: 'required'
-    }
-
-    let check = await Validations.check(params, rules)
-    if (check.err) {
+    try{
+      const rules = {
+        color_id: 'required',
+        model_id: 'required',
+        number_2: 'required',
+        number_ch: 'required',
+        number_3: 'required',
+        number_ir: 'required',
+        number_extra: 'required'
+      }
+  
+      let check = await Validations.check(params, rules)
+      if (check.err) {
+        return [{
+          status: 0,
+          messages: check.messages,
+          data: {}
+        }]
+      }
+  
+  
+      let car = Car.query().where({
+        number_2: params.number_2,
+        number_3: params.number_3,
+        number_ch: params.number_ch,
+        number_ir: params.number_ir,
+      }).first()
+      if(!car) {
+        car = new Car
+        for(let i in params) {
+          car[i] = params[i]
+        }
+        await car.save()  
+      }
+  
+      let userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
+      if(!userCar) {
+        userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
+        if(!userCar) {
+          userCar = new UserCar
+          userCar.user_id = user.id
+          userCar.vehicle_id = car.id
+          await userCar.save()    
+        }
+      }else {
+        return [{
+          status: 0,
+          messages: [{
+            code: "CarBelongsToOther",
+            message: "این خودرو به نام شخص دیگری ثبت است"
+          }],
+          data: {}
+        }]      
+      }
+  
       return [{
-        status: 0,
-        messages: check.messages,
+        status: 1,
+        messages: [],
         data: {}
       }]
-    }
-
-
-    let car = Car.query().where({
-      number_2: params.number_2,
-      number_3: params.number_3,
-      number_ch: params.number_ch,
-      number_ir: params.number_ir,
-    }).first()
-    if(!car) {
-      car = new Car
-      for(let i in params) {
-        car[i] = params[i]
-      }
-      await car.save()  
-    }
-
-    let userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
-    if(!userCar) {
-      userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
-      if(!userCar) {
-        userCar = new UserCar
-        userCar.user_id = user.id
-        userCar.vehicle_id = car.id
-        await userCar.save()    
-      }
-    }else {
+    }catch(e) {
+      console.log('Error Add Car')
+      console.log(e)
       return [{
         status: 0,
         messages: [{
-          code: "CarBelongsToOther",
-          message: "این خودرو به نام شخص دیگری ثبت است"
+          code: "SystemError",
+          message: "خطای سیستمی",
         }],
         data: {}
-      }]      
+      }]
     }
-
-    return [{
-      status: 1,
-      messages: [],
-      data: {}
-    }]
   }
 
   static async list(params, user) {
