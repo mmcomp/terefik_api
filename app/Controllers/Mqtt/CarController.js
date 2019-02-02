@@ -199,10 +199,10 @@ class CarController {
         }
         await car.save()  
       }
-  
-      let userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
+      console.log('vehicle_id', car.id, '|', 'user_id', user.id)
+      let userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', '!=', user.id).first()
       if(!userCar) {
-        userCar = UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
+        userCar = await UserCar.query().where('vehicle_id', car.id).where('user_id', user.id).first()
         if(!userCar) {
           userCar = new UserCar
           userCar.user_id = user.id
