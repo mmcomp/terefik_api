@@ -186,7 +186,7 @@ class CarController {
       }
   
   
-      let car = Car.query().where({
+      let car = await Car.query().where({
         number_2: params.number_2,
         number_3: params.number_3,
         number_ch: params.number_ch,
