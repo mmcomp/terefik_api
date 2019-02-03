@@ -269,6 +269,8 @@ class CarController {
   }
 
   static async arrest(params, user) {
+    console.log('Arrest start', params)
+
     let settings = await Setting.get() 
 
     let loot = {
@@ -387,6 +389,14 @@ class CarController {
 
       loot.silver_coin = rangerSilver
 
+      console.log('Arrest result', {
+        status: 1,
+        messages: [],
+        data: {
+          car_status: carStatus,
+          loot: loot
+        }
+      })
       return [{
         status: 1,
         messages: [],
