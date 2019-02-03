@@ -29,7 +29,7 @@ class LotteryController {
           if(userLottery) {
             lotteries.rangerLotteries[i]['is_in'] = true
           }
-          lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')<=0)
+          lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')>0)
         }
       }
 
