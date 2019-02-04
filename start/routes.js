@@ -23,7 +23,7 @@ const Route = use('Route')
 const MqttClient = require('mqtt')
 const Notification = use('App/Models/Notification')
 
-// require('./kue')
+require('./kue')
 
 Route.match(['options'],'*',function * () {
   return 'allowed'

@@ -11,7 +11,7 @@ try {
   const Queue = kue.createQueue()
 
   Queue.remove({
-    unique: 'minesweeper_weeklygift'
+    unique: 'terefiki_dashboard'
   }, function (error, response) {
     if (error) {
       console.log(error, response)
@@ -19,23 +19,7 @@ try {
   })
 
   Queue.remove({
-    unique: 'minesweeper_absents'
-  }, function (error, response) {
-    if (error) {
-      console.log(error, response)
-    }
-  })
-
-  Queue.remove({
-    unique: 'minesweeper_dashboard'
-  }, function (error, response) {
-    if (error) {
-      console.log(error, response)
-    }
-  })
-
-  Queue.remove({
-    unique: 'minesweeper_stat'
+    unique: 'terefiki_stat'
   }, function (error, response) {
     if (error) {
       console.log(error, response)
@@ -43,40 +27,24 @@ try {
   })
 
   // DashboardStat Cron Workder
-  const statJob = Queue.createJob('minesweeper_stat')
+  const statJob = Queue.createJob('terefiki_stat')
     .attempts(3)
     .priority('normal')
 
   Queue.every('10 0 * * *', statJob)
-  Queue.process('minesweeper_stat', DashboardStat.stat)
+  Queue.process('terefiki_stat', DashboardStat.stat)
 
   // Dashboard Cron Workder
-  const dashboardJob = Queue.createJob('minesweeper_dashboard')
+  const dashboardJob = Queue.createJob('terefiki_dashboard')
     .attempts(3)
     .priority('normal')
 
   Queue.every('20 minutes', dashboardJob)
-  Queue.process('minesweeper_dashboard', DashboardStat.dashboard)
-
-  // User Absent Cron Worker
-  const absentJob = Queue.createJob('minesweeper_absents')
-    .attempts(3)
-    .priority('normal')
-
-  Queue.every('0 18 * * *', absentJob)
-  Queue.process('minesweeper_absents', DashboardStat.absents)
-
-    // User Weekly Gift Cron Worker
-  const weeklyGiftJob = Queue.createJob('minesweeper_weeklygift')
-    .attempts(3)
-    .priority('normal')
-
-  Queue.every('every friday', weeklyGiftJob)
-  // Queue.every('2 seconds', weeklyGiftJob)
-  Queue.process('minesweeper_weeklygift', DashboardStat.weeklyGift)
+  Queue.process('terefiki_dashboard', DashboardStat.dashboard)
 
 } catch (error) {
   // SentryException.captureException(error)
+  console.log('Workers Error', error)
 }
 
 console.log('Start worker ...')

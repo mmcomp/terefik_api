@@ -1,8 +1,5 @@
 'use strict'
 
-// شامل job های منشر شده ایجاد شده برای kue 
-// start/kue
-
 const User = use('App/Models/User')
 const UserFuge = use('App/Models/UserFuge')
 const Property = use('App/Models/Property')
@@ -52,26 +49,26 @@ class DashboardStat {
       stat['register'] = await User.query().where('created_at', '>', Time().subtract(1, 'days').format('YYYY-M-D HH:mm:ss')).count()
       stat['register'] = stat['register'][0]['count(*)']
 
-      stat['elixir_1'] = await Property.query().sum('elixir_1')
-      stat['elixir_1'] = stat['elixir_1'][0]['sum(`elixir_1`)']
+      // stat['elixir_1'] = await Property.query().sum('elixir_1')
+      // stat['elixir_1'] = stat['elixir_1'][0]['sum(`elixir_1`)']
 
-      stat['elixir_2'] = await Property.query().sum('elixir_2')
-      stat['elixir_2'] = stat['elixir_2'][0]['sum(`elixir_2`)']
+      // stat['elixir_2'] = await Property.query().sum('elixir_2')
+      // stat['elixir_2'] = stat['elixir_2'][0]['sum(`elixir_2`)']
 
-      stat['elixir_3'] = await Property.query().sum('elixir_3')
-      stat['elixir_3'] = stat['elixir_3'][0]['sum(`elixir_3`)']
+      // stat['elixir_3'] = await Property.query().sum('elixir_3')
+      // stat['elixir_3'] = stat['elixir_3'][0]['sum(`elixir_3`)']
 
-      stat['elixir_exchange'] = await User.query().sum('elixir_exchange')
-      stat['elixir_exchange'] = stat['elixir_exchange'][0]['sum(`elixir_exchange`)']      
+      // stat['elixir_exchange'] = await User.query().sum('elixir_exchange')
+      // stat['elixir_exchange'] = stat['elixir_exchange'][0]['sum(`elixir_exchange`)']      
 
-      stat['elixir_shield'] = await User.query().sum('elixir_shield')
-      stat['elixir_shield'] = stat['elixir_shield'][0]['sum(`elixir_shield`)']      
+      // stat['elixir_shield'] = await User.query().sum('elixir_shield')
+      // stat['elixir_shield'] = stat['elixir_shield'][0]['sum(`elixir_shield`)']      
 
-      stat['elixir_award'] = await User.query().sum('elixir_reward')
-      stat['elixir_award'] = stat['elixir_award'][0]['sum(`elixir_reward`)']
+      // stat['elixir_award'] = await User.query().sum('elixir_reward')
+      // stat['elixir_award'] = stat['elixir_award'][0]['sum(`elixir_reward`)']
       
-      stat['elixir_fuge'] = await UserFuge.query().sum('amount')
-      stat['elixir_fuge'] = stat['elixir_fuge'][0]['sum(`amount`)']    
+      // stat['elixir_fuge'] = await UserFuge.query().sum('amount')
+      // stat['elixir_fuge'] = stat['elixir_fuge'][0]['sum(`amount`)']    
 
       await Redis.select(Env.get('REDIS_STAT_DATABASE'))
       const cacheStat = await Redis.hgetall(Env.get('REDIS_STAT_KEY'))
@@ -85,12 +82,12 @@ class DashboardStat {
         stat['game_success'] = cacheStat['game_success']
       }
 
-      stat['exchanges_view'] = 0
-      let exchangeViewCount = await Redis.get(Env.get('REDIS_STAT_EXCHANGE_VIEW'))
-      if (exchangeViewCount) {
-        stat['exchanges_view'] = parseInt(exchangeViewCount)
-      }
-      await Redis.del(Env.get('REDIS_STAT_EXCHANGE_VIEW'))
+      // stat['exchanges_view'] = 0
+      // let exchangeViewCount = await Redis.get(Env.get('REDIS_STAT_EXCHANGE_VIEW'))
+      // if (exchangeViewCount) {
+      //   stat['exchanges_view'] = parseInt(exchangeViewCount)
+      // }
+      // await Redis.del(Env.get('REDIS_STAT_EXCHANGE_VIEW'))
 
       stat['date'] = Time().format('YYYY-M-D')
       await Stat.create(stat)
@@ -106,22 +103,22 @@ class DashboardStat {
     try {
       //از بین بردن بازی ها و شبیخون هایی که بیش از ۱۵ دقیقه از شروع آن گذشته و اتمام آن گزارش نشده است
       
-      let fifth = Time(Moment.now('YYYY-MM-DD HH:mm:ss')).subtract(15,'minute').format('YYYY-MM-DD HH:mm:ss')
-      let theAttack, userAttacked, underAttacks, attackGames = await GameSession.query().whereNot('user_defence',null).where('created_at','<=',fifth)
-      for(let i = 0;i < attackGames.length;i++){
-        theAttack = attackGames[i]
-        underAttacks = await GameSession.query().where('user_defence',theAttack.user_defence).where('created_at','>',Time(Moment.now('YYYY-MM-DD HH:mm:ss')).subtract(50,'second').format('YYYY-MM-DD HH:mm:ss'))
-        if(underAttacks.length==0){
-          userAttacked = await User.query().where('id',theAttack.user_defence).first()
-          userAttacked.under_attack = 'no'
-          userAttacked.save()
-        }
-      }
+      // let fifth = Time(Moment.now('YYYY-MM-DD HH:mm:ss')).subtract(15,'minute').format('YYYY-MM-DD HH:mm:ss')
+      // let theAttack, userAttacked, underAttacks, attackGames = await GameSession.query().whereNot('user_defence',null).where('created_at','<=',fifth)
+      // for(let i = 0;i < attackGames.length;i++){
+      //   theAttack = attackGames[i]
+      //   underAttacks = await GameSession.query().where('user_defence',theAttack.user_defence).where('created_at','>',Time(Moment.now('YYYY-MM-DD HH:mm:ss')).subtract(50,'second').format('YYYY-MM-DD HH:mm:ss'))
+      //   if(underAttacks.length==0){
+      //     userAttacked = await User.query().where('id',theAttack.user_defence).first()
+      //     userAttacked.under_attack = 'no'
+      //     userAttacked.save()
+      //   }
+      // }
 
       // let lostGames = await GameSession.query().where('created_at','<=',Time(Moment.now('YY-MM-DD HH:mm:ss')).subtract(15,'minute').format('YYY-MM-DD HH:mm:ss')).delete()
 
       
-
+      console.log('STAT Worker')
       await Redis.select(Env.get('REDIS_STAT_DATABASE'))
 
       let stat
@@ -137,26 +134,26 @@ class DashboardStat {
         stat = await Redis.hgetall(Env.get('REDIS_DASHBOARD_KEY'))
       }
 
-      stat['elixir_1'] = await Property.query().sum('elixir_1')
-      stat['elixir_1'] = stat['elixir_1'][0]['sum(`elixir_1`)']
+      // stat['elixir_1'] = await Property.query().sum('elixir_1')
+      // stat['elixir_1'] = stat['elixir_1'][0]['sum(`elixir_1`)']
 
-      stat['elixir_2'] = await Property.query().sum('elixir_2')
-      stat['elixir_2'] = stat['elixir_2'][0]['sum(`elixir_2`)']
+      // stat['elixir_2'] = await Property.query().sum('elixir_2')
+      // stat['elixir_2'] = stat['elixir_2'][0]['sum(`elixir_2`)']
 
-      stat['elixir_3'] = await Property.query().sum('elixir_3')
-      stat['elixir_3'] = stat['elixir_3'][0]['sum(`elixir_3`)']
+      // stat['elixir_3'] = await Property.query().sum('elixir_3')
+      // stat['elixir_3'] = stat['elixir_3'][0]['sum(`elixir_3`)']
 
-      stat['elixir_exchange'] = await User.query().sum('elixir_exchange')
-      stat['elixir_exchange'] = stat['elixir_exchange'][0]['sum(`elixir_exchange`)']      
+      // stat['elixir_exchange'] = await User.query().sum('elixir_exchange')
+      // stat['elixir_exchange'] = stat['elixir_exchange'][0]['sum(`elixir_exchange`)']      
 
-      stat['elixir_shield'] = await User.query().sum('elixir_shield')
-      stat['elixir_shield'] = stat['elixir_shield'][0]['sum(`elixir_shield`)']      
+      // stat['elixir_shield'] = await User.query().sum('elixir_shield')
+      // stat['elixir_shield'] = stat['elixir_shield'][0]['sum(`elixir_shield`)']      
 
-      stat['elixir_award'] = await User.query().sum('elixir_reward')
-      stat['elixir_award'] = stat['elixir_award'][0]['sum(`elixir_reward`)']
+      // stat['elixir_award'] = await User.query().sum('elixir_reward')
+      // stat['elixir_award'] = stat['elixir_award'][0]['sum(`elixir_reward`)']
       
-      stat['elixir_fuge'] = await UserFuge.query().sum('amount')
-      stat['elixir_fuge'] = stat['elixir_fuge'][0]['sum(`amount`)']            
+      // stat['elixir_fuge'] = await UserFuge.query().sum('amount')
+      // stat['elixir_fuge'] = stat['elixir_fuge'][0]['sum(`amount`)']            
 
       stat['users'] = await User.query().count()
       stat['users'] = stat['users'][0]['count(*)']
@@ -172,20 +169,21 @@ class DashboardStat {
       stat['register_today'] = await User.query().where('created_at', '>', Time().subtract(1, 'days').format('YYYY-M-D HH:mm:ss')).count()
       stat['register_today'] = stat['register_today'][0]['count(*)']
 
-      const response = await axios.get(Env.get('EMQTT_API_ADDRESS'), {
-        headers: {
-          'Authorization': 'Basic ' + Buffer.from(Env.get('EMQTT_DASHBOARD_USER') + ':' + Env.get('EMQTT_DASHBOARD_PASSWORD')).toString('base64')
-        }
-      })
-      if (response.status === 200) {
-        const server = _.keys(response.data.result[0])
-        const data = response.data.result[0][server]
-        if (stat['online'] < (data['clients/count'] - 1)) {
-          stat['online'] = data['clients/count'] - 1
-        }
-        await Redis.hmset(Env.get('REDIS_DASHBOARD_KEY'), stat)
-      }
-
+      // const response = await axios.get(Env.get('EMQTT_API_ADDRESS'), {
+      //   headers: {
+      //     'Authorization': 'Basic ' + Buffer.from(Env.get('EMQTT_DASHBOARD_USER') + ':' + Env.get('EMQTT_DASHBOARD_PASSWORD')).toString('base64')
+      //   }
+      // })
+      // if (response.status === 200) {
+      //   const server = _.keys(response.data.result[0])
+      //   const data = response.data.result[0][server]
+      //   if (stat['online'] < (data['clients/count'] - 1)) {
+      //     stat['online'] = data['clients/count'] - 1
+      //   }
+      //   
+      // }
+      await Redis.hmset(Env.get('REDIS_DASHBOARD_KEY'), stat)
+      console.log('Stat Data', stat)
       done()
     } catch (error) {
       console.log('Error')
