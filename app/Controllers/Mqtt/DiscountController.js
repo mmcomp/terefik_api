@@ -7,6 +7,7 @@ const Setting = use('App/Models/Setting')
 class DiscountController {
   static async get(params, user) {
     let settings = await Setting.get()
+    console.log('user_id', user.id)
     let userDiscounter = await UserTerefik.query().where('user_id', user.id).where('ttype', 'discounter').first()
 
     if(!userDiscounter) {
