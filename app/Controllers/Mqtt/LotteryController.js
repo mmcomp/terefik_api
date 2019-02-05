@@ -124,7 +124,7 @@ class LotteryController {
         }]
       }
 
-      let userProperty = await Property.query().where('user_id', user.id).fisrt()
+      let userProperty = await Property.query().where('user_id', user.id).first()
       if(!userProperty) {
         return [{
           status: 0,
