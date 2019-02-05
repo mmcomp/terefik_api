@@ -68,6 +68,44 @@ class UserController {
     }]
   }
 
+  static async setUsername (params, user) {
+    const rules = {
+      username: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    // let users = await UserController.query().where('username', username).first()
+    // if(users) {
+    //   return [{
+    //     status: 0,
+    //     messages: [{
+    //       code: "UsernameTaken",
+    //       message: "نام کاربری تکراری می باشد",
+    //     }],
+    //     data: {
+    //     }
+    //   }]
+    // }
+
+    user.username = username
+    await user.save()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+      }
+    }]
+  }
+
   static async pusheId (params, user) {
     console.log('Pushe id Setting', params)
     try{
@@ -113,7 +151,8 @@ class UserController {
       for(let theUser of users) {
         leads.push({
           image_path: theUser.user.image_path,
-          score: theUser.experience_score
+          score: theUser.experience_score,
+          username: theUser.username,
         })
       }
       return [{
@@ -144,7 +183,8 @@ class UserController {
       for(let theUser of users) {
         leads.push({
           image_path: theUser.user.image_path,
-          score: theUser.finance_score
+          score: theUser.finance_score,
+          username: theUser.username,
         })
       }
       return [{
@@ -175,7 +215,8 @@ class UserController {
       for(let theUser of users) {
         leads.push({
           image_path: theUser.user.image_path,
-          score: theUser.ontime_score
+          score: theUser.ontime_score,
+          username: theUser.username,
         })
       }
       return [{
@@ -206,7 +247,8 @@ class UserController {
       for(let theUser of users) {
         leads.push({
           image_path: theUser.user.image_path,
-          score: theUser.inspector_score
+          score: theUser.inspector_score,
+          username: theUser.username,
         })
       }
       return [{
@@ -238,7 +280,8 @@ class UserController {
       for(let theUser of users) {
         leads.push({
           image_path: theUser.user.image_path,
-          score: theUser.report_count
+          score: theUser.report_count,
+          username: theUser.username,
         })
       }
       return [{

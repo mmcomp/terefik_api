@@ -63,7 +63,8 @@ class User extends Model {
   async register () {
     try {
       const setting = await Setting.get()
-
+      await this.save()
+      this.username = 'User' + String(this.id)
       await this.save()
       let property = new Property
       

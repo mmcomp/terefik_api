@@ -41,6 +41,7 @@ const routes = {
   'UserProfile': 'User/profile',
   'GetUserPath' : 'User/path',
   'SetUserPath' : 'User/setPath',
+  'SetUsername' : 'User/setUsername',
   'SetPusheID' : 'User/pusheId',
   'ExperienceLeaderBoard': 'User/expLeader',
   'FinanceLeaderBoard': 'User/finLeader',

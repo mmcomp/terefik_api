@@ -97,7 +97,7 @@ class LotteryController {
           status: 0,
           messages: [{
             code: "AlreadyInThisLottery",
-            message: "شما در این قرعه کشی شرکت کرده اید"
+            message: "شما قبلا در این قرعه کشی شرکت کرده اید"
           }],
           data: {}
         }]
