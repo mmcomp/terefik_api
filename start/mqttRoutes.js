@@ -79,6 +79,9 @@ const routes = {
   //Lottery
   'LotteryList': 'Lottery/list',
   'LotteryRequest': 'Lottery/inRequest',
+
+  //Achievment
+  'AchievmentList': 'Achievment/list',
   
   'Test': 'Test/test'
 }
