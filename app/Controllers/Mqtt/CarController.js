@@ -132,6 +132,10 @@ class CarController {
     userCar.lat = params.lat_gps
     await userCar.save()
 
+    user.property().update({
+      experience_score: userData.property.experience_score + settings.car_park_exp
+    })
+
     return [{
       status: 1,
       messages: [],
