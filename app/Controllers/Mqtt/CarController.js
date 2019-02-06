@@ -113,7 +113,8 @@ class CarController {
 
     await user.property().update({
       bronze_coin: userData.property.bronze_coin - totalPay,
-      diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond
+      diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond,
+      experience_score: userData.property.experience_score + settings.car_park_exp,
     })
 
     if(discountPercent < 1) {
@@ -131,11 +132,6 @@ class CarController {
     userCar.lon = params.lon_gps
     userCar.lat = params.lat_gps
     await userCar.save()
-
-    console.log('Exp change', settings.car_park_exp)
-    await user.property().update({
-      experience_score: userData.property.experience_score + settings.car_park_exp
-    })
 
     return [{
       status: 1,
@@ -426,6 +422,7 @@ class CarController {
   static async _arrest(params, user) {   
     let settings = await Setting.get() 
     
+    await user.loadMany(['property'])
     let userData = user.toJSON()
 
     let loot = {
@@ -460,7 +457,7 @@ class CarController {
     rangerWork.image_path = params.image_path
     rangerWork.silver_coin = isNotReDone * settings.silver_when_not_reported
     
-
+    let rangerExp = settings.car_check_exp
     let driver, userCar = await UserCar.query().where('vehicle_id', params.car_id).with('user').first()
     if(userCar) {
       driver = userCar.toJSON().user
@@ -488,8 +485,6 @@ class CarController {
         userProperty.diamond -= settings.diamond_lose_on_arrest
         await userProperty.save()
 
-        await rangerWork.save()
-
         if(rangerWork.zone_id==0) {
           rangerWork.silver_coin = rangerWork.silver_coin * settings.arrest_outofzone_loot_percent /100
           rangerWork.gasoline = settings.arrest_outofzone_loot_percent * theOwnerData.property.gasoline / 100
@@ -497,6 +492,10 @@ class CarController {
           rangerWork.cleaning = settings.arrest_outofzone_loot_percent * theOwnerData.property.cleaning_soap / 100
           is_out = true
         }
+
+        rangerExp += settings.car_arrest_exp
+
+        await rangerWork.save()
 
         loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
         loot.gasoline = parseInt(rangerWork.gasoline, 10)
@@ -507,7 +506,8 @@ class CarController {
           silver_coin: userData.property.silver_coin + loot.silver_coin,
           gasoline : userData.property.gasoline + loot.gasoline,
           health_oil: userData.property.health_oil + loot.health,
-          cleaning_soap : userData.property.cleaning_soap + loot.cleaning
+          cleaning_soap : userData.property.cleaning_soap + loot.cleaning,
+          experience_score: userData.property.experience_score + rangerExp
         })
 
 
