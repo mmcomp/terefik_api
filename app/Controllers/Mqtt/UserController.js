@@ -152,7 +152,7 @@ class UserController {
         leads.push({
           image_path: theUser.user.image_path,
           score: theUser.experience_score,
-          username: theUser.username,
+          username: theUser.user.username,
         })
       }
       return [{
@@ -184,7 +184,7 @@ class UserController {
         leads.push({
           image_path: theUser.user.image_path,
           score: theUser.finance_score,
-          username: theUser.username,
+          username: theUser.user.username,
         })
       }
       return [{
@@ -216,7 +216,7 @@ class UserController {
         leads.push({
           image_path: theUser.user.image_path,
           score: theUser.ontime_score,
-          username: theUser.username,
+          username: theUser.user.username,
         })
       }
       return [{
@@ -248,7 +248,7 @@ class UserController {
         leads.push({
           image_path: theUser.user.image_path,
           score: theUser.inspector_score,
-          username: theUser.username,
+          username: theUser.user.username,
         })
       }
       return [{
@@ -281,7 +281,7 @@ class UserController {
         leads.push({
           image_path: theUser.user.image_path,
           score: theUser.report_count,
-          username: theUser.username,
+          username: theUser.user.username,
         })
       }
       return [{
