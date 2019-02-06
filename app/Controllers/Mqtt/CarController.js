@@ -132,7 +132,8 @@ class CarController {
     userCar.lat = params.lat_gps
     await userCar.save()
 
-    user.property().update({
+    console.log('Exp change', settings.car_park_exp)
+    await user.property().update({
       experience_score: userData.property.experience_score + settings.car_park_exp
     })
 
@@ -141,7 +142,8 @@ class CarController {
       messages: [],
       data: {
         total_pay: totalPay,
-        end_time: Time(userCar.shield_start).add(userCar.shield_duration, 'minutes').format("YYYY-MM-DD HH:mm:ss")
+        end_time: Time(userCar.shield_start).add(userCar.shield_duration, 'minutes').format("YYYY-MM-DD HH:mm:ss"),
+        experience_score: userData.property.experience_score + settings.car_park_exp,
       }
     }]
   }
