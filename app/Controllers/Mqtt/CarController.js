@@ -422,7 +422,6 @@ class CarController {
   static async _arrest(params, user) {   
     let settings = await Setting.get() 
     
-    await user.loadMany(['property'])
     let userData = user.toJSON()
 
     let loot = {
@@ -507,7 +506,7 @@ class CarController {
           gasoline : userData.property.gasoline + loot.gasoline,
           health_oil: userData.property.health_oil + loot.health,
           cleaning_soap : userData.property.cleaning_soap + loot.cleaning,
-          experience_score: userData.property.experience_score + rangerExp
+          inspector_score: userData.property.experience_score + rangerExp
         })
 
 
