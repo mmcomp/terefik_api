@@ -54,17 +54,22 @@ class AchievmentController {
         openAch = tmpAch.achievment
         openAch.collected = tmpAch.collected
         openAch.achieved = tmpAch.achieved
-        if(allAchievments[openAch.tag]) {
-          allAchievments[openAch.tag].push(openAch)
-        }else {
-          if(openAch.tag) {
-            allAchievments[openAch.tag] = []
+        if(tmpAch.collected==1) {
+          openAch = await Achievment.query().where('tag', openAch.tag).where('level', '>', openAch.level).first()
+        }
+        if(openAch) {
+          if(allAchievments[openAch.tag]) {
             allAchievments[openAch.tag].push(openAch)
-          }else{
-            if(!allAchievments['notag']) {
-              allAchievments['notag'] = []
+          }else {
+            if(openAch.tag) {
+              allAchievments[openAch.tag] = []
+              allAchievments[openAch.tag].push(openAch)
+            }else{
+              if(!allAchievments['notag']) {
+                allAchievments['notag'] = []
+              }
+              allAchievments.notag.push(openAch)
             }
-            allAchievments.notag.push(openAch)
           }
         }
       }
@@ -85,6 +90,54 @@ class AchievmentController {
         }
       }]
     }
+  }
+
+  static async collect (params, user) {
+    const rules = {
+      achievment_id: 'required|integer'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let userAchiement = await UserAchievment.query().with('achievment').where('achievments_id', params.achievment_id).where('users_id', user.id).first()
+    if(!userAchiement) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotInAchievment",
+          message: "شما در این دستاورد پیشرفتی نداشته اید",
+        }],
+        data: {}
+      }]
+    }
+    let userAchiementData = userAchiement.toJSON()
+    // console.log('User Achievment Data', userAchiementData)
+    if(userAchiementData.achieved < userAchiementData.achievment.total) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotEnoughAchievment",
+          message: "شما در این دستاورد پیشرفت کافی نداشته اید",
+        }],
+        data: {}
+      }]
+    }
+
+    userAchiement.collected = 1
+    await userAchiement.save()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {}
+    }]
   }
 }
 

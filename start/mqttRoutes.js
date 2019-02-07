@@ -82,6 +82,7 @@ const routes = {
 
   //Achievment
   'AchievmentList': 'Achievment/list',
+  'AchievmentCollect': 'Achievment/collect',
   
   'Test': 'Test/test'
 }
