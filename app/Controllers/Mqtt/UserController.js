@@ -4,6 +4,7 @@ const Validations = use('App/Libs/Validations')
 const Property = use('App/Models/Property')
 const InspectorDailyReport = use('App/Models/InspectorDailyReport')
 const RangerWork = use('App/Models/RangerWork')
+const Setting = use('App/Models/Setting')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -334,6 +335,57 @@ class UserController {
         messages: [],
         data: {
           inspector_work_leaders: leads
+        }
+      }]
+    }catch(e){
+      return [{
+        status: 0,
+        messages: [{
+          code: "UnknowError",
+          message: JSON.stringify(e)
+        }],
+        data: {}
+      }]
+    }
+  }
+
+  static async randomGift (params, user) {
+    try{
+      let settings = await Setting.get()
+      let loots = {}
+      if(user.is_parking_ranger==4) {
+        loots['silver_coin'] = Math.ceil(Math.random() * (settings.random_gift_silver_max - settings.random_gift_silver_min) + settings.random_gift_silver_min)
+      }else {
+        loots['diamond'] = Math.ceil(Math.random() * (settings.random_gift_diamond_max - settings.random_gift_diamond_min) + settings.random_gift_diamond_min)
+      }
+
+      let assets = [
+        'gasoline',
+        'health_oil',
+        'cleaning_soap',
+        'water',
+        'coke',
+      ]
+      let index1 = -1, index2 = -1
+      index1 = Math.ceil(Math.random() * 4)
+      while(index2<0 || index1==index2) {
+        index2 = Math.ceil(Math.random() * 4)
+      }
+
+      loots[assets[index1]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+      loots[assets[index2]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+
+      let property = await Property.query().where('user_id', user.id).first()
+      for(let loot in loots) {
+        property[loot] += loots[loot]
+      }
+      await property.save()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          loots: loots
         }
       }]
     }catch(e){
