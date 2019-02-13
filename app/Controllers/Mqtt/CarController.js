@@ -312,6 +312,19 @@ class CarController {
         data: {}
       }]
     }
+     
+    let currentHour = parseInt(Time().format('HH'), 10)
+    
+    if(currentHour>=settings.time_limit_end || currentHour<=settings.time_limit_start) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'OutOfWorkingHours',
+          message: 'خارج از محدوده زمانی فعالیت ثبت امکان پذیر نمی باشد'
+        }],
+        data: {}
+      }]
+    }
 
     let carOwner = {}, rangerSilver = 0, isNotReDone = 1
 

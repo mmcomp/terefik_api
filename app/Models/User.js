@@ -42,6 +42,10 @@ class User extends Model {
   traps() {
     return this.hasMany('App/Models/UserTrap', 'id', 'user_id')
   }
+
+  zones() {
+    return this.hasMany('App/Models/UserZone', 'id', 'users_id')
+  }
   // transactions () {
   //   return this.hasMany('App/Models/Transaction', 'id', 'user_id')
   // }

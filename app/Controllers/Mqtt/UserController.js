@@ -9,14 +9,38 @@ const Time = Moment.moment()
 
 class UserController {
   static async profile (params, user) {
-    await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap'])
+    await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap', 'zones.zone'])
+    let userData = user.toJSON()
+    let minimum_report = null
+    if(userData.zones && userData.zones.length>0) {
+      minimum_report = 0;
+      for(let uZ of userData.zones) {
+        if(uZ.zone) {
+          minimum_report += uZ.zone.desired_reports
+        }
+      }
+    }
+    let totalReport = 0, totalArrest = 0, todaySilverCoin = 0, todayReport = 0, todayArrest = 0
+    userData['ranger_data'] = {
+      minimum_report: minimum_report,
+      total: {
+        silver_coin: userData.silver_coin,
+        report: totalReport,
+        arrest: totalArrest,
+      },
+      today: {
+        silver_coin: todaySilverCoin,
+        report: todayReport,
+        arrest: todayArrest,
+      },
+    }
 
 
     return [{
       status: 1,
       messages: [],
       data: {
-        profile: user.toJSON()
+        profile: userData
       }
     }]
   }

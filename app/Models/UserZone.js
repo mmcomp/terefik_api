@@ -20,6 +20,10 @@ class UserZone extends Model {
   user () {
     return this.belongsTo('App/Models/User', 'users_id', 'id')
   }
+
+  zone () {
+    return this.belongsTo('App/Models/Zone', 'zone_id', 'id')
+  }
 }
 
 module.exports = UserZone
