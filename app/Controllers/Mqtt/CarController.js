@@ -9,6 +9,7 @@ const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
 const UserTerefik = use('App/Models/UserTerefik')
 const Notification = use('App/Models/Notification')
+const InspectorDailyReport = use('App/Models/InspectorDailyReport')
 const Env = use('Env')
 
 const DiscountController = use('App/Controllers/Mqtt/DiscountController')
@@ -403,6 +404,15 @@ class CarController {
       })
 
       loot.silver_coin = rangerSilver
+
+      let inspectorDailyReport = await InspectorDailyReport.query().where('user_id', user.id).whereRaw("created_at like  '" + Moment.now('YYYY-MM-DD') + "%'").first()
+      if(!inspectorDailyReport) {
+          inspectorDailyReport = new InspectorDailyReport
+          inspectorDailyReport.user_id = user.id
+          inspectorDailyReport.report_count = 0
+      }
+      inspectorDailyReport.report_count += 1
+      await inspectorDailyReport.save()
 
       console.log('Arrest result', {
         status: 1,
