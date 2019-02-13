@@ -3,6 +3,7 @@
 const Validations = use('App/Libs/Validations')
 const Property = use('App/Models/Property')
 const InspectorDailyReport = use('App/Models/InspectorDailyReport')
+const RangerWork = use('App/Models/RangerWord')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -12,27 +13,36 @@ class UserController {
     await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap', 'zones.zone'])
     let userData = user.toJSON()
     let minimum_report = null
-    if(userData.zones && userData.zones.length>0) {
-      minimum_report = 0;
-      for(let uZ of userData.zones) {
-        if(uZ.zone) {
-          minimum_report += uZ.zone.desired_reports
+    userData['ranger_data'] = {}
+    if(userData.property.is_parking_ranger==4) {
+      if(userData.zones && userData.zones.length>0) {
+        minimum_report = 0;
+        for(let uZ of userData.zones) {
+          if(uZ.zone) {
+            minimum_report += uZ.zone.desired_reports
+          }
         }
       }
-    }
-    let totalReport = 0, totalArrest = 0, todaySilverCoin = 0, todayReport = 0, todayArrest = 0
-    userData['ranger_data'] = {
-      minimum_report: minimum_report,
-      total: {
-        silver_coin: userData.silver_coin,
-        report: totalReport,
-        arrest: totalArrest,
-      },
-      today: {
-        silver_coin: todaySilverCoin,
-        report: todayReport,
-        arrest: todayArrest,
-      },
+      let totalReport = 0, totalArrest = 0, todaySilverCoin = 0, todayReport = 0, todayArrest = 0
+      totalArrest = await RangerWork.query().where('ranger_id', user.id).getCount()
+      totalReport = await InspectorDailyReport.query().where('user_id', user.id).getSum('report_count')
+      todayArrest = await RangerWork.query().where('ranger_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getCount()
+      todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
+      
+      userData['ranger_data'] = {
+        minimum_report: minimum_report,
+        total: {
+          silver_coin: userData.silver_coin,
+          report: totalReport,
+          arrest: totalArrest,
+        },
+        today: {
+          silver_coin: todaySilverCoin,
+          report: todayReport,
+          arrest: todayArrest,
+        },
+      }
+  
     }
 
 
