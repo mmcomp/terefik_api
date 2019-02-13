@@ -11,6 +11,7 @@ const Time = Moment.moment()
 
 class UserController {
   static async profile (params, user) {
+    let settings = await Setting.get()
     await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap', 'zones.zone'])
     let userData = user.toJSON()
     let minimum_report = null
@@ -43,6 +44,7 @@ class UserController {
       
       userData['ranger_data'] = {
         minimum_report: minimum_report,
+        ranger_star_change: settings.ranger_star_change,
         total: {
           silver_coin: userData.property.silver_coin,
           report: totalReport,
