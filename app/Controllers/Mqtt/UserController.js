@@ -13,7 +13,7 @@ class UserController {
     await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap', 'zones.zone'])
     let userData = user.toJSON()
     let minimum_report = null
-    userData['ranger_data'] = {}
+    userData['ranger_data'] = null
     if(userData.is_parking_ranger==4) {
       if(userData.zones && userData.zones.length>0) {
         minimum_report = 0;
