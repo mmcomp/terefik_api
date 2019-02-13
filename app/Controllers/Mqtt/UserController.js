@@ -3,7 +3,7 @@
 const Validations = use('App/Libs/Validations')
 const Property = use('App/Models/Property')
 const InspectorDailyReport = use('App/Models/InspectorDailyReport')
-const RangerWork = use('App/Models/RangerWord')
+const RangerWork = use('App/Models/RangerWork')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -14,7 +14,7 @@ class UserController {
     let userData = user.toJSON()
     let minimum_report = null
     userData['ranger_data'] = {}
-    if(userData.property.is_parking_ranger==4) {
+    if(userData.is_parking_ranger==4) {
       if(userData.zones && userData.zones.length>0) {
         minimum_report = 0;
         for(let uZ of userData.zones) {
@@ -23,16 +23,27 @@ class UserController {
           }
         }
       }
+      
       let totalReport = 0, totalArrest = 0, todaySilverCoin = 0, todayReport = 0, todayArrest = 0
       totalArrest = await RangerWork.query().where('ranger_id', user.id).getCount()
+      todaySilverCoin = await RangerWork.query().where('ranger_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('silver_coin')
+      if(!todaySilverCoin) {
+        todaySilverCoin = 0
+      }
       totalReport = await InspectorDailyReport.query().where('user_id', user.id).getSum('report_count')
+      if(!totalReport) {
+        totalReport = 0
+      }
       todayArrest = await RangerWork.query().where('ranger_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getCount()
       todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
+      if(!todayReport) {
+        todayReport = 0
+      }
       
       userData['ranger_data'] = {
         minimum_report: minimum_report,
         total: {
-          silver_coin: userData.silver_coin,
+          silver_coin: userData.property.silver_coin,
           report: totalReport,
           arrest: totalArrest,
         },
@@ -45,7 +56,7 @@ class UserController {
   
     }
 
-
+    delete userData.zones
     return [{
       status: 1,
       messages: [],
