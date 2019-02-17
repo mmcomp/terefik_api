@@ -56,7 +56,8 @@ class UserController {
           arrest: todayArrest,
         },
       }
-  
+      console.log('Ranger Data')
+      console.log(userData.ranger_data)
     }
 
     delete userData.zones
