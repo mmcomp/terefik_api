@@ -24,7 +24,7 @@ class Property extends Model {
   }
 
   inspector () {
-    return this.hasOne('App/Models/InspectorLevel', 'inspector_level', 'id')
+    return this.belongsTo('App/Models/InspectorLevel', 'inspector_level', 'id')
   }
 }
 
