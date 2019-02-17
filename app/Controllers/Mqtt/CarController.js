@@ -97,7 +97,7 @@ class CarController {
         return [{
           status: 0,
           messages: [{
-            code: "ShortOnBronzeEventWithExtra",
+            code: "ShortOnBronzeEvenWithExtra",
             message: "سکه شما کافی نمی باشد و اعتبار سکه شما منفی شده است"
           }],
           data: {}
