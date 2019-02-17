@@ -93,14 +93,27 @@ class CarController {
     let totalPay = Math.ceil(settings.unit_to_bronze_coin * units * discountPercent, 10)
 
     if(totalPay > userData.property.bronze_coin) {
-      return [{
-        status: 0,
-        messages: [{
-          code: "ShortOnBronze",
-          message: "سکه شما کافی نمی باشد"
-        }],
-        data: {}
-      }]
+      if(userData.property.bronze_coin<0) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ShortOnBronzeEventWithExtra",
+            message: "سکه شما کافی نمی باشد و اعتبار سکه شما منفی شده است"
+          }],
+          data: {}
+        }]
+      }
+
+      if(settings.max_bronze_negative + userData.property.bronze_coin < totalPay) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ShortOnBronze",
+            message: "سکه شما کافی نمی باشد"
+          }],
+          data: {}
+        }]
+      }
     }
 
     let transaction = new Transaction
