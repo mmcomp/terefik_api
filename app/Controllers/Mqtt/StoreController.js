@@ -45,6 +45,7 @@ class StoreBoardController {
         image: store.image,
         description: store.description,
         price: store.price,
+        price_resident_coin: store.price_resident_coin,
         currency: ''
       })
     })
