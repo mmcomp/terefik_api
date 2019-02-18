@@ -56,6 +56,7 @@ const routes = {
   // Stores
   'StoreList': 'Store/list',
   'StoreBuy': 'Store/buy',
+  'StoreResidentBuy': 'Store/residentBuy',
 
   // Products
   'ProductGallonPrice': 'Product/gallonList',

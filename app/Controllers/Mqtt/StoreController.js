@@ -3,6 +3,7 @@
 const Store = use('App/Models/Store')
 const Transaction = use('App/Models/Transaction')
 const Randomatic = require('randomatic')
+const Gamification = use('App/Models/Gamification')
 
 const Messages = use('App/Libs/Messages/Messages')
 const Validations = use('App/Libs/Validations')
@@ -192,6 +193,69 @@ class StoreBoardController {
         data: {
           error_code: postData.return
           // revertURL: Env.get('BANK_MELLAT_REVERT_URL')
+        }
+      }]  
+    }
+  }
+
+  static async residentBuy (params, user) {
+    let rules = {
+      id: 'required|integer'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let store = await Store.find(params.id)
+    if (!store) {
+      return [{
+        status: 0,
+        messages: Messages.parse(['StoreNotFound']),
+        data: {}
+      }]
+    }
+
+
+    var transaction = new Transaction()
+    transaction.user_id = user.id
+    transaction.type = 'store'
+    transaction.type_id = store.id
+    transaction.price = store.price_resident_coin
+    transaction.payment_id = Randomatic('0', 12)
+    transaction.price_type = 'resident_coin'
+    transaction.status = 'pending'
+    await transaction.save()
+
+    let gamification = new Gamification
+    let response = await gamification.changeCoin(user.mobile.replace('+98', '0'), -1 * store.price_resident_coin)
+    if(response.status==1) {
+      transaction.status = 'success'
+      transaction.payment_ticket = postData.return.split(',')[1]
+      await transaction.save()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+        }
+      }]  
+    } else {
+      transaction.status = 'error'
+      await transaction.save()
+      return [{
+        status: 0,
+        messages: [{
+          code: "ResidentCoinError",
+          message: "خطا در کم کردن سکه شهروندی"
+        }],
+        data: {
+          error_code: ''
         }
       }]  
     }
