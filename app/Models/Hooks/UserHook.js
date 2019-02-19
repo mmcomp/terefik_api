@@ -73,7 +73,7 @@ UserHook.loadExperienceLevels = async (properties) => {
                 let notification = new Notification
                 notification.title = Env.get('PUSH_USER_EXPERIENCE_LEVEL_TTILE')
                 notification.message = Env.get('PUSH_USER_EXPERIENCE_LEVEL_MESSAGE')
-                notification.users_id = theOwner.id
+                notification.users_id = property.user_id
                 await notification.save()
             }
             property.experience_level = expLevel.id
