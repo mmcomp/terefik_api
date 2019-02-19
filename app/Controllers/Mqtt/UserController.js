@@ -26,11 +26,15 @@ class UserController {
         }
       }
       
-      let totalReport = 0, totalArrest = 0, todaySilverCoin = 0, todayReport = 0, todayArrest = 0
+      let totalReport = 0, totalArrest = 0, todaySilverCoin = 0, totalSilverCoin = 0, todayReport = 0, todayArrest = 0
       totalArrest = await RangerWork.query().where('ranger_id', user.id).getCount()
       todaySilverCoin = await RangerWork.query().where('ranger_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('silver_coin')
       if(!todaySilverCoin) {
         todaySilverCoin = 0
+      }
+      totalSilverCoin = await RangerWork.query().where('ranger_id', user.id).getSum('silver_coin')
+      if(!totalSilverCoin) {
+        totalSilverCoin = 0
       }
       totalReport = await InspectorDailyReport.query().where('user_id', user.id).getSum('report_count')
       if(!totalReport) {
@@ -46,7 +50,7 @@ class UserController {
         minimum_report: minimum_report,
         ranger_star_change: settings.ranger_star_change,
         total: {
-          silver_coin: userData.property.silver_coin,
+          silver_coin: totalSilverCoin,
           report: totalReport,
           arrest: totalArrest,
         },
