@@ -4,6 +4,7 @@ const Store = use('App/Models/Store')
 const Transaction = use('App/Models/Transaction')
 const Randomatic = require('randomatic')
 const Gamification = use('App/Models/Gamification')
+const Property = use('/App/Models/Property')
 
 const Messages = use('App/Libs/Messages/Messages')
 const Validations = use('App/Libs/Validations')
@@ -236,8 +237,14 @@ class StoreBoardController {
     let response = await gamification.changeCoin(user.mobile.replace('+98', '0'), -1 * store.price_resident_coin)
     if(response.status==1) {
       transaction.status = 'success'
-      transaction.payment_ticket = postData.return.split(',')[1]
+      transaction.payment_ticket = ''
       await transaction.save()
+
+      let userProperty = await Property.query().where('user_id').first()
+      if(userProperty) {
+        userProperty.bronze_coin += store.coin
+        await userProperty.save()
+      }
 
       return [{
         status: 1,
@@ -248,6 +255,8 @@ class StoreBoardController {
     } else {
       transaction.status = 'error'
       await transaction.save()
+      console.log('Gamification Error')
+      console.log(response.messages[0])
       return [{
         status: 0,
         messages: [{

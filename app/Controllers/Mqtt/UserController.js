@@ -212,6 +212,7 @@ class UserController {
         }
       }]
     }catch(e){
+      console.log('Exp Leader Error', e)
       return [{
         status: 0,
         messages: [{
