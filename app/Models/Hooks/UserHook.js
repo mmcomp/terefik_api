@@ -52,12 +52,12 @@ UserHook.loadExperienceLevels = async (properties) => {
         let insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
         if(insLevel) {
             if(property.inspector_level < insLevel.id) {
-                properties.silver_coin += properties.silver_coin * insLevel.level_order / 100
+                property.silver_coin += property.silver_coin * insLevel.level_order / 100
 
                 let notification = new Notification
                 notification.title = Env.get('PUSH_USER_ARREST_TTILE')
                 notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
-                notification.users_id = theOwner.id
+                notification.users_id = property.user_id
                 await notification.save()
             }
             property.inspector_level = insLevel.id
