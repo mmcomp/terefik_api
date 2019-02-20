@@ -4,7 +4,7 @@ const Store = use('App/Models/Store')
 const Transaction = use('App/Models/Transaction')
 const Randomatic = require('randomatic')
 const Gamification = use('App/Models/Gamification')
-const Property = use('/App/Models/Property')
+const Property = use('App/Models/Property')
 
 const Messages = use('App/Libs/Messages/Messages')
 const Validations = use('App/Libs/Validations')
