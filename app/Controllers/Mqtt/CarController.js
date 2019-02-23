@@ -679,6 +679,8 @@ class CarController {
           theCar = await Car.find(results[i].vehicle_id)
           theCar = theCar.toJSON()
           theCar['distance'] = parseInt(results[i].dis, 10)
+          theCar['shield_start'] = results[i].shield_start
+          theCar['shield_duration'] = results[i].shield_duration
           cars.push(theCar)
       }
       return [{
