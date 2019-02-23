@@ -17,7 +17,7 @@ class Achievment extends Model {
       userAchievmentIds.push(uAch.achievments_id)
       if(uAch.collected==0) {
         if(uAch.achieved<uAch.achievment.total) {
-          await UserAchievment.query().where('id', uAch).update({
+          await UserAchievment.query().where('id', uAch.id).update({
             achieved: uAch.achieved+1
           })
         }else {
