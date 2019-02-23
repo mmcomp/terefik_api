@@ -4,6 +4,7 @@ const Log = use('App/Models/Log')
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
 const Achievment = use('App/Models/Achievment')
+const Property = use('App/Models/Property')
 const UserAchievment = use('App/Models/UserAchievment')
 
 const Env = use('Env')
@@ -132,6 +133,12 @@ class AchievmentController {
 
     userAchiement.collected = 1
     await userAchiement.save()
+
+    let property = await Property.query().where('user_id', user.id).first()
+    if(property) {
+      property[userAchiementData.achievment.price_type] += userAchiementData.achievment.price
+      await property.save()
+    }
 
     return [{
       status: 1,

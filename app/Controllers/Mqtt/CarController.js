@@ -10,6 +10,7 @@ const Transaction = use('App/Models/Transaction')
 const UserTerefik = use('App/Models/UserTerefik')
 const Notification = use('App/Models/Notification')
 const InspectorDailyReport = use('App/Models/InspectorDailyReport')
+const Achievment = use('App/Models/Achievment')
 const Env = use('Env')
 
 const DiscountController = use('App/Controllers/Mqtt/DiscountController')
@@ -146,6 +147,8 @@ class CarController {
     userCar.lon = params.lon_gps
     userCar.lat = params.lat_gps
     await userCar.save()
+
+    await Achievment.achieve(user.id, 'park')
 
     return [{
       status: 1,
@@ -561,6 +564,8 @@ class CarController {
           diamond: -1*settings.diamond_lose_on_arrest,
         })
         await notification.save()
+
+        await Achievment.achieve(user.id, 'ranger')
 
         return [{
           status: 1,

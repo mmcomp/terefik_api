@@ -2,8 +2,6 @@
 
 const ExperienceLevel = use('App/Models/ExperienceLevel')
 const InspectorLevel = use('App/Models/InspectorLevel')
-// const Achievment = use('App/Models/Achievment')
-// const UserAchievment = use('App/Models/Achievment')
 const Notification = use('App/Models/Notification')
 const Env = use('Env')
 
@@ -40,8 +38,6 @@ UserHook.loadExperienceLevel = async (property) => {
         }
         property.experience_level = expLevel.id
     }
-
-
 
     if(insLevel || expLevel) {
         await property.save()
