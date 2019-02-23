@@ -14,6 +14,53 @@ const _ = require('lodash')
 class AchievmentController {
   static async list (params, user) {
     try{
+      let allAchievments = {}
+      let allTagNames = await Achievment.query().groupBy('tag').pluck('tag')
+      let tagIds = {}, tmpAchiemnets, userAchiements, foundAchievments
+      for(let tag of allTagNames) {
+        tmpAchiemnets = await Achievment.query().where('tag', tag).orderBy('level').pluck('id')
+        tagIds[tag] = tmpAchiemnets
+        userAchiements = await UserAchievment.query().with('achievment').whereIn('achievments_id', tmpAchiemnets).where('users_id', user.id).orderBy('collected', 'desc').fetch()
+        userAchiements = userAchiements.toJSON()
+        foundAchievments = []
+        for(let uAch of userAchiements) {
+          foundAchievments.push(uAch.achievment.id)
+          if(!allAchievments[tag]) {
+            allAchievments[tag] = []
+          }
+          allAchievments[tag].push({
+            id: uAch.achievment.id,
+            title: uAch.achievment.title,
+            action: uAch.achievment.action,
+            achieved: uAch.achieved,
+            total: uAch.achievment.total,
+            collected: uAch.collected,
+            prize: uAch.achievment.price,
+            prize_type: uAch.achievment.price_type,
+            level: uAch.achievment.level,
+          })
+        }
+        tmpAchiemnets = await Achievment.query().where('tag', tag).whereNotIn('id', foundAchievments).orderBy('level').first()
+        if(tmpAchiemnets) {
+          if(!allAchievments[tag]) {
+            allAchievments[tag] = []
+          }
+          allAchievments[tag].push({
+            id: tmpAchiemnets.id,
+            title: tmpAchiemnets.title,
+            action: tmpAchiemnets.action,
+            achieved: 0,
+            total: tmpAchiemnets.total,
+            collected: 0,
+            prize: tmpAchiemnets.price,
+            prize_type: tmpAchiemnets.price_type,
+            level: tmpAchiemnets.level,
+          })
+        }
+      }
+      // console.log('Tag Ids', tagIds)
+
+      /*
       let userAchiements = await UserAchievment.query().with('achievment').where('users_id', user.id).fetch()
       userAchiements = userAchiements.toJSON()
       console.log('User Achievments')
@@ -57,6 +104,8 @@ class AchievmentController {
         openAch.achieved = tmpAch.achieved
         if(tmpAch.collected==1) {
           openAch = await Achievment.query().where('tag', openAch.tag).where('level', '>', openAch.level).first()
+          openAch.collected = 0
+          openAch.achieved = 0
         }
         if(openAch) {
           if(allAchievments[openAch.tag]) {
@@ -74,7 +123,7 @@ class AchievmentController {
           }
         }
       }
-
+      */
       return [{
         status: 1,
         messages: [],
