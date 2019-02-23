@@ -22,6 +22,11 @@ ArrestZoneHook.zoneDetect = async (rangerWork) => {
         }
         
     }
+    //---fake
+    if(rangerWork.zone_id==0) {
+        rangerWork.zone_id = 198
+    }
+    //-------
 
     let userProperty = await Property.query().where('user_id', rangerWork.ranger_id).first()
     userProperty.inspector_work_count++
