@@ -107,7 +107,7 @@ class AchievmentController {
       }]
     }
 
-    let userAchiement = await UserAchievment.query().with('achievment').where('achievments_id', params.achievment_id).where('users_id', user.id).first()
+    let userAchiement = await UserAchievment.query().with('achievment').where('achievments_id', params.achievment_id).where('users_id', user.id).where('collected', 0).first()
     if(!userAchiement) {
       return [{
         status: 0,
