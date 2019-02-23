@@ -241,7 +241,9 @@ class CarController {
       return [{
         status: 1,
         messages: [],
-        data: {}
+        data: {
+          car_id: car.id,
+        }
       }]
     }catch(e) {
       console.log('Error Add Car')
