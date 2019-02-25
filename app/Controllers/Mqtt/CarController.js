@@ -5,6 +5,7 @@ const CarFake = use('App/Models/CarFake')
 const User = use('App/Models/User')
 const UserCar = use('App/Models/UserCar')
 const RangerWork = use('App/Models/RangerWork')
+const RangerSilverTime = use('App/Models/RangerSilverTime')
 const Property = use('App/Models/Property')
 const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
@@ -631,7 +632,10 @@ class CarController {
       }
 
       rangerSilver += isNotReDone * settings.silver_when_not_reported
-
+      let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
+      if(rangerSilverTime) {
+        rangerSilver += rangerSilverTime.extra_silver
+      }
 
       await user.property().update({
         silver_coin: userData.property.silver_coin + rangerSilver
@@ -705,6 +709,12 @@ class CarController {
       }
     }
 
+    let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
+    let extraSilver = 0
+    if(rangerSilverTime) {
+      extraSilver = rangerSilverTime.extra_silver
+    }
+
     rangerWork = new RangerWork
     rangerWork.ranger_id = user.id
     rangerWork.vehicle_id = params.car_id
@@ -759,7 +769,7 @@ class CarController {
         loot.cleaning = parseInt(rangerWork.cleaning, 10)
 
         await user.property().update({
-          silver_coin: userData.property.silver_coin + loot.silver_coin,
+          silver_coin: userData.property.silver_coin + loot.silver_coin + extraSilver,
           gasoline : userData.property.gasoline + loot.gasoline,
           health_oil: userData.property.health_oil + loot.health,
           cleaning_soap : userData.property.cleaning_soap + loot.cleaning,
@@ -804,7 +814,7 @@ class CarController {
       loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
 
       await user.property().update({
-        silver_coin: userData.property.silver_coin + loot.silver_coin
+        silver_coin: userData.property.silver_coin + loot.silver_coin + extraSilver
       })
 
       return [{
