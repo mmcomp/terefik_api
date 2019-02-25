@@ -161,6 +161,124 @@ class CarController {
     }]
   }
 
+  static async leave(params, user) {
+    const rules = {
+      car_id: 'required',
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let car_id = params.car_id
+
+    let userCar = await UserCar.query().where('user_id', user.id).where('vehicle_id', car_id).first()
+    if(!userCar) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "CarNotYours",
+          message: "خودرو متعلق به شما نمی باشد"
+        }],
+        data: {}
+      }]
+    }
+
+    let shieldDiff = Time().diff(Time(userCar.shield_start).add(userCar.shield_duration, 'minutes'), 'seconds')
+    if(shieldDiff>=0) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NotShielded",
+          message: "شما شیلد نمی باشید"
+        }],
+        data: {}
+      }]
+    }
+
+    let leaveTime = Time().format('YYYY-MM-DD HH:mm:ss')
+    userCar.leave_time = leaveTime
+    await userCar.save()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {}
+    }]
+  }
+
+  static async leaveList(params, user) {
+    const rules = {
+      lon_gps: 'required',
+      lat_gps: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    if(user.is_parking_ranger!=4) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'NotRanger',
+          message: 'شما پارکیار نمی باشید'
+        }],
+        data: {}
+      }]
+    }
+
+    try{
+      let settings = await Setting.get()
+      let results = await Car.getCarsAround(params.lon_gps, params.lat_gps, settings.arrest_lookup_distance)
+      let theCar, cars = [], shieldFinish, shieldDiff, leaveTime
+      for(let i = 0;i < results.length;i++) {
+        if(results[i].leave_time) {
+          shieldFinish = Time(results[i].shield_start).add(results[i].shield_duration, 'minutes')
+          shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+          leaveTime = shieldFinish.diff(results[i].leave_time, 'seconds')
+          if(shieldDiff>0 && leaveTime>0) {
+            theCar = await Car.find(results[i].vehicle_id)
+            theCar = theCar.toJSON()
+            theCar['distance'] = parseInt(results[i].dis, 10)
+            theCar['shield_start'] = results[i].shield_start
+            theCar['shield_duration'] = results[i].shield_duration
+            theCar['shield_end'] = shieldFinish.format('YYYY-MM-DD HH:mm:ss')
+            theCar['lon'] = results[i].lon
+            theCar['lat'] = results[i].lat
+            cars.push(theCar)
+          }
+        }
+      }
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          founds: cars
+        }
+      }]
+    }catch(e){
+      return [{
+        status: 0,
+        messages: [{
+          code: 'SpatialError',
+          message: e.message
+        }],
+        data: {}
+      }]
+    }
+  }
+
   static async shieldList(params, user) {
     let shieldDiff = 0, cars = [], userCars = await UserCar.query().where('user_id', user.id).with('cars').fetch()
     userCars = userCars.toJSON()

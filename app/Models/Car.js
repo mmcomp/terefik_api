@@ -19,7 +19,7 @@ class Car extends Model {
 
     static async getCarsAround(lon, lat, distance) {
         // let sql = "select `vehicle_id`,st_distance(point(lon, lat), point(" + lon + ", " + lat + ")) * 100000  `dis`, `shield_start`, `shield_duration`, `lon`, `lat` from `user_vehicle` where st_distance(point(lon, lat), point(" + lon + ", " + lat + ")) < " + String(parseFloat(distance)/100000)
-        let sql = "select `vehicle_id`,glength(LineStringFromWKB(LineString(GeomFromText(astext(PointFromWKB(POINT(lon,lat)))),GeomFromText(astext(PointFromWKB(POINT(" + lon + ", " + lat + "))))))) * 100000  `dis`, `shield_start`, `shield_duration`, `lon`, `lat` from `user_vehicle` where glength(LineStringFromWKB(LineString(GeomFromText(astext(PointFromWKB(POINT(lon,lat)))),GeomFromText(astext(PointFromWKB(POINT(" + lon + ", " + lat + "))))))) < " + String(parseFloat(distance)/100000);
+        let sql = "select `vehicle_id`,glength(LineStringFromWKB(LineString(GeomFromText(astext(PointFromWKB(POINT(lon,lat)))),GeomFromText(astext(PointFromWKB(POINT(" + lon + ", " + lat + "))))))) * 100000  `dis`, `shield_start`, `shield_duration`, `lon`, `lat`, `leave_time` from `user_vehicle` where glength(LineStringFromWKB(LineString(GeomFromText(astext(PointFromWKB(POINT(lon,lat)))),GeomFromText(astext(PointFromWKB(POINT(" + lon + ", " + lat + "))))))) < " + String(parseFloat(distance)/100000);
         console.log('Cars Around Query')
         console.log(sql)
         let results = await Database.raw(sql)

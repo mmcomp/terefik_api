@@ -27,6 +27,8 @@ const routes = {
   'ArrestList': 'Car/arrestList',
   'ShieldCar': 'Car/shield',
   'ShieldList': 'Car/shieldList',
+  'LeaveSooner': 'Car/leave',
+  'LeaveSoonerList': 'Car/leaveList',
 
   // Discount
   'GetDiscount': 'Discount/get',
