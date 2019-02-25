@@ -1,6 +1,7 @@
 'use strict'
 
 const Car = use('App/Models/Car')
+const CarFake = use('App/Models/CarFake')
 const User = use('App/Models/User')
 const UserCar = use('App/Models/UserCar')
 const RangerWork = use('App/Models/RangerWork')
@@ -359,6 +360,103 @@ class CarController {
       //   }]      
       // }
   
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          car_id: car.id,
+        }
+      }]
+    }catch(e) {
+      console.log('Error Add Car')
+      console.log(e)
+      return [{
+        status: 0,
+        messages: [{
+          code: "SystemError",
+          message: "خطای سیستمی",
+        }],
+        data: {}
+      }]
+    }
+  }
+
+  static async fake(params, user) {
+    try{
+      const rules = {
+        color_id: 'required',
+        model_id: 'required',
+        car_id: 'required',
+      }
+  
+      let check = await Validations.check(params, rules)
+      if (check.err) {
+        return [{
+          status: 0,
+          messages: check.messages,
+          data: {}
+        }]
+      }
+  
+  
+      let car = await Car.query().where('id', params.car_id).first()
+      if(!car) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "CarNotFound",
+            message: "خودرو مورد نظر پیدا نشد",
+          }],
+          data: {}
+        }]
+      }
+
+      if(car.model_id==params.model_id && car.color_id==params.color_id) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "CarIsTheSame",
+            message: "خودرو مورد نظر با همین مشخصات ثبت است",
+          }],
+          data: {}
+        }]
+      }
+
+      let carFakeUser = await CarFake.query().where('vehicle_id', car.id).where('ranger_id', user.id).first()
+      if(carFakeUser) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "CarAlreadyReported",
+            message: "خودرو مورد نظر قبلا توسط شما گزارش شده است",
+          }],
+          data: {}
+        }]
+      }
+
+      let carFakes = await CarFake.query().where('vehicle_id', car.id).where('model_id', params.model_id).where('color_id', params.color_id).fetch()
+      carFakes = carFakes.toJSON()
+      if(carFakes.length>=2) {
+        car.model_id = params.model_id
+        car.color_id = params.color_id
+        await car.save()
+
+        await CarFake.query().where('vehicle_id', car.id).delete()
+
+        return [{
+          status: 1,
+          messages: [],
+          data: {}
+        }]
+      }
+
+      let carFake = new CarFake
+      carFake.vehicle_id = car.id
+      carFake.model_id = params.model_id
+      carFake.color_id = params.color_id
+      carFake.ranger_id = user.id
+      await carFake.save()
+      
       return [{
         status: 1,
         messages: [],
