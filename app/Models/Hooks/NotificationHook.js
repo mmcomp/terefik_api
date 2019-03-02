@@ -29,7 +29,7 @@ NotificationHook.send = async (notification) => {
             let theUser = await User.query().where('id', notification.users_id).first()
             if(theUser) {
                 console.log('Pushe Id ', theUser.pushe_id)
-                if(theUser.pushe_id!='') {
+                // if(theUser.pushe_id!='') {
                     data['filter'] = {
                         pushe_id: [theUser.pushe_id]
                     }
@@ -44,7 +44,7 @@ NotificationHook.send = async (notification) => {
                     response = await axios.post('', data)
                     console.log('Push response')
                     console.log(response.data)
-                }
+                // }
                 let pubTopic = 'client_' + theUser.token + '/ArrestNotification'
                 let data = {}
                 try{
