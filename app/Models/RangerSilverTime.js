@@ -5,7 +5,7 @@ const Model = use('Model')
 
 class RangerSilverTime extends Model {
   static get table () {
-    return 'insector_silver_time'
+    return 'inspector_silver_time'
   }
 
   static get createdAtColumn () {
