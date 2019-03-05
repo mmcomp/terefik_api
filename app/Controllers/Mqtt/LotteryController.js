@@ -30,6 +30,25 @@ class LotteryController {
             lotteries.rangerLotteries[i]['is_in'] = true
           }
           lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')>0)
+          if(lotteries.rangerLotteries[i].status=='finish') {
+            let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
+            winners = winners.toJSON()
+            lotteries.rangerLotteries[i]['winners'] = []
+            for(let uWin of winners) {
+              lotteries.rangerLotteries[i].winners.push({
+                user: {
+                  fname: uWin.user.fname,
+                  lname: uWin.user.lname,
+                  image_path: uWin.user.image_path,
+                },
+                award: {
+                  name: uWin.award.name,
+                  description: uWin.award.description,
+                  image_path: uWin.award.image_path,
+                }
+              })
+            }
+          }
         }
       }
 
@@ -41,6 +60,25 @@ class LotteryController {
           lotteries.userLotteries[i]['is_in'] = true
         }
         lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')<=0)
+        if(lotteries.userLotteries[i].status=='finish') {
+          let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
+          winners = winners.toJSON()
+          lotteries.userLotteries[i]['winners'] = []
+          for(let uWin of winners) {
+            lotteries.userLotteries[i].winners.push({
+              user: {
+                fname: uWin.user.fname,
+                lname: uWin.user.lname,
+                image_path: uWin.user.image_path,
+              },
+              award: {
+                name: uWin.award.name,
+                description: uWin.award.description,
+                image_path: uWin.award.image_path,
+              }
+            })
+          }
+        }
       }
 
       return [{
