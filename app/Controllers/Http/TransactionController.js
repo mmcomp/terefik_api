@@ -257,8 +257,13 @@ class TransactionController {
     }
     
 
-    let user = await User.query().where('id', transaction.user_id).with('property').first()
-    let userData = user.toJSON()
+    // let user = await User.query().where('id', transaction.user_id).with('property').first()
+    // let userData = user.toJSON()
+    let userProperty = await Property.query().where('user_id', transaction.user_id).first()
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
 
     let store = await Store.find(transaction.type_id)
     if(!store) {
@@ -275,34 +280,34 @@ class TransactionController {
     store.stat++
     await store.save()
 
-    const log = new Log()
-    log.type = 'mall_trade'
-    log.type_id = store.id
-    log.user_id = user.id
+    // const log = new Log()
+    // log.type = 'mall_trade'
+    // log.type_id = store.id
+    // log.user_id = user.id
 
-    log.before_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin
-    })
-    log.after_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin+store.coin
-    })
+    // log.before_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin
+    // })
+    // log.after_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin+store.coin
+    // })
 
-    await log.save()
+    // await log.save()
 
 
-    user.coin += store.coin
-    user.coin_incomes += store.coin
-    await user.save()
+    // user.coin += store.coin
+    // user.coin_incomes += store.coin
+    // await user.save()
 
     request_log.response = 'pay ok'
     request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
@@ -446,8 +451,13 @@ class TransactionController {
     }
     
 
-    let user = await User.query().where('id', transaction.user_id).with('property').first()
-    let userData = user.toJSON()
+    // let user = await User.query().where('id', transaction.user_id).with('property').first()
+    // let userData = user.toJSON()
+    let userProperty = await Property.query().where('user_id', transaction.user_id).first()
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
 
     let store = await Store.find(transaction.type_id)
     if(!store) {
@@ -464,34 +474,34 @@ class TransactionController {
     store.stat++
     await store.save()
 
-    const log = new Log()
-    log.type = 'mall_trade'
-    log.type_id = store.id
-    log.user_id = user.id
+    // const log = new Log()
+    // log.type = 'mall_trade'
+    // log.type_id = store.id
+    // log.user_id = user.id
 
-    log.before_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin
-    })
-    log.after_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin+store.coin
-    })
+    // log.before_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin
+    // })
+    // log.after_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin+store.coin
+    // })
 
-    await log.save()
+    // await log.save()
 
 
-    user.coin += store.coin
-    user.coin_incomes += store.coin
-    await user.save()
+    // user.coin += store.coin
+    // user.coin_incomes += store.coin
+    // await user.save()
 
     request_log.response = 'pay ok'
     request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
@@ -730,8 +740,13 @@ class TransactionController {
     }
     
 
-    let user = await User.query().where('id', transaction.user_id).with('property').first()
-    let userData = user.toJSON()
+    // let user = await User.query().where('id', transaction.user_id).with('property').first()
+    // let userData = user.toJSON()
+    let userProperty = await Property.query().where('user_id', transaction.user_id).first()
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
 
     let store = await Store.find(transaction.type_id)
     if(!store) {
@@ -748,34 +763,34 @@ class TransactionController {
     store.stat++
     await store.save()
 
-    const log = new Log()
-    log.type = 'mall_trade'
-    log.type_id = store.id
-    log.user_id = user.id
+    // const log = new Log()
+    // log.type = 'mall_trade'
+    // log.type_id = store.id
+    // log.user_id = user.id
 
-    log.before_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin
-    })
-    log.after_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin+store.coin
-    })
+    // log.before_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin
+    // })
+    // log.after_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin+store.coin
+    // })
 
-    await log.save()
+    // await log.save()
 
 
-    user.coin += store.coin
-    user.coin_incomes += store.coin
-    await user.save()
+    // user.coin += store.coin
+    // user.coin_incomes += store.coin
+    // await user.save()
 
     request_log.response = 'pay ok'
     request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
