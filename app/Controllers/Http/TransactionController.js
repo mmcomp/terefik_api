@@ -2,6 +2,7 @@
 
 const Transaction = use('App/Models/Transaction')
 const User = use('App/Models/User')
+const Property = use('App/Models/Property')
 const Store = use('App/Models/Store')
 const Log = use('App/Models/Log')
 const RequestLog = use('App/Models/RequestLog')
@@ -103,42 +104,47 @@ class TransactionController {
     }
 
 
-    let user = User.query().where('id', transaction.user_id).with('property').first()
-    let userData = user.toJSON()
+    // let user = User.query().where('id', transaction.user_id).with('property').first()
+    // let userData = user.toJSON()
+    let userProperty = await Property.query().where('user_id', transaction.user_id).first()
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
 
     let store = Store.find(transaction.type_id)
     store.stat++
     await store.save()
-    const log = new Log()
-    log.type = 'mall_trade'
-    log.type_id = store.id
-    log.user_id = user.id
+    // const log = new Log()
+    // log.type = 'mall_trade'
+    // log.type_id = store.id
+    // log.user_id = user.id
 
-    log.before_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin
-    })
-    log.after_state = JSON.stringify({
-      ye: userData.property.ye,
-      be: userData.property.be,
-      elixir_1: userData.property.elixir_1,
-      elixir_2: userData.property.elixir_2,
-      elixir_3: userData.property.elixir_3,
-      coin: userData.coin+store.coin
-    })
+    // log.before_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin
+    // })
+    // log.after_state = JSON.stringify({
+    //   ye: userData.property.ye,
+    //   be: userData.property.be,
+    //   elixir_1: userData.property.elixir_1,
+    //   elixir_2: userData.property.elixir_2,
+    //   elixir_3: userData.property.elixir_3,
+    //   coin: userData.coin+store.coin
+    // })
 
-    await log.save()
+    // await log.save()
 
     // await user.property().update({
     //   coin: userData.property.coin + store.coind
     // })
-    user.bronze_coin += store.coin
+    // user.bronze_coin += store.coin
     // user.coin_incomes += store.coin
-    await user.save()
+    // await user.save()
 
     request_log.response = 'pay ok'
     request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
