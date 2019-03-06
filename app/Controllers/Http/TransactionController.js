@@ -136,8 +136,8 @@ class TransactionController {
     // await user.property().update({
     //   coin: userData.property.coin + store.coind
     // })
-    user.coin += store.coin
-    user.coin_incomes += store.coin
+    user.bronze_coin += store.coin
+    // user.coin_incomes += store.coin
     await user.save()
 
     request_log.response = 'pay ok'
