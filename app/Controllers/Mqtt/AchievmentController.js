@@ -15,7 +15,12 @@ class AchievmentController {
   static async list (params, user) {
     try{
       let allAchievments = {}
-      let allTagNames = await Achievment.query().groupBy('tag').pluck('tag')
+      let allTagNames 
+      if(user.is_parking_ranger==4){
+        allTagNames = await Achievment.query().groupBy('tag').pluck('tag')
+      }else {
+        allTagNames = await Achievment.query().whereNot('action_type', 'ranger').groupBy('tag').pluck('tag')
+      }
       let tagIds = {}, tmpAchiemnets, userAchiements, foundAchievments
       for(let tag of allTagNames) {
         tmpAchiemnets = await Achievment.query().where('tag', tag).orderBy('level').pluck('id')
