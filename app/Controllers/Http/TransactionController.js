@@ -260,10 +260,7 @@ class TransactionController {
     // let user = await User.query().where('id', transaction.user_id).with('property').first()
     // let userData = user.toJSON()
     let userProperty = await Property.query().where('user_id', transaction.user_id).first()
-    if(userProperty){
-      userProperty.bronze_coin += store.coin
-      await userProperty.save()
-    }
+
 
     let store = await Store.find(transaction.type_id)
     if(!store) {
@@ -279,7 +276,10 @@ class TransactionController {
 
     store.stat++
     await store.save()
-
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
     // const log = new Log()
     // log.type = 'mall_trade'
     // log.type_id = store.id
@@ -454,10 +454,7 @@ class TransactionController {
     // let user = await User.query().where('id', transaction.user_id).with('property').first()
     // let userData = user.toJSON()
     let userProperty = await Property.query().where('user_id', transaction.user_id).first()
-    if(userProperty){
-      userProperty.bronze_coin += store.coin
-      await userProperty.save()
-    }
+
 
     let store = await Store.find(transaction.type_id)
     if(!store) {
@@ -473,7 +470,10 @@ class TransactionController {
 
     store.stat++
     await store.save()
-
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
     // const log = new Log()
     // log.type = 'mall_trade'
     // log.type_id = store.id
@@ -743,10 +743,7 @@ class TransactionController {
     // let user = await User.query().where('id', transaction.user_id).with('property').first()
     // let userData = user.toJSON()
     let userProperty = await Property.query().where('user_id', transaction.user_id).first()
-    if(userProperty){
-      userProperty.bronze_coin += store.coin
-      await userProperty.save()
-    }
+
 
     let store = await Store.find(transaction.type_id)
     if(!store) {
@@ -763,6 +760,10 @@ class TransactionController {
     store.stat++
     await store.save()
 
+    if(userProperty){
+      userProperty.bronze_coin += store.coin
+      await userProperty.save()
+    }
     // const log = new Log()
     // log.type = 'mall_trade'
     // log.type_id = store.id
