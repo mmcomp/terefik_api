@@ -30,6 +30,7 @@ class CarWashController {
       }
       terefikis.push(
         {
+          terefiki_id: userData.terefik[i].id,
           terefiki_type: userData.terefik[i].ttype,
           terefikI_clean_level: userData.terefik[i].clean,
           terefikI_filth_layers : userData.terefik[i].filth_layers
