@@ -37,7 +37,7 @@ class AttackController {
         }
       }]
     }
-    let theTrefiki = await UserTerefik.where('id', params.terefiki_id).where('user_id', user.id).first()
+    let theTrefiki = await UserTerefik.query().where('id', params.terefiki_id).where('user_id', user.id).first()
     if(!theTrefiki) {
       return [{
         status: 0,
