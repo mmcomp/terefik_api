@@ -647,6 +647,19 @@ class CarController {
 
       loot.silver_coin = rangerSilver
 
+      let zones = await UserZone.query().where('users_id', user.id).pluck('zone_id')
+      let zone_id = 0
+      if(zones.length>0) {
+          let query = "SELECT id FROM zone WHERE id in (" + zones.join(',') + ") and intersects(shape, point(" + params.lon_gps + ", " + params.lat_gps + "))=1"
+          let res = await Database.raw(query)
+          if(res[0].length>0) {
+              zone_id = res[0][0].id
+              let theZone = await zones.query().where('id', zone_id).first()
+              theZone.reports++
+              await theZone.save()
+          }
+      }
+
       let inspectorDailyReport = await InspectorDailyReport.query().where('user_id', user.id).whereRaw("created_at like  '" + Moment.now('YYYY-MM-DD') + "%'").first()
       if(!inspectorDailyReport) {
           inspectorDailyReport = new InspectorDailyReport

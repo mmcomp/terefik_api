@@ -19,6 +19,9 @@ ArrestZoneHook.zoneDetect = async (rangerWork) => {
         let res = await Database.raw(query)
         if(res[0].length>0) {
             rangerWork.zone_id = res[0][0].id
+            let theZone = await zones.query().where('id', rangerWork.zone_id).first()
+            theZone.reports++
+            await theZone.save()
         }
         
     }
