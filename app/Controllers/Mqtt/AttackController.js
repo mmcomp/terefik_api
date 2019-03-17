@@ -382,8 +382,9 @@ class AttackController {
       // userDefence.under_attack = 'no'
       // await userDefence.save()
 
+      console.log('Loose User')
       return [{
-        status: 0,
+        status: 1,
         messages: [],
         data: {
         }
@@ -451,6 +452,7 @@ class AttackController {
 
     await gameSession.delete()
 
+    console.log('Win User')
     return [{
       status: 1,
       messages: [],
