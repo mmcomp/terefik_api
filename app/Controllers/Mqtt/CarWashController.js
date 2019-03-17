@@ -32,8 +32,11 @@ class CarWashController {
         {
           terefiki_id: userData.terefik[i].id,
           terefiki_type: userData.terefik[i].ttype,
-          terefikI_clean_level: userData.terefik[i].clean,
-          terefikI_filth_layers : userData.terefik[i].filth_layers
+          terefiki_clean_level: userData.terefik[i].clean,
+          terefiki_filth_layers : userData.terefik[i].filth_layers,
+          terefiki_gasoline : userData.terefik[i].gasoline,
+          terefiki_health : userData.terefik[i].health,
+          terefiki_clean : userData.terefik[i].clean,
         }
       )
     }
