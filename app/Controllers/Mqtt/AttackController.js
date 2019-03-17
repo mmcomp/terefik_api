@@ -348,6 +348,9 @@ class AttackController {
       algorithm: 'sha256'
     })
 
+    console.log('Win hash :')
+    console.log(winHash)
+
     // const winHash = hasha('win' + Env.get('ATTACK_SESSION') + params.session + '|' + params.session + '|' + userDefenceData.property.path, {
     //   algorithm: 'sha256'
     // })
