@@ -165,20 +165,20 @@ class AttackController {
 
     // Gasoline
     data['gasoline'] = _.min([
-      _.round((settings.loot_gasoline/100) * targetData.gasoline),
-      targetData.gasoline >= settings.loot_gasoline_max ? settings.loot_gasoline_max : targetData.gasoline
+      (settings.loot_gasoline/100) * targetData.gasoline,
+      targetData.gasoline >= (settings.loot_gasoline_max/100) ? (settings.loot_gasoline_max/100) : targetData.gasoline
     ])
 
     // Health
     data['health'] = _.min([
-      _.round((settings.loot_health/100) * targetData.health),
-      targetData.health >= settings.loot_health_max ? settings.loot_health_max : targetData.health
+      (settings.loot_health/100) * targetData.health,
+      targetData.health >= (settings.loot_health_max/100) ? (settings.loot_health_max/100) : targetData.health
     ])
 
     // Clean
     data['clean'] = _.min([
-      _.round((settings.loot_clean/100) * targetData.clean),
-      targetData.clean >= settings.loot_clean_max ? settings.loot_clean_max : targetData.clean
+      (settings.loot_clean/100) * targetData.clean,
+      targetData.clean >= (settings.loot_clean_max/100) ? (settings.loot_clean_max/100) : targetData.clean
     ])
 
     return [{
