@@ -131,10 +131,21 @@ class CarController {
     let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
     let gift = (transactions % settings.park_count_for_gift == 0) 
 
+    let loot = {
+      daimond: settings.diamond_earn_on_shielding + extraDiamond,
+      gasoline: settings.park_gasoline,
+      health: settings.park_health,
+      clean: settings.park_clean,
+      water: settings.park_water,
+    }
     await user.property().update({
       bronze_coin: userData.property.bronze_coin - totalPay,
       diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond,
       experience_score: userData.property.experience_score + settings.car_park_exp,
+      gasoline: userData.property.gasoline + settings.park_gasoline,
+      health: userData.property.health + settings.park_health,
+      clean: userData.property.clean + settings.park_clean,
+      water: userData.property.water + settings.park_water,
     })
 
     if(discountPercent < 1) {
@@ -163,6 +174,7 @@ class CarController {
         end_time: Time(userCar.shield_start).add(userCar.shield_duration, 'minutes').format("YYYY-MM-DD HH:mm:ss"),
         experience_score: userData.property.experience_score + settings.car_park_exp,
         gift: gift,
+        loot: loot,
       }
     }]
   }
