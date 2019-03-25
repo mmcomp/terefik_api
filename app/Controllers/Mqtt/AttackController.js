@@ -561,6 +561,8 @@ class AttackController {
       }
 
       messages[i]['is_online'] = (lastAct<=5)
+      messages[i]['under_attack'] = (messages[i].user.under_attack=='yes')
+      messages[i]['is_shield'] = (messages[i].user.is_shield==1)
     }
 
     return [{
