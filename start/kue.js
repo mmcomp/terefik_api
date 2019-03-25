@@ -26,6 +26,14 @@ try {
     }
   })
 
+  Queue.remove({
+    unique: 'parkings'
+  }, function (error, response) {
+    if (error) {
+      console.log(error, response)
+    }
+  })
+
   // DashboardStat Cron Workder
   const statJob = Queue.createJob('terefiki_stat')
     .attempts(3)
@@ -41,6 +49,14 @@ try {
 
   Queue.every('20 minutes', dashboardJob)
   Queue.process('terefiki_dashboard', DashboardStat.dashboard)
+
+  // Parking Cron Workder
+  const parkingJob = Queue.createJob('parkings')
+    .attempts(3)
+    .priority('normal')
+
+  Queue.every('5 minutes', parkingJob)
+  Queue.process('parkings', DashboardStat.updateParkings)
 
 } catch (error) {
   // SentryException.captureException(error)

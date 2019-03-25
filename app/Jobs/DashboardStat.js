@@ -1,7 +1,7 @@
 'use strict'
 
 const User = use('App/Models/User')
-const UserFuge = use('App/Models/UserFuge')
+const Parking = use('App/Models/Parking')
 const Property = use('App/Models/Property')
 const Stat = use('App/Models/Stat')
 const UserSms = use('App/Models/UserSms')
@@ -364,6 +364,60 @@ class DashboardStat {
       done()
     }
     
+  }
+
+  static async updateParkings (job, done) {
+    console.log('Update Parkings')
+    try{
+      const response = await axios.get(Env.get('PARKING_URL'))
+      if (response.status === 200) {
+        // console.log('Response')
+        // console.log(response.data)
+        let parkingData =response.data, parking, theParking
+        // console.log('Parking Data')
+        // console.log(parkingData)
+        if(parkingData.error==0) {
+          for(let i in parkingData.parkings) {
+            parking = parkingData.parkings[i]
+            // console.log('Processing Parking fava id', parking.id)
+            parking.id = parseInt(parking.id, 10)
+            if(!isNaN(parking.id)) {
+              // console.log('check if it exists')
+              theParking = await Parking.query().where('fava_id',parking.id).first()
+              if(!theParking) {
+                // console.log('it does not')
+                parking.capacity = parseInt(parking.capacity, 10)
+                if(!isNaN(parking.capacity)) {
+                  theParking = new Parking
+                  theParking.fava_id = parking.id
+                  theParking.name = parking.name
+                  theParking.description = parking.address
+                  theParking.lat = parking.x
+                  theParking.lon = parking.y
+                  theParking.capacity = parking.capacity
+                  theParking.online_capacity = parking.onlineCapacity
+                  await theParking.save()
+                  // console.log('Added')
+                }else {
+                  // console.log('Capacity problem', parking.capacity)
+                }
+              }else {
+                theParking.online_capacity = parking.onlineCapacity
+                await theParking.save()
+                // console.log('Updated')
+              }
+            }else {
+              // console.log('ID not ok')
+            }
+          }
+        }
+      }
+    }catch(e) {
+      console.log("error happend")
+      console.log(e)
+    }
+    console.log('Finish Updating parkings')
+    return done()
   }
 }
 
