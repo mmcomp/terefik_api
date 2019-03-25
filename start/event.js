@@ -20,47 +20,46 @@ Redis.psubscribe('__keyevent@?__:expired', async (message, channel, pattern) => 
 
     switch (channelParse[0]) {
       // برای هندل بازی های سیستمی
-      case 'game':
-        gameSession = await GameSession.query().where('type', 'system').where('session_id', channel).with('game').with('user').with('user.property').first()
-        if (gameSession) {
-          let gameSessionData = gameSession.toJSON()
-          let changes = {}
+      // case 'game':
+      //   gameSession = await GameSession.query().where('type', 'system').where('session_id', channel).with('game').with('user').with('user.property').first()
+      //   if (gameSession) {
+      //     let gameSessionData = gameSession.toJSON()
+      //     let changes = {}
 
           // if (gameSessionData.depo_type != 'none') {
           //   changes[gameSessionData.depo_type] = gameSessionData.user.property[gameSessionData.depo_type] + gameSessionData.depo_amount
           // }
 
-          if (gameSessionData.game.cancel_type != 'none') {
-            changes[gameSessionData.game.cancel_type] = gameSessionData.user.property[gameSessionData.game.cancel_type] + gameSessionData.game.cancel_amount
-          }
+          // if (gameSessionData.game.cancel_type != 'none') {
+          //   changes[gameSessionData.game.cancel_type] = gameSessionData.user.property[gameSessionData.game.cancel_type] + gameSessionData.game.cancel_amount
+          // }
 
-          await Property.query().where('user_id', gameSessionData.user.id).update(changes)
-          await gameSession.user().update({
-            game_lose: gameSessionData.user.game_lose++,
-            courage_stat: gameSessionData.user.courage_stat--
-          })
+          // await Property.query().where('user_id', gameSessionData.user.id).update(changes)
+          // await gameSession.user().update({
+          //   game_lose: gameSessionData.user.game_lose++,
+          //   courage_stat: gameSessionData.user.courage_stat--
+          // })
 
-          await gameSession.delete()
-        }
-        break
+        //   await gameSession.delete()
+        // }
+        // break
 
       // برای هندل حمله ها و انتقام ها
       case 'attack':
         gameSession = await GameSession.query().where('type', '!=', 'system').where('session_id', channel).first()
         if (gameSession) {
-          let user = await User.query().where('id', gameSession.user_id).first()
-          user.game_lose++
-          user.courage('sub', 1)
+          // let user = await User.query().where('id', gameSession.user_id).first()
+          // user.game_lose++
+          // user.courage('sub', 1)
 
-          await user.save()
+          // await user.save()
 
           let award = {
-            elixir: 0,
-            yellow: 0,
-            blue: 0,
-            antique: [],
+            gasoline: 0,
+            health_oil: 0,
+            cleaning_soap : 0,
             win: false,
-            revenge: true
+            revenge: true,
           }
 
           await Message.create({

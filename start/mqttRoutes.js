@@ -77,6 +77,7 @@ const routes = {
   'Attack': 'Attack/attack',
   'Reattack': 'Attack/reattack',
   'RefuelTerefiki': 'Attack/refuel',
+  'AttackList': 'Attack/list',
 
   // Experience Level
   'LevelList': 'ExperienceLevel/index',

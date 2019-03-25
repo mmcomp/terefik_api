@@ -16,6 +16,11 @@ class Message extends Model {
   static get updatedAtColumn () {
     return 'updated_at'
   }
+
+  // Relations
+  user () {
+    return this.belongsTo('App/Models/User', 'user_id', 'id')
+  }
 }
 
 module.exports = Message

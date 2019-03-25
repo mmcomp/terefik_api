@@ -533,6 +533,44 @@ class AttackController {
       }
     }]
   }
+
+  static async list (params, user) {
+    let messages = await Message.query().where('user_id', user.id).with('user').whereIn('type', ['attack', 'revenge']).orderBy('created_at', 'desc').limit(20).fetch()
+    messages = messages.toJSON()
+
+    let lastAct
+    for(let i = 0;i < messages.length;i++) {
+      try{
+        messages[i].message = JSON.parse(messages[i].message)
+        messages[i].message.gasoline = messages[i].message.gasoline/100
+        messages[i].message.health_oil = messages[i].message.health_oil/100
+        messages[i].message.cleaning_soap = messages[i].message.cleaning_soap/100
+      }catch(e) {
+        messages[i].message = {
+          gasoline: 0,
+          health_oil: 0,
+          cleaning_soap : 0,
+          win: false,
+          revenge: false,
+        }
+      }
+
+      lastAct = 0
+      if(messages[i].user) {
+        lastAct = Time().diff(messages[i].user.last_activity, 'minutes')
+      }
+
+      messages[i]['is_online'] = (lastAct<=5)
+    }
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        messages: messages
+      }
+    }]
+  }
 }
 
 module.exports = AttackController
