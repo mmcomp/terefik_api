@@ -3,7 +3,7 @@
 const Car = use('App/Models/Car')
 const User = use('App/Models/User')
 const Property = use('App/Models/Property')
-const UserCar = use('App/Models/UserCar')
+const UserCarwash = use('App/Models/UserCarwash')
 const RangerWork = use('App/Models/RangerWork')
 const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
@@ -137,6 +137,16 @@ class CarWashController {
     userTerefiki.clean = 1
     userTerefiki.filth_layers = '[]'
     await userTerefiki.save()
+
+    let userCarwash = await UserCarwash.query().where('user_id', user.id).where('terefiki_id', userTerefiki.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
+    if(!userCarwash) {
+      userCarwash = new UserCarwash
+      userCarwash.user_id = user.id
+      userCarwash.terefiki_id = userTerefiki.id
+      userCarwash.carwash_count = 0
+    }
+    userCarwash.carwash_count++
+    await userCarwash.save()
     
     return [{
       status: 1,

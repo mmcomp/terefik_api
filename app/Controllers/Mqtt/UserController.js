@@ -6,6 +6,8 @@ const InspectorDailyReport = use('App/Models/InspectorDailyReport')
 const RangerWork = use('App/Models/RangerWork')
 const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
+const UserCarwash = use('App/Models/UserCarwash')
+const Message = use('App/Models/Message')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -64,6 +66,39 @@ class UserController {
       console.log('Ranger Data')
       console.log(userData.ranger_data)
     }
+
+    let totalPark = await Transaction.query().where('type', 'shield').where('user_id', user.id).getCount()
+    let todayPark = await Transaction.query().where('type', 'shield').where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getCount()
+    let totalCarwash = await UserCarwash.query().where('user_id', user.id).getSum('carwash_count')
+    if(!totalCarwash) {
+      totalCarwash = 0
+    }
+    let todayCarwash = await UserCarwash.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('carwash_count')
+    if(!todayCarwash) {
+      todayCarwash = 0
+    }
+
+    let totalAttack = await Message.query().where('sender_id', user.id).whereIn('type', ['attack', 'revenge']).getCount()
+    let todayAttack = await Message.query().where('sender_id', user.id).whereIn('type', ['attack', 'revenge']).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getCount()
+
+    let totalAttacked = await Message.query().where('user_id', user.id).whereIn('type', ['attack', 'revenge']).getCount()
+    let todayAttacked = await Message.query().where('user_id', user.id).whereIn('type', ['attack', 'revenge']).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getCount()
+  
+    userData['driver_data'] = {
+      total: {
+        park: totalPark,
+        carwash: totalCarwash,
+        attack: totalAttack,
+        attacked: totalAttacked,
+      },
+      today: {
+        park: todayPark,
+        carwash: todayCarwash,
+        attack: todayAttack,
+        attacked: todayAttacked,
+      },
+    }
+    
 
     delete userData.zones
     return [{
@@ -198,17 +233,84 @@ class UserController {
 
   static async expLeader (params, user) {
     try{
-      let users = await Property.query().with('user').orderBy('experience_score', 'desc').limit(50).fetch()
-      users = users.toJSON()
-      let leads = []
+      let leaderField = 'experience_score'
 
+      let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(50).fetch()
+      users = users.toJSON()
+      let leads = {
+        tops: [],
+        user_position: [],
+      }
+
+      let userFound = false
+      let indx = 1
       for(let theUser of users) {
-        leads.push({
+        if(theUser.user_id == user.id) {
+          userFound = true
+        }
+        leads.tops.push({
+          index: indx,
           image_path: theUser.user.image_path,
           score: theUser.experience_score,
           username: theUser.user.username,
+          its_you: (theUser.user_id == user.id),
         })
+        indx++
       }
+
+      if(!userFound) {
+        let userProperty = await Property.query().where('user_id', user.id).first()
+        if(!userProperty) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "UserNotFound",
+              message: "کاربر مورد نظر پیدا نشد"
+            }],
+            data: {}
+          }]
+        }
+        let userPos = await Property.query().where(leaderField, '>=', userProperty[leaderField]).orderBy(leaderField).getCount()
+        let upperUsers = await Property.query().with('user').where('user_id', '!=', user.id).where(leaderField, '>=', userProperty[leaderField]).orderBy(leaderField).limit(5).fetch()
+        upperUsers = upperUsers.toJSON()
+        let downerUsers = await Property.query().with('user').where('user_id', '!=', user.id).where(leaderField, '<', userProperty[leaderField]).orderBy(leaderField, 'desc').limit(5).fetch()
+        downerUsers = downerUsers.toJSON()
+        let user_position = [], uppers = [], downers = []
+        for(let theUser of upperUsers) {
+          uppers.push({
+            image_path: theUser.user.image_path,
+            score: theUser.experience_score,
+            username: theUser.user.username,
+            its_you: false,
+          })
+        }
+        for(let theUser of downerUsers) {
+          downers.push({
+            image_path: theUser.user.image_path,
+            score: theUser.experience_score,
+            username: theUser.user.username,
+            its_you: false,
+          })
+        }
+        for(let i = uppers.length - 1;i>=0;i--) {
+          uppers[i]['index'] = userPos - i - 1
+          user_position.push(uppers[i])
+        }
+        user_position.push({
+          index: userPos,
+          image_path: user.image_path,
+          score: userProperty.experience_score,
+          username: user.username,
+          its_you: true,
+        })
+        for(let i = 0;i < downers.length;i++) {
+          downers[i]['index'] = userPos + i + 1
+          user_position.push(downers[i])
+        }
+
+        leads.user_position = user_position
+      }
+
       return [{
         status: 1,
         messages: [],
@@ -295,17 +397,84 @@ class UserController {
 
   static async insLeader (params, user) {
     try{
-      let users = await Property.query().with('user').orderBy('inspector_score', 'desc').limit(50).fetch()
-      users = users.toJSON()
-      let leads = []
+      let leaderField = 'inspector_score'
 
-      for(let theUser of users) {
-        leads.push({
-          image_path: theUser.user.image_path,
-          score: theUser.inspector_score,
-          username: theUser.user.username,
-        })
+      let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(50).fetch()
+      users = users.toJSON()
+      let leads = {
+        tops: [],
+        user_position: [],
       }
+
+      let userFound = false
+      let indx = 1
+      for(let theUser of users) {
+        if(theUser.user_id == user.id) {
+          userFound = true
+        }
+        leads.tops.push({
+          index: indx,
+          image_path: theUser.user.image_path,
+          score: theUser.experience_score,
+          username: theUser.user.username,
+          its_you: (theUser.user_id == user.id),
+        })
+        indx++
+      }
+
+      if(!userFound) {
+        let userProperty = await Property.query().where('user_id', user.id).first()
+        if(!userProperty) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "UserNotFound",
+              message: "کاربر مورد نظر پیدا نشد"
+            }],
+            data: {}
+          }]
+        }
+        let userPos = await Property.query().where(leaderField, '>=', userProperty[leaderField]).orderBy(leaderField).getCount()
+        let upperUsers = await Property.query().with('user').where('user_id', '!=', user.id).where(leaderField, '>=', userProperty[leaderField]).orderBy(leaderField).limit(5).fetch()
+        upperUsers = upperUsers.toJSON()
+        let downerUsers = await Property.query().with('user').where('user_id', '!=', user.id).where(leaderField, '<', userProperty[leaderField]).orderBy(leaderField, 'desc').limit(5).fetch()
+        downerUsers = downerUsers.toJSON()
+        let user_position = [], uppers = [], downers = []
+        for(let theUser of upperUsers) {
+          uppers.push({
+            image_path: theUser.user.image_path,
+            score: theUser.experience_score,
+            username: theUser.user.username,
+            its_you: false,
+          })
+        }
+        for(let theUser of downerUsers) {
+          downers.push({
+            image_path: theUser.user.image_path,
+            score: theUser.experience_score,
+            username: theUser.user.username,
+            its_you: false,
+          })
+        }
+        for(let i = uppers.length - 1;i>=0;i--) {
+          uppers[i]['index'] = userPos - i - 1
+          user_position.push(uppers[i])
+        }
+        user_position.push({
+          index: userPos,
+          image_path: user.image_path,
+          score: userProperty.experience_score,
+          username: user.username,
+          its_you: true,
+        })
+        for(let i = 0;i < downers.length;i++) {
+          downers[i]['index'] = userPos + i + 1
+          user_position.push(downers[i])
+        }
+
+        leads.user_position = user_position
+      }
+
       return [{
         status: 1,
         messages: [],

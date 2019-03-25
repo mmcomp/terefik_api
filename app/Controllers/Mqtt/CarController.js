@@ -13,6 +13,9 @@ const UserTerefik = use('App/Models/UserTerefik')
 const Notification = use('App/Models/Notification')
 const InspectorDailyReport = use('App/Models/InspectorDailyReport')
 const Achievment = use('App/Models/Achievment')
+const Zone = use('App/Models/Zone')
+const Database = use('Database')
+
 const Env = use('Env')
 
 const DiscountController = use('App/Controllers/Mqtt/DiscountController')
@@ -143,8 +146,8 @@ class CarController {
       diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond,
       experience_score: userData.property.experience_score + settings.car_park_exp,
       gasoline: userData.property.gasoline + settings.park_gasoline,
-      health: userData.property.health + settings.park_health,
-      clean: userData.property.clean + settings.park_clean,
+      health_oil: userData.property.health_oil + settings.park_health,
+      cleaning_soap: userData.property.cleaning_soap + settings.park_clean,
       water: userData.property.water + settings.park_water,
     })
 
@@ -163,6 +166,18 @@ class CarController {
     userCar.lon = params.lon_gps
     userCar.lat = params.lat_gps
     await userCar.save()
+
+    if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
+      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
+      let res = await Database.raw(query)
+
+      if(res[0].length>0) {
+          let theZone = await Zone.find(res[0][0].id)
+          if(theZone) {
+            await theZone.crowdInc(params.crowd)
+          }
+      }
+    }
 
     await Achievment.achieve(user.id, 'park')
 
