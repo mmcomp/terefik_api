@@ -235,7 +235,7 @@ class UserController {
     try{
       let leaderField = 'experience_score'
 
-      let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(50).fetch()
+      let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(20).fetch()
       users = users.toJSON()
       let leads = {
         tops: [],
@@ -399,7 +399,7 @@ class UserController {
     try{
       let leaderField = 'inspector_score'
 
-      let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(50).fetch()
+      let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(20).fetch()
       users = users.toJSON()
       let leads = {
         tops: [],
