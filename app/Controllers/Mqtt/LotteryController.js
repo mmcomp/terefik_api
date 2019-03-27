@@ -59,7 +59,7 @@ class LotteryController {
         if(userLottery) {
           lotteries.userLotteries[i]['is_in'] = true
         }
-        lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')<=0)
+        lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 23:59:59')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')>0)
         if(lotteries.userLotteries[i].status=='finish') {
           let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
           winners = winners.toJSON()
