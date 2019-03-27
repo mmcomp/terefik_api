@@ -415,7 +415,7 @@ class UserController {
         leads.tops.push({
           index: indx,
           image_path: theUser.user.image_path,
-          score: theUser.experience_score,
+          score: theUser[leaderField],
           username: theUser.user.username,
           its_you: (theUser.user_id == user.id),
         })
@@ -443,7 +443,7 @@ class UserController {
         for(let theUser of upperUsers) {
           uppers.push({
             image_path: theUser.user.image_path,
-            score: theUser.experience_score,
+            score: theUser[leaderField],
             username: theUser.user.username,
             its_you: false,
           })
@@ -451,7 +451,7 @@ class UserController {
         for(let theUser of downerUsers) {
           downers.push({
             image_path: theUser.user.image_path,
-            score: theUser.experience_score,
+            score: theUser[leaderField],
             username: theUser.user.username,
             its_you: false,
           })
@@ -463,7 +463,7 @@ class UserController {
         user_position.push({
           index: userPos,
           image_path: user.image_path,
-          score: userProperty.experience_score,
+          score: userProperty[leaderField],
           username: user.username,
           its_you: true,
         })
