@@ -24,7 +24,7 @@ class LotteryController {
         lotteries.rangerLotteries = lotteries.rangerLotteries.toJSON()
         for(let i = 0;i < lotteries.rangerLotteries.length;i++) {
           lottery = lotteries.rangerLotteries[i]
-          userLottery = await UserLotteryAward.query().where('user_id', user.id).where('lottery_id', lottery.id).first()
+          userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
           lotteries.rangerLotteries[i]['is_in'] = false
           if(userLottery) {
             lotteries.rangerLotteries[i]['is_in'] = true
