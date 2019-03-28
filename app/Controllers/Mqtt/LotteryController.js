@@ -29,9 +29,9 @@ class LotteryController {
           if(userLottery) {
             lotteries.rangerLotteries[i]['is_in'] = true
           }
-          lotteries.rangerLotteries[i]['start_date_remaining'] = Time(lotteries.rangerLotteries[i].start_date).diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-          lotteries.rangerLotteries[i]['finish_in_date_remaining'] = Time(lotteries.rangerLotteries[i].finish_in_date).diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-          lotteries.rangerLotteries[i]['exec_date_remaining'] = Time(lotteries.rangerLotteries[i].exec_date).diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+          lotteries.rangerLotteries[i]['start_date_remaining'] = Time(lotteries.rangerLotteries[i].start_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+          lotteries.rangerLotteries[i]['finish_in_date_remaining'] = Time(lotteries.rangerLotteries[i].finish_in_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+          lotteries.rangerLotteries[i]['exec_date_remaining'] = Time(lotteries.rangerLotteries[i].exec_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
           lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 00:00:00')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')>0)
           if(lotteries.rangerLotteries[i].status=='finish') {
             let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
@@ -62,9 +62,9 @@ class LotteryController {
         if(userLottery) {
           lotteries.userLotteries[i]['is_in'] = true
         }
-        lotteries.userLotteries[i]['start_date_remaining'] = Time(lotteries.userLotteries[i].start_date).diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-        lotteries.userLotteries[i]['finish_in_date_remaining'] = Time(lotteries.userLotteries[i].finish_in_date).diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-        lotteries.userLotteries[i]['exec_date_remaining'] = Time(lotteries.userLotteries[i].exec_date).diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+        lotteries.userLotteries[i]['start_date_remaining'] = Time(lotteries.userLotteries[i].start_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+        lotteries.userLotteries[i]['finish_in_date_remaining'] = Time(lotteries.userLotteries[i].finish_in_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+        lotteries.userLotteries[i]['exec_date_remaining'] = Time(lotteries.userLotteries[i].exec_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
         lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 00:00:00')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')>0)
         if(lotteries.userLotteries[i].status=='finish') {
           let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
