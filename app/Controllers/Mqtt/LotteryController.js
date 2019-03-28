@@ -86,7 +86,7 @@ class LotteryController {
         messages: [],
         data: {
           lotteries: lotteries,
-          current_time: Time().fomrat('YYYY-MM-DD HH:mm:ss'),
+          current_time: Time().format('YYYY-MM-DD HH:mm:ss'),
         }
       }]
     }catch(e){
