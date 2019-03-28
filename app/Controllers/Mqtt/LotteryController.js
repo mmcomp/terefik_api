@@ -85,7 +85,8 @@ class LotteryController {
         status: 1,
         messages: [],
         data: {
-          lotteries: lotteries
+          lotteries: lotteries,
+          current_time: Time().fomrat('YYYY-MM-DD HH:mm:ss'),
         }
       }]
     }catch(e){
