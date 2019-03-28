@@ -7,6 +7,7 @@ const Message = use('App/Models/Message')
 const Setting = use('App/Models/Setting')
 const GameSession = use('App/Models/GameSession')
 const Log = use('App/Models/Log')
+const Notification = use('App/Models/Notification')
 
 const Redis = use('Redis')
 const Randomatic = require('randomatic')
@@ -456,6 +457,16 @@ class AttackController {
     await gameSession.delete()
 
     console.log('Win User')
+
+    let loseNotification = new Notification
+    loseNotification.users_id = userDefence.id
+    loseNotification.type = 'attack'
+    loseNotification.title = Env.get('PUSH_USER_ATTACK_TITLE')
+    loseNotification.message = Env.get('PUSH_USER_ATTACK_MESSAGE')
+    loseNotification.send_type = 'push'
+    await loseNotification.save()
+
+
     return [{
       status: 1,
       messages: [],
