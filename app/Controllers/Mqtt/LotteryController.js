@@ -174,7 +174,7 @@ class LotteryController {
         }]
       }
 
-      if(user.is_parking_ranger==4) {
+      if(lotteryData.type=='rangers') {
         if(userProperty.silver_coin < params.amount) {
           return [{
             status: 0,
@@ -186,8 +186,10 @@ class LotteryController {
           }]
         }
 
+        console.log('decrease silver', params.amount, userProperty.silver_coin)
         userProperty.silver_coin -= params.amount
-        await userProperty.save()
+        await userProperty.save(userProperty.silver_coin)
+        console.log()
       }else {
         if(userProperty.diamond < params.amount) {
           return [{
@@ -200,7 +202,9 @@ class LotteryController {
           }]
         }
 
+        console.log('decrease diamond', params.amount, userProperty.diamond)
         userProperty.diamond -= params.amount
+        console.log(userProperty.diamond)
         await userProperty.save()
       }
       
