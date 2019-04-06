@@ -18,7 +18,7 @@ class UserLotteryAward extends Model {
 
   // Relations
   user () {
-    return this.belongsTo('App/Models/User', 'user_id', 'id')
+    return this.belongsTo('App/Models/User', 'users_id', 'id')
   }
 
   lottery () {
@@ -26,7 +26,7 @@ class UserLotteryAward extends Model {
   }
 
   award() {
-    return this.belongsTo('App/Models/LotteryAward', 'lottery_award_id', 'id')
+    return this.belongsTo('App/Models/LotteryAward', 'lottary_award_id', 'id')
   }
 }
 
