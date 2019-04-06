@@ -33,7 +33,7 @@ class LotteryController {
           lotteries.rangerLotteries[i]['finish_in_date_remaining'] = Time(lotteries.rangerLotteries[i].finish_in_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
           lotteries.rangerLotteries[i]['exec_date_remaining'] = Time(lotteries.rangerLotteries[i].exec_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
           lotteries.rangerLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 00:00:00')).diff(lotteries.rangerLotteries[i].finish_in_date, 'seconds')>0)
-          if(lotteries.rangerLotteries[i].status=='finish') {
+          if(lotteries.rangerLotteries[i].status=='done') {
             let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
             winners = winners.toJSON()
             lotteries.rangerLotteries[i]['winners'] = []
