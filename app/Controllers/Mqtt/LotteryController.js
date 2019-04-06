@@ -39,18 +39,20 @@ class LotteryController {
             console.log('Winners', winners)
             lotteries.rangerLotteries[i]['winners'] = []
             for(let uWin of winners) {
-              lotteries.rangerLotteries[i].winners.push({
-                user: {
-                  fname: uWin.user.fname,
-                  lname: uWin.user.lname,
-                  image_path: uWin.user.image_path,
-                },
-                award: {
-                  name: uWin.award.name,
-                  description: uWin.award.description,
-                  image_path: uWin.award.image_path,
-                }
-              })
+              if(uWin.user && uWin.award) {
+                lotteries.rangerLotteries[i].winners.push({
+                  user: {
+                    fname: uWin.user.fname,
+                    lname: uWin.user.lname,
+                    image_path: uWin.user.image_path,
+                  },
+                  award: {
+                    name: uWin.award.name,
+                    description: uWin.award.description,
+                    image_path: uWin.award.image_path,
+                  }
+                })
+              }
             }
           }
         }
