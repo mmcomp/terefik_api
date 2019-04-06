@@ -45,6 +45,7 @@ class LotteryController {
                     fname: uWin.user.fname,
                     lname: uWin.user.lname,
                     image_path: uWin.user.image_path,
+                    mobile: uWin.user.mobile,
                   },
                   award: {
                     name: uWin.award.name,
@@ -80,6 +81,7 @@ class LotteryController {
                   fname: uWin.user.fname,
                   lname: uWin.user.lname,
                   image_path: uWin.user.image_path,
+                  mobile: uWin.user.mobile,
                 },
                 award: {
                   name: uWin.award.name,
