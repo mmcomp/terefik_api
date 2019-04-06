@@ -36,7 +36,7 @@ class LotteryController {
           if(lotteries.rangerLotteries[i].status=='done') {
             let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
             winners = winners.toJSON()
-            console.log('Winners', winners)
+            // console.log('Winners', winners)
             lotteries.rangerLotteries[i]['winners'] = []
             for(let uWin of winners) {
               if(uWin.user && uWin.award) {
@@ -69,23 +69,25 @@ class LotteryController {
         lotteries.userLotteries[i]['finish_in_date_remaining'] = Time(lotteries.userLotteries[i].finish_in_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
         lotteries.userLotteries[i]['exec_date_remaining'] = Time(lotteries.userLotteries[i].exec_date.split(' ')[0] + ' 23:59:59').diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
         lotteries.userLotteries[i]['is_closed'] = (Time(Moment.now('YYYY-MM-DD 00:00:00')).diff(lotteries.userLotteries[i].finish_in_date, 'seconds')>0)
-        if(lotteries.userLotteries[i].status=='finish') {
+        if(lotteries.userLotteries[i].status=='done') {
           let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
           winners = winners.toJSON()
           lotteries.userLotteries[i]['winners'] = []
           for(let uWin of winners) {
-            lotteries.userLotteries[i].winners.push({
-              user: {
-                fname: uWin.user.fname,
-                lname: uWin.user.lname,
-                image_path: uWin.user.image_path,
-              },
-              award: {
-                name: uWin.award.name,
-                description: uWin.award.description,
-                image_path: uWin.award.image_path,
-              }
-            })
+            if(uWin.user && uWin.award) {
+              lotteries.userLotteries[i].winners.push({
+                user: {
+                  fname: uWin.user.fname,
+                  lname: uWin.user.lname,
+                  image_path: uWin.user.image_path,
+                },
+                award: {
+                  name: uWin.award.name,
+                  description: uWin.award.description,
+                  image_path: uWin.award.image_path,
+                }
+              })
+            }
           }
         }
       }
