@@ -36,6 +36,7 @@ class LotteryController {
           if(lotteries.rangerLotteries[i].status=='done') {
             let winners = await UserLotteryAward.query().with('user').with('award').where('lottery_id', lottery.id).fetch()
             winners = winners.toJSON()
+            console.log('Winners', winners)
             lotteries.rangerLotteries[i]['winners'] = []
             for(let uWin of winners) {
               lotteries.rangerLotteries[i].winners.push({
