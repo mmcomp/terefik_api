@@ -9,6 +9,18 @@ const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
 
 class LotteryController {
+  static hideMobile (inp) {
+    let out = inp
+    if(inp.indexOf('+')==0) {
+      out = inp.substring(0, 6) + '***' + inp.substring(9)
+    }else if(inp.length==11) {
+      out = inp.substring(0, 4) + '***' + inp.substring(7)
+    }else if(inp.length==11) {
+      out = inp.substring(0, 3) + '***' + inp.substring(6)
+    }
+    return out
+  }
+
   static async list (params, user) {
     try{
       let userLottery, lottery, lotteries = {
@@ -42,10 +54,10 @@ class LotteryController {
               if(uWin.user && uWin.award) {
                 lotteries.rangerLotteries[i].winners.push({
                   user: {
-                    fname: uWin.user.fname,
-                    lname: uWin.user.lname,
-                    image_path: uWin.user.image_path,
-                    mobile: uWin.user.mobile,
+                    // fname: uWin.user.fname,
+                    // lname: uWin.user.lname,
+                    // image_path: uWin.user.image_path,
+                    mobile: LotteryController.hideMobile(uWin.user.mobile),
                   },
                   award: {
                     name: uWin.award.name,
@@ -78,10 +90,10 @@ class LotteryController {
             if(uWin.user && uWin.award) {
               lotteries.userLotteries[i].winners.push({
                 user: {
-                  fname: uWin.user.fname,
-                  lname: uWin.user.lname,
-                  image_path: uWin.user.image_path,
-                  mobile: uWin.user.mobile,
+                  // fname: uWin.user.fname,
+                  // lname: uWin.user.lname,
+                  // image_path: uWin.user.image_path,
+                  mobile: LotteryController.hideMobile(uWin.user.mobile),
                 },
                 award: {
                   name: uWin.award.name,
