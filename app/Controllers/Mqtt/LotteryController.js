@@ -10,13 +10,14 @@ const Time = Moment.moment()
 
 class LotteryController {
   static hideMobile (inp) {
-    let out = inp.replace('+98', '0')
+    inp = inp.replace('+98', '0')
+	  let out = inp
     if(inp.indexOf('+')==0) {
-      out = inp.substring(0, 4) + '****' + inp.substring(9)
+      out = inp.substring(0, 4) + '***' + inp.substring(9)
     }else if(inp.length==11) {
-      out = inp.substring(0, 4) + '****' + inp.substring(7)
+      out = inp.substring(0, 4) + '***' + inp.substring(7)
     }else if(inp.length==11) {
-      out = inp.substring(0, 3) + '****' + inp.substring(6)
+      out = inp.substring(0, 3) + '***' + inp.substring(6)
     }
     return out
   }
