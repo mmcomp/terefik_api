@@ -517,12 +517,14 @@ class CarController {
     for(let i=0;i<cars.length;i++) {
       car = cars[i]
       shieldDiff = null
+      cars[i].leave_time = null
       if(car.usercar) {
         shieldFinish = Time(car.usercar.shield_start).add(car.usercar.shield_duration, 'minutes')
         shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
         if(shieldDiff<0) {
           shieldDiff = null
         }
+        cars[i].leave_time = car.usercar.leave_time
       }
       delete cars[i].usercar
       cars[i].shield_diff = shieldDiff
