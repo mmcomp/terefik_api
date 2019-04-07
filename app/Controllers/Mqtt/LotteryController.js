@@ -12,7 +12,7 @@ class LotteryController {
   static hideMobile (inp) {
     let out = inp
     if(inp.indexOf('+')==0) {
-      out = inp.replace('+98', '0').substring(0, 4) + '****' + inp.substring(7)
+      out = inp.replace('+98', '0').substring(0, 4) + '****' + inp.substring(8, 3)
     }else if(inp.length==11) {
       out = inp.substring(0, 4) + '****' + inp.substring(7)
     }else if(inp.length==11) {
