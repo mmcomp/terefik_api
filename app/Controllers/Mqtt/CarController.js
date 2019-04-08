@@ -237,11 +237,14 @@ class CarController {
 
     let settings = await Setting.get()
     let leaveTime = Time().format('YYYY-MM-DD HH:mm:ss')
+    console.log('LeaveTime', leaveTime, 'shieldStart', userCar.shield_start)
     let leave_diff = Time(leaveTime).diff(userCar.shield_start, 'minutes')
+    console.log('leave_diff', leave_diff, 'duration', userCar.shield_duration)
     if(leave_diff<userCar.shield_duration) {
       userCar.shield_duration = leave_diff
       userCar.leave_unit = parseInt((userCar.shield_duration - leave_diff)/settings.unit_to_minute, 10)
       userCar.leave_time = leaveTime
+      console.log('leave_unit', userCar.leave_unit)
     }
     await userCar.save()
 
