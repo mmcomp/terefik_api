@@ -24,7 +24,7 @@
     "@adonisjs/ignitor": "^1.0.14",
     "@adonisjs/lucid": "^4.1.2",
     "@adonisjs/redis": "^2.0.3",
-    "@adonisjs/validator": "^4.0.8",
+    "@adonisjs/validator": "^4.0.9",
     "adonis-cache": "^0.3.1",
     "axios": "^0.17.1",
     "buffer": "^5.0.8",

@@ -5,17 +5,20 @@ const {
 } = use('Validator')
 const _ = require('lodash')
 const phone = require('phone')
-const messages = require('./Messages/ValidationMessages')
+const vmessages = require('./Messages/ValidationMessages')
 
 class Validaitons {
   // چک کردن داده های ورودی همراه با قوانین ورود و valida کردن داده ها
   static async check (inputs, rules) {
-    const validation = await validate(inputs, rules, messages)
+    // console.log('Validate ', inputs, rules)
+    const validation = await validate(inputs, rules)//, vmessages)
 
     if (validation.fails()) {
+      // console.log('Validate Fails')
       let messages = []
 
       _.each(validation.messages(), msg => {
+        // console.log('Validate msg', msg)
         messages.push({
           code: msg.field + ' ' + msg.validation,
           message: msg.message

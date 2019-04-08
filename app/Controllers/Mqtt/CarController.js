@@ -165,6 +165,7 @@ class CarController {
     userCar.shield_duration = units * settings.unit_to_minute
     userCar.lon = params.lon_gps
     userCar.lat = params.lat_gps
+    userCar.total_unit = units
     await userCar.save()
 
     if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
@@ -234,14 +235,36 @@ class CarController {
       }]
     }
 
+    let settings = await Setting.get()
     let leaveTime = Time().format('YYYY-MM-DD HH:mm:ss')
-    userCar.leave_time = leaveTime
+    let leave_diff = Time(leaveTime).diff(userCar.shield_start, 'minutes')
+    if(leave_diff<userCar.shield_duration) {
+      userCar.shield_duration = leave_diff
+      userCar.leave_unit = parseInt((userCar.shield_duration - leave_diff)/settings.unit_to_minute, 10)
+      userCar.leave_time = leaveTime
+    }
     await userCar.save()
+
+    let loot = {
+      remaining_units: userCar.leave_unit,
+      back_bronze_coin: 0,
+    }
+
+    if(userCar.leave_unit>0) {
+      loot.back_bronze_coin = userCar.leave_unit * settings.unit_to_bronze_coin
+      let userProperty = await Property.query().where('user_id', user.id).first()
+      if(userProperty) {
+        userProperty.bronze_coin += loot.back_bronze_coin
+        await userProperty.save()
+      }
+    }
 
     return [{
       status: 1,
       messages: [],
-      data: {}
+      data: {
+        loot: loot,
+      }
     }]
   }
 
