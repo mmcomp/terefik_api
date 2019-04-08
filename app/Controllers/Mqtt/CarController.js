@@ -166,6 +166,8 @@ class CarController {
     userCar.lon = params.lon_gps
     userCar.lat = params.lat_gps
     userCar.total_unit = units
+    userCar.leave_time = null
+    userCar.leave_unit = 0
     await userCar.save()
 
     if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
