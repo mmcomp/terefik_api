@@ -166,6 +166,7 @@ class CarController {
     userCar.lon = params.lon_gps
     userCar.lat = params.lat_gps
     userCar.total_unit = units
+    userCar.total_coin = totalPay
     userCar.leave_time = null
     userCar.leave_unit = 0
     await userCar.save()
@@ -240,10 +241,11 @@ class CarController {
     let settings = await Setting.get()
     let leaveTime = Time().format('YYYY-MM-DD HH:mm:ss')
     console.log('LeaveTime', leaveTime, 'shieldStart', userCar.shield_start)
-    let leave_diff = Time(leaveTime).diff(userCar.shield_start, 'minutes')
+    let leave_diff = Time(leaveTime).diff(userCar.shield_start, 'seconds')
     console.log('leave_diff', leave_diff, 'duration', userCar.shield_duration)
     if(leave_diff<userCar.shield_duration) {
-      userCar.leave_unit = parseInt((userCar.shield_duration - leave_diff)/settings.unit_to_minute, 10)
+      userCar.leave_unit = userCar.total_unit - Math.ceil(leave_diff/(settings.unit_to_minute*60))
+      userCar.leave_coin = userCar.total_coin - (Math.ceil(leave_diff/(settings.unit_to_minute*60)) * settings.unit_to_bronze_coin)
       userCar.shield_duration = leave_diff
       userCar.leave_time = leaveTime
       console.log('leave_unit', userCar.leave_unit)
@@ -252,14 +254,13 @@ class CarController {
 
     let loot = {
       remaining_units: userCar.leave_unit,
-      back_bronze_coin: 0,
+      back_bronze_coin: userCar.leave_coin,
     }
 
-    if(userCar.leave_unit>0) {
-      loot.back_bronze_coin = userCar.leave_unit * settings.unit_to_bronze_coin
+    if(userCar.leave_coin>0) {
       let userProperty = await Property.query().where('user_id', user.id).first()
       if(userProperty) {
-        userProperty.bronze_coin += loot.back_bronze_coin
+        userProperty.bronze_coin += userCar.leave_coin
         await userProperty.save()
       }
     }
