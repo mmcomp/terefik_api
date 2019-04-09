@@ -92,6 +92,7 @@ const routes = {
 
   //Parking
   'ParkingsAround': 'Parking/around',
+  'RegisterParking': 'Parking/register',
   
   'Test': 'Test/test'
 }
