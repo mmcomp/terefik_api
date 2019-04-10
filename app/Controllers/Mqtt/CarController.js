@@ -171,17 +171,17 @@ class CarController {
     userCar.leave_unit = 0
     await userCar.save()
 
-    if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
-      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
-      let res = await Database.raw(query)
+    // if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
+    //   let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
+    //   let res = await Database.raw(query)
 
-      if(res[0].length>0) {
-          let theZone = await Zone.find(res[0][0].id)
-          if(theZone) {
-            await theZone.crowdInc(params.crowd)
-          }
-      }
-    }
+    //   if(res[0].length>0) {
+    //       let theZone = await Zone.find(res[0][0].id)
+    //       if(theZone) {
+    //         await theZone.crowdInc(params.crowd)
+    //       }
+    //   }
+    // }
 
     await Achievment.achieve(user.id, 'park')
 
@@ -194,6 +194,55 @@ class CarController {
         experience_score: userData.property.experience_score + settings.car_park_exp,
         gift: gift,
         loot: loot,
+      }
+    }]
+  }
+
+  static async crowd(params, user) {
+    const rules = {
+      lon_gps: 'required',
+      lat_gps: 'required',
+      crowd: 'required',
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let data = null
+    if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
+      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
+      let res = await Database.raw(query)
+      data = 'Zone Not Found'
+      if(res[0].length>0) {
+          let theZone = await Zone.find(res[0][0].id)
+          if(theZone) {
+            await theZone.crowdInc(params.crowd)
+            data = 'Zone Updated'
+          }
+      }
+    }else {
+      return [{
+        status: 0,
+        messages: [{
+          code: "InvalidInput",
+          message: "ورودی ها صحیج نمی باشد",
+        }],
+        data: {
+        }
+      }]
+    }
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        message: data,
       }
     }]
   }

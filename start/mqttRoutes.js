@@ -30,6 +30,7 @@ const routes = {
   'LeaveSooner': 'Car/leave',
   'LeaveSoonerList': 'Car/leaveList',
   'FakeCarReport': 'Car/fake',
+  'CrowdReport': 'Car/crowd',
 
   // Discount
   'GetDiscount': 'Discount/get',
