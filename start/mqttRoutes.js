@@ -95,6 +95,10 @@ const routes = {
   'ParkingsAround': 'Parking/around',
   'RegisterParking': 'Parking/register',
   
+  //Trap
+  'TrapList': 'Attack/trapList',
+  'TrapBuy': 'Attack/buyTrap',
+
   'Test': 'Test/test'
 }
 

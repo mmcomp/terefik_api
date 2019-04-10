@@ -8,6 +8,8 @@ const Setting = use('App/Models/Setting')
 const GameSession = use('App/Models/GameSession')
 const Log = use('App/Models/Log')
 const Notification = use('App/Models/Notification')
+const Trap = use('App/Models/Trap')
+const UserTrap = use('App/Models/UserTrap')
 
 const Redis = use('Redis')
 const Randomatic = require('randomatic')
@@ -581,6 +583,91 @@ class AttackController {
       messages: [],
       data: {
         messages: messages
+      }
+    }]
+  }
+
+  static async trapList (params, user) {
+    let traps = await Trap.query().where('id', '>', 0).fetch()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        traps: traps,
+      }
+    }]
+  }
+
+
+  static async buyTrap (params, user) {
+    if(!params || !params.trap_id) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "InvalidInput",
+          message: "ورود tap_id الزامی است",
+        }],
+        data: {
+        }
+      }]
+    }
+
+    let trap = await Trap.query().where('trap_id', params.trap_id).first()
+    if(!trap) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "TrapNotFound",
+          message: "تله مورد نظر یافت نشد",
+        }],
+        data: {
+        }
+      }]
+    }
+
+    let userProperty = await Property.query().where('user_id', user.id).first()
+    if(!userProperty) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UserNotFound",
+          message: "کاربر مورد نظر یافت نشد",
+        }],
+        data: {
+        }
+      }]
+    }
+
+    if(userProperty.bronze_coin<trap.bronze_coin) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "ShortOnBronzeCoin",
+          message: "سکه برونز شما کافی نمی باشد",
+        }],
+        data: {
+        }
+      }]
+    }
+
+    userProperty.bronze_coin -= trap.bronze_coin
+    await userProperty.save()
+
+    let userTrap = await UserTrap.query().where('user_id', user.id).where('trap_id', trap.id).first()
+    if(!userTrap) {
+      userTrap = new UserTrap
+      userTrap.user_id = user.id
+      userTrap.trap_id = trap.id
+      userTrap.count = 0
+    }
+    userTrap.count++
+    await userTrap.save()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
       }
     }]
   }
