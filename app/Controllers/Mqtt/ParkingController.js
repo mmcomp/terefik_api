@@ -128,6 +128,7 @@ class ParkingController {
         messages: [],
         data: {
           founds: results,
+          search_radius: settings.parking_lookup_distance,
         }
       }]
     }catch(e){
