@@ -1,11 +1,14 @@
 'use strict'
 
 const Parking = use('App/Models/Parking')
+const ParkingRegister = use('App/Models/ParkingRegister')
 const Setting = use('App/Models/Setting')
 const Property = use('App/Models/Property')
 const Car = use('App/Models/Car')
 const UserCar = use('App/Models/UserCar')
 
+const Moment = use('App/Libs/Moment')
+const Time = Moment.moment()
 const Validations = use('App/Libs/Validations')
 const _ = require('lodash')
 
@@ -86,13 +89,31 @@ class ParkingController {
 
     // Fake Output
     if(true) {
+      // return [{
+      //   status: 0,
+      //   messages: [{
+      //     code: "ParkingFull",
+      //     message: "ظرفیت پارکینگ پر شده است",
+      //   }],
+      //   data: {}
+      // }]
+      let regTime = Time().format("YYYY-MM-DD HH:mm:ss")
+      let parkingRegister = await ParkingRegister.query().with('car').with('parking').where('vehicle_id', params.car_id).where('parkings_id', params.parking_id).where('expired_at', '>', Time().format('YYYY-MM-DD HH:mm:ss')).first()
+      if(!parkingRegister) {
+        parkingRegister = new ParkingRegister
+        parkingRegister.vehicle_id = params.car_id
+        parkingRegister.parkings_id = params.parking_id
+        parkingRegister.expired_at = Time(regTime).add(parking.minimum_reserve_minutes, 'minutes').format('YYYY-MM-DD HH:mm:ss')
+        await parkingRegister.save()
+        parkingRegister.loadMany(['car', 'parking'])
+      }
+
       return [{
-        status: 0,
-        messages: [{
-          code: "ParkingFull",
-          message: "ظرفیت پارکینگ پر شده است",
-        }],
-        data: {}
+        status: 1,
+        messages: [],
+        data: {
+          parkingRegister
+        }
       }]
     }
 

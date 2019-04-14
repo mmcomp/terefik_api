@@ -14,6 +14,7 @@ const Notification = use('App/Models/Notification')
 const InspectorDailyReport = use('App/Models/InspectorDailyReport')
 const Achievment = use('App/Models/Achievment')
 const Zone = use('App/Models/Zone')
+const ParkingRegister = use('App/Models/ParkingRegister')
 const Database = use('Database')
 
 const Env = use('Env')
@@ -607,6 +608,8 @@ class CarController {
       }
       delete cars[i].usercar
       cars[i].shield_diff = shieldDiff
+      console.log('Check parking register', 'vehicle_id', car.id, Time().format('YYYY-MM-DD HH:mm:ss'))
+      cars[i].parking_register = await ParkingRegister.query().with('parking').where('vehicle_id', car.id).where('expired_at', '>', Time().format('YYYY-MM-DD HH:mm:ss')).first()
     }
 
     return [{
