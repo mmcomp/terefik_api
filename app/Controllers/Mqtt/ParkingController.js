@@ -136,6 +136,78 @@ class ParkingController {
     }]
   }
 
+  static async unregister(params, user) {
+    const rules = {
+      car_id: 'required',
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+
+    let userProperty = await Property.query().where('user_id', user.id).first()
+    if(!userProperty) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UserNotFound",
+          message: "کاربر مورد نظر پیدا نشد",
+        }],
+        data: {}
+      }]
+    }
+
+    let car = await Car.query().where('id', params.car_id).first()
+    if(!car) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "CarNotFound",
+          message: "خودرو مورد نظر پیدا نشد",
+        }],
+        data: {}
+      }]
+    }
+
+    let userCar = await UserCar.query().where('user_id', user.id).where('vehicle_id', car.id).first()
+    if(!userCar) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "CarNotYours",
+          message: "خودرو مورد نظر متعلق به شما نیست",
+        }],
+        data: {}
+      }]
+    }
+
+    let parkingRegister = await ParkingRegister.query().with('car').with('parking').where('vehicle_id', params.car_id).where('expired_at', '>', Time().format('YYYY-MM-DD HH:mm:ss')).first()
+    if(!parkingRegister) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "NoRegistration",
+          message: "شما در با این خودرو در هیچ پارکینگ ای رزرو ندارید",
+        }],
+        data: {}
+      }]
+    }
+
+    await parkingRegister.delete()
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+      }
+    }]
+  }
+
   static async around(params, user) {
     const rules = {
       lon_gps: 'required',

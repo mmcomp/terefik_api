@@ -94,6 +94,7 @@ const routes = {
   //Parking
   'ParkingsAround': 'Parking/around',
   'RegisterParking': 'Parking/register',
+  'UnRegisterParking': 'Parking/unregister',
   
   //Trap
   'TrapList': 'Attack/trapList',
