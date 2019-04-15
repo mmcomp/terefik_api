@@ -617,7 +617,7 @@ class CarController {
       messages: [],
       data: {
         cars: cars,
-        server_time: Time().format('YYYY-MM-DD HH:ii:ss'),
+        server_time: Time().format('YYYY-MM-DD HH:mm:ss'),
       }
     }]
   }
