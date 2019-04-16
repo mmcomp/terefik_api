@@ -136,7 +136,7 @@ class CarController {
     let gift = (transactions % settings.park_count_for_gift == 0) 
 
     let loot = {
-      daimond: settings.diamond_earn_on_shielding + extraDiamond,
+      diamond: settings.diamond_earn_on_shielding + extraDiamond,
       gasoline: settings.park_gasoline,
       health: settings.park_health,
       clean: settings.park_clean,
