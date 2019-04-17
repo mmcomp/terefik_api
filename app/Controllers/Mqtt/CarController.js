@@ -97,15 +97,14 @@ class CarController {
 
     discountPercent = (100 - discountPercent)/100
 
-    let unitCost = settings.unit_to_bronze_coin_10
-    if(units<10) {
-      if(units>1) {
-        unitCost = settings['unit_to_bronze_coin_' + units]
-      }else {
-        unitCost = settings.unit_to_bronze_coin
-      }
-    } 
-    let unitsTotal = unitCost * units
+    let unitCost = parseInt(settings.unit_to_bronze_coin_10, 10)
+    let unitsTotal = parseInt(settings.unit_to_bronze_coin, 10)
+    for(let i = 2;i <= Math.min(units, 10);i++) {
+      unitsTotal += parseInt(settings['unit_to_bronze_coin_' + i], 10)
+    }
+    if(units>10) {
+      unitsTotal += unitCost * (units - 10)
+    }
 
     let totalPay = Math.ceil(unitsTotal * discountPercent, 10)
 
