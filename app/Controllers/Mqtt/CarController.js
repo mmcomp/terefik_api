@@ -745,13 +745,10 @@ class CarController {
       let checkFinish = Time(userCar.check_time).add(settings.check_timeout, 'minutes')
 
       let checkDiff = checkFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-      let theStat = 0
 
-      if(checkDiff<0) {
-        // Reward Ranger
-        theStat = 1
-
+      if(checkDiff<0 || userCar.checker_id!=user.id) {
         userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
+        userCar.checker_id = user.id
         await userCar.save()
       }else {
         isNotReDone = 0
@@ -830,9 +827,16 @@ class CarController {
       health: 0,
       cleaning: 0,
     }
+    let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
+    let extraSilver = 0
+    if(rangerSilverTime) {
+      extraSilver = rangerSilverTime.extra_silver
+    }
+    let driver, userCar = await UserCar.query().where('vehicle_id', params.car_id).with('user').first()
     let is_out = false
+    let rangerExp = settings.car_check_exp
     let isNotReDone = 1, rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
-    if(rangerWork) {
+    if(rangerWork && rangerWork.ranger_id==user.id) {
       let settings = await Setting.get()
       let lastArrestTime = Time(rangerWork.created_at)
       if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
@@ -846,13 +850,48 @@ class CarController {
           data: {}
         }]
       }
-    }
+    }else if(rangerWork && rangerWork.ranger_id!=user.id) {
+      let inspectorDailyReport = await InspectorDailyReport.query().where('user_id', user.id).whereRaw("created_at like  '" + Moment.now('YYYY-MM-DD') + "%'").first()
+      if(!inspectorDailyReport) {
+          inspectorDailyReport = new InspectorDailyReport
+          inspectorDailyReport.user_id = user.id
+          inspectorDailyReport.report_count = 0
+      }
+      inspectorDailyReport.report_count += 1
+      await inspectorDailyReport.save()
 
-    let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
-    let extraSilver = 0
-    if(rangerSilverTime) {
-      extraSilver = rangerSilverTime.extra_silver
+      if(userCar) {
+        let checkFinish = Time(userCar.check_time).add(settings.check_timeout, 'minutes')
+
+        let checkDiff = checkFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+  
+        if(checkDiff<0 || userCar.checker_id!=user.id) {
+          userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
+          userCar.checker_id = user.id
+          await userCar.save()
+        }
+      }
+      let rangerSilver = settings.silver_when_not_reported + extraSilver
+      loot.silver_coin = rangerSilver
+
+      await user.property().update({
+        silver_coin: userData.property.silver_coin + loot.silver_coin ,
+        inspector_score: userData.property.experience_score + rangerExp
+      })
+
+      await Achievment.achieve(user.id, 'ranger')
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          car_status: 'Shielded',
+          in_out : is_out,
+          loot: loot
+        }
+      }]
     }
+    
 
     rangerWork = new RangerWork
     rangerWork.ranger_id = user.id
@@ -862,8 +901,7 @@ class CarController {
     rangerWork.image_path = params.image_path
     rangerWork.silver_coin = isNotReDone * settings.silver_when_not_reported
     
-    let rangerExp = settings.car_check_exp
-    let driver, userCar = await UserCar.query().where('vehicle_id', params.car_id).with('user').first()
+    
     if(userCar) {
       driver = userCar.toJSON().user
       let shieldFinish = Time(userCar.shield_start).add(userCar.shield_duration, 'minutes')
