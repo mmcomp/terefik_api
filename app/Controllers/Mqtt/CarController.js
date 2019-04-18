@@ -15,6 +15,7 @@ const InspectorDailyReport = use('App/Models/InspectorDailyReport')
 const Achievment = use('App/Models/Achievment')
 const Zone = use('App/Models/Zone')
 const ParkingRegister = use('App/Models/ParkingRegister')
+const UserFindableGift = use('App/Models/UserFindableGift')
 const Database = use('Database')
 
 const Env = use('Env')
@@ -688,7 +689,6 @@ class CarController {
     }
 
     let carOwner = {}, rangerSilver = 0, isNotReDone = 1
-
     let carStatus = 'NotRegistered'
 
     await user.loadMany(['property'])
@@ -825,7 +825,10 @@ class CarController {
       gasoline: 0,
       health: 0,
       cleaning: 0,
+      findable_gift: false,
     }
+    let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
+
     let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
     let extraSilver = 0
     if(rangerSilverTime) {
@@ -868,6 +871,10 @@ class CarController {
           userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
           userCar.checker_id = user.id
           await userCar.save()
+          let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+          if(gift_id) {
+            loot.findable_gift = true
+          }
         }
       }
       let rangerSilver = settings.silver_when_not_reported + extraSilver
@@ -969,6 +976,11 @@ class CarController {
 
         await Achievment.achieve(user.id, 'ranger')
 
+        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+        if(gift_id) {
+          loot.findable_gift = true
+        }
+
         return [{
           status: 1,
           messages: [],
@@ -992,6 +1004,11 @@ class CarController {
       await user.property().update({
         silver_coin: userData.property.silver_coin + loot.silver_coin + extraSilver
       })
+
+      let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+      if(gift_id) {
+        loot.findable_gift = true
+      }
 
       return [{
         status: 1,

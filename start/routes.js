@@ -95,6 +95,9 @@ Route.any('/bank_saderat_revert', 'TransactionController.saderatRevert')
 Route.any('/bank_saderat_send', 'TransactionController.saderatSend')
 Route.any('/bank_saman_send', 'TransactionController.samanSend')
 Route.any('/bank_saman_revert', 'TransactionController.samanRevert')
+
+Route.get('/gift', 'FileController.testGift')
+
 /*
 const { exec } = require('child_process')
 exec('service emqttd start', (err, stdout, stderr) => {

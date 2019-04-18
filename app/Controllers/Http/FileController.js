@@ -7,6 +7,7 @@ const readFile = Helpers.promisify(fs.readFile)
 const User = use('App/Models/User')
 const UserTerefik = use('App/Models/UserTerefik')
 const ParkingRangerDoc = use('App/Models/ParkingRangerDoc')
+const UserFindableGift = use('App/Models/UserFindableGift')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -210,6 +211,21 @@ class FileController {
         data: {}
       })
     }
+  }
+
+  async testGift ({
+    request,
+    response,
+    params
+  }) {
+    try{
+      let gift_id = await UserFindableGift.tryToGetGift(3, 4)
+      console.log('test gift result', gift_id)
+    }catch(e) {
+      console.log('test gift error')
+      console.log(e)
+    }
+    return 'OK'
   }
 }
 

@@ -100,6 +100,9 @@ const routes = {
   'TrapList': 'Attack/trapList',
   'TrapBuy': 'Attack/buyTrap',
 
+  //Findable Gift
+  'FindableGiftList': 'FindableGift/list',
+
   'Test': 'Test/test'
 }
 

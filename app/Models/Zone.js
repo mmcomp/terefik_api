@@ -41,6 +41,16 @@ class Zone extends Model {
 
     await this.save()
   }
+
+  static async zoneByCords (lon, lat) {
+    let zone_id = 0
+    let query = "SELECT id FROM zone WHERE intersects(shape, point(" + lon + ", " + lat + "))=1"
+    let res = await Database.raw(query)
+    if(res[0].length>0) {
+        zone_id = res[0][0].id
+    }
+    return zone_id
+  }
 }
 
 module.exports = Zone
