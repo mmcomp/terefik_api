@@ -1,7 +1,7 @@
 'use strict'
 
 const Setting = use('App/Models/Setting')
-
+const Database = use('Database')
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
 
