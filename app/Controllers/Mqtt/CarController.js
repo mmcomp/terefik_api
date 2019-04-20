@@ -688,6 +688,18 @@ class CarController {
       }]
     }
 
+    let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
+    if(theZoneId<=0) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'OutOfZones',
+          message: 'خارج از محدوده های مکانی گزارش نمی توانید ارسال کنید'
+        }],
+        data: {}
+      }]
+    }
+
     let carOwner = {}, rangerSilver = 0, isNotReDone = 1
     let carStatus = 'NotRegistered'
 
