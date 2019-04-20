@@ -51,7 +51,9 @@ class UserController {
       
       userData['ranger_data'] = {
         minimum_report: minimum_report,
-        ranger_star_change: settings.ranger_star_change,
+        ranger_star_change_1: settings.ranger_star_change_1,
+        ranger_star_change_2: settings.ranger_star_change_2,
+        ranger_star_change_3: settings.ranger_star_change_3,
         total: {
           silver_coin: totalSilverCoin,
           report: totalReport,
@@ -557,9 +559,9 @@ class UserController {
         }
         if(minimum_report>0 && todayReport>=minimum_report) {
           star = 1
-          if(todayReport>minimum_report + settings.ranger_star_change && todayReport<=minimum_report + 2*settings.ranger_star_change) {
+          if(todayReport>minimum_report + settings.ranger_star_change_1 && todayReport<=minimum_report + settings.ranger_star_change_2) {
             star = 2
-          }else if(todayReport>minimum_report + 2*settings.ranger_star_change && todayReport<=minimum_report + 3*settings.ranger_star_change) {
+          }else if(todayReport>minimum_report + settings.ranger_star_change_2 && todayReport<=minimum_report + settings.ranger_star_change_3) {
             star = 3
           }
         }
