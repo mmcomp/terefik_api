@@ -8,7 +8,7 @@ class Achievment extends Model {
     let possibleAchievments = await Achievment.query().where('action_type', action_type).pluck('id')
     console.log('Possible Achievment IDS for ' + action_type)
     console.log(possibleAchievments)
-    let userAchievments = await UserAchievment.query().with('achievment').whereIn('achievments_id', possibleAchievments).where('users_id', user_id)/*.where('collected', 0)*/.fetch()
+    let userAchievments = await UserAchievment.query().with('achievment').with('user').whereIn('achievments_id', possibleAchievments).where('users_id', user_id)/*.where('collected', 0)*/.fetch()
     let userAchievmentsData = userAchievments.toJSON()
     let userAchievmentIds = []
     console.log('Achievments that User Have of possibles')
@@ -22,6 +22,19 @@ class Achievment extends Model {
           })
         }else {
           console.log('Nailed Achiement id', uAch.achievment.id)
+          if(uAch.user && uAch.user.token) {
+            let pubTopic = 'client_' + uAch.user.token + '/AchievmentNotification'
+            let messageData = {
+              status: 1,
+              messages: [],
+              data: {
+                  achievment: uAch.achievment,
+              },
+              type: 'AchievmentNotification',
+            }
+
+            Mqtt.publish(pubTopic, JSON.stringify(messageData))
+          }
         }  
       }
     }
