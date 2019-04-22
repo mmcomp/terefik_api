@@ -22,7 +22,9 @@ class SettingController {
           unit_to_bronze_coin_8: settings.unit_to_bronze_coin_8,
           unit_to_bronze_coin_9: settings.unit_to_bronze_coin_9,
           unit_to_bronze_coin_10: settings.unit_to_bronze_coin_10,
-          unit_max: settings.unit_max
+          unit_max: settings.unit_max,
+          last_critical_version: settings.last_critical_version,
+          last_version: settings.last_version,
         }
       }
     }]
