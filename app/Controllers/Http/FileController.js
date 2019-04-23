@@ -61,10 +61,10 @@ class FileController {
   
       let doc_type = (request.all()['doc_type'])?request.all()['doc_type']:'profile'
 
-      const profilePic = request.file('the_file', {
+      const profilePic = request.file('the_file'/*, {
         types: ['image'],
         size: '2mb'
-      })
+      }*/)
   
       let filename = User.getToken()
       let ext = profilePic.clientName.split('.')[profilePic.clientName.split('.').length-1]
