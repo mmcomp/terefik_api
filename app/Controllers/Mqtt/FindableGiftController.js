@@ -6,10 +6,12 @@ const Time = Moment.moment()
 const Validations = use('App/Libs/Validations')
 
 const UserFindableGift = use('App/Models/UserFindableGift')
+const Setting = use('App/Models/Setting')
 
 class FindableGiftController {
   static async list(params, user) {
     let currentHour = parseInt(Time().format('HH'), 10)
+    let settings = await Setting.get()
     
     if(currentHour<=settings.time_limit_end && currentHour>=settings.time_limit_start) {
       return [{
