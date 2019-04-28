@@ -227,7 +227,7 @@ class CarController {
 
     let data = null
     if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
-      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
+      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + lon_gps + ", " + lat_gps + "))=1"
       let res = await Database.raw(query)
       data = 'Zone Not Found'
       if(res[0].length>0) {
