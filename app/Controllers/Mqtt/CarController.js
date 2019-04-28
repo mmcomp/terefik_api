@@ -29,6 +29,20 @@ const Validations = use('App/Libs/Validations')
 const _ = require('lodash')
 
 class CarController {
+  static unitCost(units, settings) {
+    let unitCost = parseInt(settings.unit_to_bronze_coin_10, 10)
+    let unitsTotal = parseInt(settings.unit_to_bronze_coin, 10)
+
+    for(let i = 2;i <= Math.min(units, 10);i++) {
+      unitsTotal += parseInt(settings['unit_to_bronze_coin_' + i], 10)
+    }
+    if(units>10) {
+      unitsTotal += unitCost * (units - 10)
+    }
+
+    return unitsTotal
+  }
+
   static async shield(params, user) {
     const rules = {
       car_id: 'required',
@@ -98,6 +112,7 @@ class CarController {
 
     discountPercent = (100 - discountPercent)/100
 
+    /*
     let unitCost = parseInt(settings.unit_to_bronze_coin_10, 10)
     let unitsTotal = parseInt(settings.unit_to_bronze_coin, 10)
     for(let i = 2;i <= Math.min(units, 10);i++) {
@@ -106,6 +121,8 @@ class CarController {
     if(units>10) {
       unitsTotal += unitCost * (units - 10)
     }
+    */
+    let unitsTotal = CarController.unitCost(units)
 
     let totalPay = Math.ceil(unitsTotal * discountPercent, 10)
 
@@ -305,11 +322,7 @@ class CarController {
     console.log('Leave Diff', leave_diff, userCar.shield_duration)
     if(leave_diff/60<userCar.shield_duration) {
       userCar.leave_unit = userCar.total_unit - Math.ceil(leave_diff/(settings.unit_to_minute*60))
-      if(userCar.leave_unit<10) {
-        unit_to_bronze_coin = settings['unit_to_bronze_coin_' + userCar.leave_unit]
-      }
-      leave_diff = userCar.shield_duration - (leave_diff/60)
-      userCar.leave_coin = (parseInt(leave_diff/settings.unit_to_minute, 10) * unit_to_bronze_coin)
+      userCar.leave_coin = userCar.total_coin - CarController.unitCost(userCar.leave_unit) //(Math.ceil(leave_diff/(settings.unit_to_minute*60)) * unit_to_bronze_coin)
       if(userCar.leave_coin<0) {
         userCar.leave_coin = 0
       }
