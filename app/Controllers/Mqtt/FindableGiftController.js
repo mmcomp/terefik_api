@@ -12,16 +12,18 @@ class FindableGiftController {
   static async list(params, user) {
     let currentHour = parseInt(Time().format('HH'), 10)
     let settings = await Setting.get()
-    
-    if(currentHour<=settings.time_limit_end && currentHour>=settings.time_limit_start) {
-      return [{
-        status: 0,
-        messages: [{
-          code: 'InTheWorkingHours',
-          message: 'خارج از محدوده زمانی فعالیت امکان مشاهده جوایز را دارید'
-        }],
-        data: {}
-      }]
+
+    if(params.test) {
+      if(currentHour<=settings.time_limit_end && currentHour>=settings.time_limit_start) {
+        return [{
+          status: 0,
+          messages: [{
+            code: 'InTheWorkingHours',
+            message: 'خارج از محدوده زمانی فعالیت امکان مشاهده جوایز را دارید'
+          }],
+          data: {}
+        }]
+      }
     }
 
     let userFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
