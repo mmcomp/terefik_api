@@ -244,7 +244,7 @@ class CarController {
 
     let data = null
     if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
-      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + lon_gps + ", " + lat_gps + "))=1"
+      let query = "SELECT id FROM zone WHERE intersects(shape, point(" + params.lon_gps + ", " + params.lat_gps + "))=1"
       let res = await Database.raw(query)
       data = 'Zone Not Found'
       if(res[0].length>0) {
@@ -322,7 +322,7 @@ class CarController {
     console.log('Leave Diff', leave_diff, userCar.shield_duration)
     if(leave_diff/60<userCar.shield_duration) {
       userCar.leave_unit = userCar.total_unit - Math.ceil(leave_diff/(settings.unit_to_minute*60))
-      userCar.leave_coin = userCar.total_coin - CarController.unitCost(userCar.leave_unit, settings) //(Math.ceil(leave_diff/(settings.unit_to_minute*60)) * unit_to_bronze_coin)
+      userCar.leave_coin = userCar.total_coin - CarController.unitCost(Math.ceil(leave_diff/(settings.unit_to_minute*60)), settings) //(Math.ceil(leave_diff/(settings.unit_to_minute*60)) * unit_to_bronze_coin)
       if(userCar.leave_coin<0) {
         userCar.leave_coin = 0
       }
