@@ -13,17 +13,17 @@ class FindableGiftController {
     let currentHour = parseInt(Time().format('HH'), 10)
     let settings = await Setting.get()
 
-    if(!params.test) {
-      if(currentHour<=settings.time_limit_end && currentHour>=settings.time_limit_start) {
-        return [{
-          status: 0,
-          messages: [{
-            code: 'InTheWorkingHours',
-            message: 'خارج از محدوده زمانی فعالیت امکان مشاهده جوایز را دارید'
-          }],
-          data: {}
-        }]
-      }
+    let can_view = true
+    if(currentHour<=settings.time_limit_end && currentHour>=settings.time_limit_start) {
+      // return [{
+      //   status: 0,
+      //   messages: [{
+      //     code: 'InTheWorkingHours',
+      //     message: 'خارج از محدوده زمانی فعالیت امکان مشاهده جوایز را دارید'
+      //   }],
+      //   data: {}
+      // }]
+      can_view = false
     }
 
     let userFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
@@ -33,6 +33,7 @@ class FindableGiftController {
       messages: [],
       data: {
         user_findable_gifts: userFindableGift.toJSON(),
+        can_view :can_view,
       }
     }]
   }
