@@ -301,10 +301,15 @@ class CarController {
     let settings = await Setting.get()
     let leaveTime = Time().format('YYYY-MM-DD HH:mm:ss')
     let leave_diff = Time(leaveTime).diff(userCar.shield_start, 'seconds')
+    let unit_to_bronze_coin = settings.unit_to_bronze_coin_10
     console.log('Leave Diff', leave_diff, userCar.shield_duration)
     if(leave_diff/60<userCar.shield_duration) {
       userCar.leave_unit = userCar.total_unit - Math.ceil(leave_diff/(settings.unit_to_minute*60))
-      userCar.leave_coin = userCar.total_coin - (Math.ceil(leave_diff/(settings.unit_to_minute*60)) * settings.unit_to_bronze_coin)
+      if(userCar.leave_unit<10) {
+        unit_to_bronze_coin = settings['unit_to_bronze_coin_' + userCar.leave_unit]
+      }
+      leave_diff = userCar.shield_duration - (leave_diff/60)
+      userCar.leave_coin = (parseInt(leave_diff/settings.unit_to_minute, 10) * unit_to_bronze_coin)
       if(userCar.leave_coin<0) {
         userCar.leave_coin = 0
       }
