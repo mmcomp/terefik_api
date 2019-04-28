@@ -13,7 +13,7 @@ class FindableGiftController {
     let currentHour = parseInt(Time().format('HH'), 10)
     let settings = await Setting.get()
 
-    if(params.test) {
+    if(!params.test) {
       if(currentHour<=settings.time_limit_end && currentHour>=settings.time_limit_start) {
         return [{
           status: 0,
