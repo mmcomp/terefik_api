@@ -367,7 +367,7 @@ class DashboardStat {
   }
 
   static async updateParkings (job, done) {
-    console.log('Update Parkings')
+    // console.log('Update Parkings')
     try{
       const response = await axios.get(Env.get('PARKING_URL'))
       if (response.status === 200) {
@@ -413,10 +413,10 @@ class DashboardStat {
         }
       }
     }catch(e) {
-      console.log("error happend")
+      console.log("parking update error happend")
       console.log(e)
     }
-    console.log('Finish Updating parkings')
+    // console.log('Finish Updating parkings')
     return done()
   }
 }

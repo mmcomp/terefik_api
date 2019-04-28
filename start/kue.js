@@ -55,7 +55,7 @@ try {
     .attempts(3)
     .priority('normal')
 
-  Queue.every('5 minutes', parkingJob)
+  Queue.every('15 minutes', parkingJob)
   Queue.process('parkings', DashboardStat.updateParkings)
 
 } catch (error) {
