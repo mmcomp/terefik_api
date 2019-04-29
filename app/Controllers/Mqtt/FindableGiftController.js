@@ -3,9 +3,8 @@
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
 
-const Validations = use('App/Libs/Validations')
-
 const UserFindableGift = use('App/Models/UserFindableGift')
+const UserPfindableGift = use('App/Models/UserPfindableGift')
 const Setting = use('App/Models/Setting')
 
 class FindableGiftController {
@@ -26,12 +25,14 @@ class FindableGiftController {
       can_view = false
     }
 
-    let userFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
+    let rangerFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
+    let userFindableGift = await UserPfindableGift.query().with('gift').where('user_id', user.id).fetch()
 
     return [{
       status: 1,
       messages: [],
       data: {
+        ranger_findable_gifts: rangerFindableGift.toJSON(),
         user_findable_gifts: userFindableGift.toJSON(),
         can_view :can_view,
       }

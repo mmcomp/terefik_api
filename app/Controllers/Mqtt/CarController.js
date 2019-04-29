@@ -16,6 +16,8 @@ const Achievment = use('App/Models/Achievment')
 const Zone = use('App/Models/Zone')
 const ParkingRegister = use('App/Models/ParkingRegister')
 const UserFindableGift = use('App/Models/UserFindableGift')
+const UserPfindableGift = use('App/Models/UserPfindableGift')
+const PfindableGift = use('App/Models/PfindableGift')
 const Database = use('Database')
 
 const Env = use('Env')
@@ -779,6 +781,27 @@ class CarController {
         userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
         userCar.checker_id = user.id
         await userCar.save()
+        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+        if(gift_id) {
+          loot.findable_gift = true
+        }
+        let pgift_id = await UserPfindableGift.tryToGetGift(theOwner.id, theZoneId)
+        if(pgift_id) {
+          //push to driver
+          let PGIFT = await PfindableGift.query().where('id', pgift_id).first()
+          if(PGIFT) {
+            let PGiftNotification = new Notification
+            PGiftNotification.user_id = theOwner.id
+            PGiftNotification.title = Env.get('PUSH_USER_FINDABLE_TITLE')
+            PGiftNotification.message = Env.get('PUSH_USER_FINDABLE_MESSAGE')
+            PGiftNotification.type = 'UserFindableGiftNotification'
+            PGiftNotification.data = JSON.stringify({
+              id: pgift_id,
+              name: PGIFT.name,
+            })
+            PGiftNotification.save()  
+          }
+        }
       }else {
         isNotReDone = 0
       }

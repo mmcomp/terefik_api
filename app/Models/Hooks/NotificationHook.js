@@ -35,12 +35,7 @@ NotificationHook.send = async (notification) => {
 
                     console.log('Push Data')
                     console.log(pusheData)
-                    // axios.defaults.baseURL = Env.get('PUSH_URL')
-                    // axios.defaults.timeout = 1000
-                    // axios.defaults.headers.common['Authorization'] = 'Token ' + Env.get('PUSH_TOKEN')
-                    // axios.defaults.headers.post['Content-Type'] = 'application/json'
-                    // axios.defaults.headers.post['Accept'] = 'application/json'
-                    // response = await axios.post('', data)
+
                     response = await axios({
                         method: 'POST',
                         headers: {
@@ -68,11 +63,15 @@ NotificationHook.send = async (notification) => {
                         message: notification.message,
                         loot: data,
                     },
-                    type: 'ArrestNotification',
+                    type: (notification.type === 'user_arrest')?'ArrestNotification':notification.type,
                 }
 
                 Mqtt.publish(pubTopic, JSON.stringify(messageData))
-                console.log('Sent Arrent Mqtt Notification ')
+                if(notification.type === 'user_arrest') {
+                    console.log('Sent Arrent Mqtt Notification ')
+                }else {
+                    console.log('Sent ' + notification.type + ' Mqtt Notification ')
+                }
                 console.log(theUser.mobile ,messageData)
             }else {
                 return false
