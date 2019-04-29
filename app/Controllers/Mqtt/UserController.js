@@ -104,6 +104,7 @@ class UserController {
         lon: lastUnexplainedArrest.lon_gps,
         lat: lastUnexplainedArrest.lat_gps,
         time: lastUnexplainedArrest.created_at,
+        id: lastUnexplainedArrest.id,
       }
     }
 
