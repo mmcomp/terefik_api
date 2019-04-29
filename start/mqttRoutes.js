@@ -54,6 +54,7 @@ const routes = {
   'InspectorWorkLeaderBoard': 'User/insWorkLeader',
   'RandomGift': 'User/randomGift',
   'DailyGift': 'User/dailyGift',
+  'ExcuseArrest': 'User/excuse',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',

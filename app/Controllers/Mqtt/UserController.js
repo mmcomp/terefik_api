@@ -760,6 +760,76 @@ class UserController {
       }]
     }
   }
+
+  static async excuse (params, user) {
+    try{
+      if(!params || !params.arrest_id) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ArrestIdNeeded",
+            message: "ورود arrest_id اجباری است",
+          }],
+          data: {}
+        }]
+      }
+
+      if(!params.excuse_type) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ExcuseTypeNeeded",
+            message: "ورود excuse_type اجباری است",
+          }],
+          data: {}
+        }]
+      }
+
+      if(params.excuse_type=='other' && !params.excuse_other) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ExcuseOtherNeeded",
+            message: "ورود excuse_other اجباری است",
+          }],
+          data: {}
+        }]
+      }
+
+      let rangerWork = await RangerWork.query().where('id', params.arrest_id).first()
+      if(!rangerWork) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ArrestNotFound",
+            message: "درخواست پیدا نشد",
+          }],
+          data: {}
+        }]
+      }
+
+      rangerWork.driver_excuse = params.excuse_type
+      if(params.excuse_type=='other') {
+        rangerWork.driver_excuse_other = params.excuse_other
+      }
+      rangerWork.save()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {}
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UnknowError",
+          message: JSON.stringify(e)
+        }],
+        data: {}
+      }]
+    }
+  }
 }
 
 module.exports = UserController
