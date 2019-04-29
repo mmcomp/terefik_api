@@ -536,6 +536,7 @@ class UserController {
       let userData = user.toJSON()
       let minimum_report = 0, todayReport = 0, star = 0
       if(userData.is_parking_ranger==4) {
+        /*
         if(parseInt(Time().format('HH'), 10) < 21) {
           return [{
             status: 0,
@@ -546,6 +547,7 @@ class UserController {
             data: {}
           }]
         }
+        */
         if(userData.zones && userData.zones.length>0) {
           for(let uZ of userData.zones) {
             if(uZ.zone) {
