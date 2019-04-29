@@ -1024,10 +1024,12 @@ class CarController {
           health: -1*loot.health,
           cleaning: -1*loot.cleaning,
           diamond: -1*settings.diamond_lose_on_arrest,
+          arrest_id: rangerWork.id,
         })
-        await notification.save()
+        notification.type = 'user_arrest'
+        notification.save()
 
-        await Achievment.achieve(user.id, 'ranger')
+        Achievment.achieve(user.id, 'ranger')
 
         let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
         if(gift_id) {
