@@ -53,6 +53,7 @@ const routes = {
   'InspectorLeaderBoard': 'User/insLeader',
   'InspectorWorkLeaderBoard': 'User/insWorkLeader',
   'RandomGift': 'User/randomGift',
+  'DailyGift': 'User/dailyGift',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',

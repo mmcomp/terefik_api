@@ -664,6 +664,73 @@ class UserController {
       }]
     }
   }
+
+  static async dailyGift (params, user) {
+    try {
+      if(user.last_daily_gift && user.last_daily_gift!=null) {
+        if(Time(user.last_daily_gift).format('YYYY-MM-DD')==Time().format('YYYY-MM-DD')) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "AlreadyGotTheGift",
+              message: 'شما هدیه امروز تان را دریافت کرده اید'
+            }],
+            data: {}
+          }]
+        }
+      }
+
+      if(params && params.consume && params.consume===false) {
+        return [{
+          status: 1,
+          messages: [],
+          data: {}
+        }]
+      }
+
+      let settings = await Setting.get()
+      let assets = [
+        'gasoline',
+        'health_oil',
+        'cleaning_soap',
+        'water',
+        'coke',
+      ]
+      let index1 = -1, index2 = -1
+      index1 = Math.ceil(Math.random() * 4)
+      while(index2<0 || index1==index2) {
+        index2 = Math.ceil(Math.random() * 4)
+      }
+
+      let loots = {}
+
+      loots[assets[index1]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+      loots[assets[index2]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+
+      let property = await Property.query().where('user_id', user.id).first()
+      for(let loot in loots) {
+        property[loot] += loots[loot]
+      }
+      property.save()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          loots: loots
+        }
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UnknowError",
+          message: JSON.stringify(e)
+        }],
+        data: {}
+      }]
+    }
+  }
 }
 
 module.exports = UserController
