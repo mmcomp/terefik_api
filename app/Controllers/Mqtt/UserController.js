@@ -7,6 +7,7 @@ const RangerWork = use('App/Models/RangerWork')
 const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
 const UserCarwash = use('App/Models/UserCarwash')
+const UserCar = use('App/Models/UserCar')
 const Message = use('App/Models/Message')
 const RangerRandomGift = use('App/Models/RangerRandomGift')
 
@@ -16,7 +17,7 @@ const Time = Moment.moment()
 class UserController {
   static async profile (params, user) {
     let settings = await Setting.get()
-    await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap', 'zones.zone'])
+    await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap', 'zones.zone', 'car'])
     let userData = user.toJSON()
     let minimum_report = null
     userData['ranger_data'] = null
@@ -87,6 +88,25 @@ class UserController {
     let totalAttacked = await Message.query().where('user_id', user.id).whereIn('type', ['attack', 'revenge']).getCount()
     let todayAttacked = await Message.query().where('user_id', user.id).whereIn('type', ['attack', 'revenge']).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getCount()
   
+    let userCars = []
+    for(let userCar of userData.car) {
+      userCars.push(userCar.id)
+    }
+
+    let lastArrest = null
+    let lastUnexplainedArrest = await RangerWork.query().whereIn('user_vehicle_id', userCars)
+      .where('driver_excuse', 'noanswer')
+      .where('created_at', '>=', Time().format('YYYY-MM-DD 00:00:00'))
+      .orderBy('created_at', 'desc')
+      .first()
+    if(lastUnexplainedArrest) {
+      lastArrest = {
+        lon: lastUnexplainedArrest.lon_gps,
+        lat: lastUnexplainedArrest.lat_gps,
+        time: lastUnexplainedArrest.created_at,
+      }
+    }
+
     userData['driver_data'] = {
       total: {
         park: totalPark,
@@ -108,7 +128,8 @@ class UserController {
       status: 1,
       messages: [],
       data: {
-        profile: userData
+        profile: userData,
+        last_arrest: lastArrest,
       }
     }]
   }
