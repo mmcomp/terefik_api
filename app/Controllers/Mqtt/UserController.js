@@ -8,6 +8,7 @@ const Setting = use('App/Models/Setting')
 const Transaction = use('App/Models/Transaction')
 const UserCarwash = use('App/Models/UserCarwash')
 const Message = use('App/Models/Message')
+const RangerRandomGift = use('App/Models/RangerRandomGift')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -535,6 +536,7 @@ class UserController {
       await user.loadMany(['zones.zone'])
       let userData = user.toJSON()
       let minimum_report = 0, todayReport = 0, star = 0
+      let todayRandomGift
       if(userData.is_parking_ranger==4) {
         /*
         if(parseInt(Time().format('HH'), 10) < 21) {
@@ -548,6 +550,17 @@ class UserController {
           }]
         }
         */
+        todayRandomGift = await RangerRandomGift.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
+        if(todayRandomGift) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "HadGiftToday",
+              message: "هدیه امروز را دریافت کرده اید",
+            }],
+            data: {}
+          }]
+        }
         if(userData.zones && userData.zones.length>0) {
           for(let uZ of userData.zones) {
             if(uZ.zone) {
@@ -609,11 +622,19 @@ class UserController {
       loots[assets[index1]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
       loots[assets[index2]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
 
+      if(user.is_parking_ranger==4) {
+        todayRandomGift = new RangerRandomGift
+        todayRandomGift.user_id = user.id
+        for(let loot in loots) {
+          todayRandomGift[loot] = loots[loot]
+        }
+        todayRandomGift.save()
+      }
       let property = await Property.query().where('user_id', user.id).first()
       for(let loot in loots) {
         property[loot] += loots[loot]
       }
-      await property.save()
+      property.save()
 
       return [{
         status: 1,
