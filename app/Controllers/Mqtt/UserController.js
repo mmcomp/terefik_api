@@ -549,6 +549,8 @@ class UserController {
             data: {}
           }]
         }
+        */
+
         todayRandomGift = await RangerRandomGift.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
         if(todayRandomGift) {
           return [{
@@ -560,7 +562,15 @@ class UserController {
             data: {}
           }]
         }
-        */
+        
+        if(params && params.consume && params.consume==false) {
+          return [{
+            status: 1,
+            messages: [],
+            data: {}
+          }]
+        }
+
         if(userData.zones && userData.zones.length>0) {
           for(let uZ of userData.zones) {
             if(uZ.zone) {
