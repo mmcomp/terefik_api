@@ -669,13 +669,17 @@ class UserController {
     try {
       if(user.last_daily_gift && user.last_daily_gift!=null) {
         if(Time(user.last_daily_gift).format('YYYY-MM-DD')==Time().format('YYYY-MM-DD')) {
+          let tomarrow = Time().add(1, 'days').format('YYYY-MM-DD 00:00:00')
+          let remaining_time = Time(tomarrow).diff(Time().format('YYYY-MM-DD HH:mm:ss'), 'seconds')
           return [{
-            status: 0,
-            messages: [{
+            status: 1,
+            messages: [/*{
               code: "AlreadyGotTheGift",
               message: 'شما هدیه امروز تان را دریافت کرده اید'
-            }],
-            data: {}
+            }*/],
+            data: {
+              remaining_time: remaining_time,
+            },
           }]
         }
       }
@@ -684,7 +688,9 @@ class UserController {
         return [{
           status: 1,
           messages: [],
-          data: {}
+          data: {
+            remaining_time: 0,
+          }
         }]
       }
 
@@ -717,7 +723,8 @@ class UserController {
         status: 1,
         messages: [],
         data: {
-          loots: loots
+          loots: loots,
+          remaining_time: 0,
         }
       }]
     }catch(e) {
