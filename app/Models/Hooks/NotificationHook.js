@@ -14,6 +14,10 @@ NotificationHook.send = async (notification) => {
             page_size = 20
           }
           let current_page = 1, clients = []
+          console.log('Request Online Clients', `${url}?curr_page=${current_page}&page_size=${page_size}`, auth: {
+            username: username,
+            password: password,
+          })
           let firstRead = await axios.get(`${url}?curr_page=${current_page}&page_size=${page_size}`, {auth: {
               username: username,
               password: password,
@@ -27,6 +31,10 @@ NotificationHook.send = async (notification) => {
               let readRecords = page_size
               let total_num = firstRead.result.total_num, nextRead
               while(readRecords<total_num) {
+                console.log('Request Online Clients', `${url}?curr_page=${current_page}&page_size=${page_size}`, auth: {
+                    username: username,
+                    password: password,
+                })
                 nextRead = await axios.get(`${url}?curr_page=${current_page}&page_size=${page_size}`, {auth: {
                     username: username,
                     password: password,
