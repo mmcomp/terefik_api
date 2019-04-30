@@ -118,7 +118,7 @@ class DashboardStat {
       // let lostGames = await GameSession.query().where('created_at','<=',Time(Moment.now('YY-MM-DD HH:mm:ss')).subtract(15,'minute').format('YYY-MM-DD HH:mm:ss')).delete()
 
       
-      console.log('STAT Worker')
+      // console.log('STAT Worker')
       await Redis.select(Env.get('REDIS_STAT_DATABASE'))
 
       let stat
@@ -183,7 +183,7 @@ class DashboardStat {
       //   
       // }
       await Redis.hmset(Env.get('REDIS_DASHBOARD_KEY'), stat)
-      console.log('Stat Data', stat)
+      // console.log('Stat Data', stat)
       done()
     } catch (error) {
       console.log('Error')
