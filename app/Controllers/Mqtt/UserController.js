@@ -137,6 +137,7 @@ class UserController {
       theNotifications.push({
         title: notification.title,
         message: notification.message,
+        type: notification.type,
         data: data,
       })
     }
