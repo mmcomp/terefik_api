@@ -3,6 +3,7 @@
 const axios = require('axios')
 const Env = use('Env')
 const User = use('App/Models/User')
+const Notification = use('App/Models/Notification')
 
 const NotificationHook = exports = module.exports = {}
 
@@ -121,10 +122,9 @@ NotificationHook.send = async (notification) => {
                     }else {
                         console.log('Sent ' + notification.type + ' Mqtt Notification ')
                     }
-                    console.log(theUser.mobile ,messageData)
-                    Notification.query().where('id', notification.id).update({
-                        status: 'sent',
-                    })
+                    console.log(theUser.mobile ,messageData, notification)
+                    notification.status = 'sent'
+                    notification.save()
                 }
             }else {
                 return false

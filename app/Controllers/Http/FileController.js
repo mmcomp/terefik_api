@@ -9,6 +9,7 @@ const UserTerefik = use('App/Models/UserTerefik')
 const ParkingRangerDoc = use('App/Models/ParkingRangerDoc')
 const UserFindableGift = use('App/Models/UserFindableGift')
 const UserPfindableGift = use('App/Models/UserPfindableGift')
+const Notification = use('App/Models/Notification')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -220,8 +221,21 @@ class FileController {
     params
   }) {
     try{
-      let gift_id = await UserPfindableGift.tryToGetGift(3, 4)
-      console.log('test gift result', gift_id)
+      // let gift_id = await UserPfindableGift.tryToGetGift(3, 4)
+      // console.log('test gift result', gift_id)
+      let notification = new Notification
+      notification.title = 'AAAA'
+      notification.message = 'BBB'
+      notification.users_id = 3
+      notification.data = JSON.stringify({
+        gasoline: -100,
+        health: -19,
+        cleaning: -14,
+        diamond: -12,
+        arrest_id: 120,
+      })
+      notification.type = 'user_arrest'
+      notification.save()
     }catch(e) {
       console.log('test gift error')
       console.log(e)
