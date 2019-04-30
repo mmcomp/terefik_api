@@ -10,6 +10,7 @@ const UserCarwash = use('App/Models/UserCarwash')
 const UserCar = use('App/Models/UserCar')
 const Message = use('App/Models/Message')
 const RangerRandomGift = use('App/Models/RangerRandomGift')
+const Notification = use('App/Models/Notification')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -123,6 +124,25 @@ class UserController {
       },
     }
     
+    let notifications = await Notification.query().where('users_id', user.id).where('status', 'created_at').fetch()
+    notifications = notifications.toJSON()
+    let notificationIds = [], theNotifications, data
+    for(let notification of notifications) {
+      try{
+        data = JSON.parse(notification.data)
+      }catch(e) {
+        data = {}
+      }
+      notificationIds.push(notification.id)
+      theNotifications.push({
+        title: notification.title,
+        message: notification.message,
+        data: data,
+      })
+    }
+    Notification.query().whereIn('id', notificationIds).update({
+      status: 'sent',
+    })
 
     delete userData.zones
     return [{
@@ -131,6 +151,7 @@ class UserController {
       data: {
         profile: userData,
         last_arrest: lastArrest,
+        notifications: theNotifications,
       }
     }]
   }
