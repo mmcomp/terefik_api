@@ -178,6 +178,9 @@ class LotteryController {
         // }
       }
       
+      console.log('The Lottery', lotteryData)
+      console.log('Min Chance', min_chance)
+
       if(params.amount < min_chance) {
         return [{
           status: 0,
