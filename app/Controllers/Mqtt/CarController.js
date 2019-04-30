@@ -1013,6 +1013,7 @@ class CarController {
         })
 
 
+        console.log('Arrest Notification')
         let notification = new Notification
         notification.title = Env.get('PUSH_USER_ARREST_TTILE')
         notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
