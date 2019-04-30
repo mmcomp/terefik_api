@@ -156,18 +156,6 @@ class LotteryController {
         }]
       }
 
-      let userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
-      if(userLottery) {
-        return [{
-          status: 0,
-          messages: [{
-            code: "AlreadyInThisLottery",
-            message: "شما قبلا در این قرعه کشی شرکت کرده اید"
-          }],
-          data: {}
-        }]
-      }
-
       let min_chance = 0
       let lotteryData = lottery.toJSON()
       for(let award of lotteryData.awards) {
@@ -180,6 +168,18 @@ class LotteryController {
       
       console.log('The Lottery', lotteryData)
       console.log('Min Chance', min_chance)
+
+      let userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
+      if(userLottery) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "AlreadyInThisLottery",
+            message: "شما قبلا در این قرعه کشی شرکت کرده اید"
+          }],
+          data: {}
+        }]
+      }
 
       if(params.amount < min_chance) {
         return [{
