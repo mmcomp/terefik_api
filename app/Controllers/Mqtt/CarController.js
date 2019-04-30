@@ -1015,9 +1015,10 @@ class CarController {
 
         let notification = new Notification
         notification.title = Env.get('PUSH_USER_ARREST_TTILE')
-        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE').replace('|diamond_count|', settings.diamond_lose_on_arrest)
-                                .replace('|recharge_time|', settings.reshielding_time)
-                                .replace('|diamond_recharge|', settings.diamond_earn_on_reshielding)
+        notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
+        notification.message = notification.message.replace(/|diamond_count|/g, settings.diamond_lose_on_arrest)
+                                .replace(/|recharge_time|/g, settings.reshielding_time)
+                                .replace(/|diamond_recharge|/g, settings.diamond_earn_on_reshielding)
         notification.users_id = theOwner.id
         notification.data = JSON.stringify({
           gasoline: -1*loot.gasoline,
