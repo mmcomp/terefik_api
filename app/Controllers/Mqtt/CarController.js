@@ -805,6 +805,14 @@ class CarController {
         }
       }else {
         isNotReDone = 0
+        return [{
+          status: 0,
+          messages: [{
+            code: "ReCheckError",
+            message: "این خودرو رو خودت همین الان ثبت کردی",
+          }],
+          data: {}
+        }]
       }
 
       rangerSilver += isNotReDone * settings.silver_when_not_reported
