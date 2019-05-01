@@ -620,11 +620,11 @@ class UserController {
         if(!todayReport) {
           todayReport = 0
         }
-        if(minimum_report>0 && todayReport>=minimum_report) {
+        if(minimum_report>0 && todayReport>=(minimum_report+settings.ranger_star_change_1)) {
           star = 1
-          if(todayReport>(minimum_report + settings.ranger_star_change_1) && todayReport<=(minimum_report + settings.ranger_star_change_2)) {
+          if(todayReport>=(minimum_report + settings.ranger_star_change_2) && todayReport<(minimum_report + settings.ranger_star_change_3)) {
             star = 2
-          }else if(todayReport>(minimum_report + settings.ranger_star_change_2) && todayReport<=(minimum_report + settings.ranger_star_change_3)) {
+          }else if(todayReport>=(minimum_report + settings.ranger_star_change_3)) {
             star = 3
           }
         }
@@ -802,13 +802,13 @@ class UserController {
               }
             }
           }
-          console.log('Minimum Report', minimum_report)
+          // console.log('Minimum Report', minimum_report)
           todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
           if(!todayReport) {
             todayReport = 0
           }
-          console.log('Today Reports', todayReport)
-          console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
+          // console.log('Today Reports', todayReport)
+          // console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
           randomGift = false
           // console.log('Start Comparision', todayReport - minimum_report)
           if(minimum_report>0 && todayReport>=(minimum_report+settings.ranger_star_change_1)) {
@@ -821,7 +821,7 @@ class UserController {
               randomGift = true
             }
           }
-          console.log('Ranger Star', star)
+          // console.log('Ranger Star', star)
         }
       }else {
         let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
