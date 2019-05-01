@@ -159,7 +159,7 @@ class CarController {
     transaction.price_type = 'bronze_coin'
     transaction.price = totalPay
     transaction.status = 'success'
-    await transaction.save()
+    transaction.save()
 
     let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
     let gift = (transactions % settings.park_count_for_gift == 0) 
@@ -171,7 +171,7 @@ class CarController {
       clean: settings.park_clean,
       water: settings.park_water,
     }
-    await user.property().update({
+    user.property().update({
       bronze_coin: userData.property.bronze_coin - totalPay,
       diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond,
       experience_score: userData.property.experience_score + settings.car_park_exp,
@@ -185,11 +185,11 @@ class CarController {
       userDiscounter.gasoline = userDiscounter.gasoline * (100 - settings.dicounter_usage_percent) / 100
       userDiscounter.health = userDiscounter.health * (100 - settings.dicounter_usage_percent) / 100
       userDiscounter.clean = userDiscounter.clean * (100 - settings.dicounter_usage_percent) / 100
-      await userDiscounter.save()
+      userDiscounter.save()
     }
 
     user.is_sheild = 1
-    await user.save()
+    user.save()
 
     userCar.shield_start = Moment.now("YYYY-MM-DD HH:mm:ss")
     userCar.shield_duration = units * settings.unit_to_minute
@@ -199,7 +199,7 @@ class CarController {
     userCar.total_coin = totalPay
     userCar.leave_time = null
     userCar.leave_unit = 0
-    await userCar.save()
+    userCar.save()
 
     // if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
     //   let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
@@ -213,7 +213,7 @@ class CarController {
     //   }
     // }
 
-    await Achievment.achieve(user.id, 'park')
+    Achievment.achieve(user.id, 'park')
 
     return [{
       status: 1,
