@@ -608,14 +608,6 @@ class UserController {
             data: {}
           }]
         }
-        
-        if(params && params.consume && params.consume==false) {
-          return [{
-            status: 1,
-            messages: [],
-            data: {}
-          }]
-        }
 
         if(userData.zones && userData.zones.length>0) {
           for(let uZ of userData.zones) {
@@ -730,16 +722,6 @@ class UserController {
         }
       }
 
-      if(params && typeof params.consume=='boolean' && params.consume===false) {
-        return [{
-          status: 1,
-          messages: [],
-          data: {
-            remaining_time: 0,
-          }
-        }]
-      }
-
       let settings = await Setting.get()
       let assets = [
         'gasoline',
@@ -764,6 +746,9 @@ class UserController {
         property[loot] += loots[loot]
       }
       property.save()
+
+      user.last_daily_gift = Time().format('YYYY-MM-DD 00:00:00')
+      user.save()
 
       return [{
         status: 1,
