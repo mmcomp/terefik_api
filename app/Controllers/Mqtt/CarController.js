@@ -1163,7 +1163,7 @@ class CarController {
       for(let i = 0;i < results.length;i++) {
         shieldFinish = Time(results[i].shield_start).add(results[i].shield_duration, 'minutes')
         shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-        leaveDiff = 0
+        let leaveDiff = 0
         if(results[i].leave_time) {
           leaveFinish = Time(results[i].leave_time).add(10, 'minutes')
           leaveDiff = leaveFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
