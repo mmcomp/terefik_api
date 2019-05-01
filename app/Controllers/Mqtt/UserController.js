@@ -810,8 +810,11 @@ class UserController {
           console.log('Today Reports', todayReport)
           console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
           randomGift = false
+          console.log('Start Comparision', todayReport - minimum_report)
           if(minimum_report>0 && todayReport>=minimum_report) {
             star = 1
+            console.log(todayReport>(minimum_report + 2), todayReport<=(minimum_report + 5))
+            console.log(todayReport>(minimum_report + 5), todayReport<=(minimum_report + 11))
             if(todayReport>(minimum_report + 2) && todayReport<=(minimum_report + 5)) {
               star = 2
             }else if(todayReport>(minimum_report + 5) && todayReport<=(minimum_report + 11)) {
