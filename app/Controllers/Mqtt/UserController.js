@@ -790,10 +790,11 @@ class UserController {
       let rangerFindableGift = null
       let userFindableGift = await UserPfindableGift.query().with('gift').where('user_id', user.id).fetch()
       let dailyGift = true
+      let remaining_time = 0
       if(user.last_daily_gift && user.last_daily_gift!=null) {
         if(Time(user.last_daily_gift).format('YYYY-MM-DD')==Time().format('YYYY-MM-DD')) {
           let tomarrow = Time().add(1, 'days').format('YYYY-MM-DD 00:00:00')
-          let remaining_time = Time(tomarrow).diff(Time().format('YYYY-MM-DD HH:mm:ss'), 'seconds')
+          remaining_time = Time(tomarrow).diff(Time().format('YYYY-MM-DD HH:mm:ss'), 'seconds')
           dailyGift = false
         }
       }
@@ -818,6 +819,7 @@ class UserController {
           user_findable_gifts: userFindableGift,
           ranger_findable_gifts: rangerFindableGift,
           has_daily_gift: dailyGift,
+          daily_gift_remaining_time: remaining_time,
           has_random_gift: randomGift,
         }
       }]
