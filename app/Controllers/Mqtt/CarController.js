@@ -1163,13 +1163,20 @@ class CarController {
       for(let i = 0;i < results.length;i++) {
         shieldFinish = Time(results[i].shield_start).add(results[i].shield_duration, 'minutes')
         shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-        if(shieldDiff>0) {
+        leaveDiff = 0
+        if(results[i].leave_time) {
+          leaveFinish = Time(results[i].leave_time).add(10, 'minutes')
+          leaveDiff = leaveFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+        }
+        if(shieldDiff>0 || leaveDiff>0) {
           theCar = await Car.find(results[i].vehicle_id)
           theCar = theCar.toJSON()
           theCar['distance'] = parseInt(results[i].dis, 10)
           theCar['shield_start'] = results[i].shield_start
           theCar['shield_duration'] = results[i].shield_duration
           theCar['shield_end'] = shieldFinish.format('YYYY-MM-DD HH:mm:ss')
+          theCar['leave_time'] = results[i].leave_time
+          theCar['is_left_sooner'] = (leaveDiff>0)
           theCar['lon'] = results[i].lon
           theCar['lat'] = results[i].lat
           cars.push(theCar)
