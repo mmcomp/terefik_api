@@ -622,9 +622,9 @@ class UserController {
         }
         if(minimum_report>0 && todayReport>=minimum_report) {
           star = 1
-          if(todayReport>minimum_report + settings.ranger_star_change_1 && todayReport<=minimum_report + settings.ranger_star_change_2) {
+          if(todayReport>(minimum_report + settings.ranger_star_change_1) && todayReport<=(minimum_report + settings.ranger_star_change_2)) {
             star = 2
-          }else if(todayReport>minimum_report + settings.ranger_star_change_2 && todayReport<=minimum_report + settings.ranger_star_change_3) {
+          }else if(todayReport>(minimum_report + settings.ranger_star_change_2) && todayReport<=(minimum_report + settings.ranger_star_change_3)) {
             star = 3
           }
         }
@@ -812,9 +812,9 @@ class UserController {
           randomGift = false
           if(minimum_report>0 && todayReport>=minimum_report) {
             star = 1
-            if(todayReport>minimum_report + settings.ranger_star_change_1 && todayReport<=minimum_report + settings.ranger_star_change_2) {
+            if(todayReport>(minimum_report + settings.ranger_star_change_1) && todayReport<=(minimum_report + settings.ranger_star_change_2)) {
               star = 2
-            }else if(todayReport>minimum_report + settings.ranger_star_change_2 && todayReport<=minimum_report + settings.ranger_star_change_3) {
+            }else if(todayReport>(minimum_report + settings.ranger_star_change_2) && todayReport<=(minimum_report + settings.ranger_star_change_3)) {
               star = 3
               randomGift = true
             }
