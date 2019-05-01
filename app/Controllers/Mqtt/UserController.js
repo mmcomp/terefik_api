@@ -772,6 +772,8 @@ class UserController {
 
   static async allGift (params, user) {
     try{
+      await user.loadMany(['zones.zone'])
+      let userData = user.toJSON()
       let rangerFindableGift = null
       let userFindableGift = await UserPfindableGift.query().with('gift').where('user_id', user.id).fetch()
       let dailyGift = true
@@ -784,16 +786,38 @@ class UserController {
         }
       }
       let randomGift = true
+      let minimum_report = 0, todayReport = 0, star = 0, park_percent = 100
       if(user.is_parking_ranger==4) {
         let todayRandomGift = await RangerRandomGift.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
         if(todayRandomGift) {
           randomGift = false
         }
         rangerFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
+        if(userData.zones && userData.zones.length>0) {
+          for(let uZ of userData.zones) {
+            if(uZ.zone) {
+              minimum_report += uZ.zone.desired_reports
+            }
+          }
+        }
+        todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
+        if(!todayReport) {
+          todayReport = 0
+        }
+        if(minimum_report>0 && todayReport>=minimum_report) {
+          star = 1
+          if(todayReport>minimum_report + settings.ranger_star_change_1 && todayReport<=minimum_report + settings.ranger_star_change_2) {
+            star = 2
+          }else if(todayReport>minimum_report + settings.ranger_star_change_2 && todayReport<=minimum_report + settings.ranger_star_change_3) {
+            star = 3
+          }
+        }
+
       }else {
         let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
         if(transactions % settings.park_count_for_gift != 0) {
           randomGift = false
+          park_percent = parseInt((transactions % settings.park_count_for_gift)*100/settings.park_count_for_gift, 10)
         }
       }
 
@@ -806,6 +830,8 @@ class UserController {
           has_daily_gift: dailyGift,
           daily_gift_remaining_time: remaining_time,
           has_random_gift: randomGift,
+          random_gift_ranger_start: star,
+          random_gift_user_percent: park_percent,
         }
       }]
     }catch(e) {
