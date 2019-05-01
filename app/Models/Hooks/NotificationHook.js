@@ -8,6 +8,10 @@ const Notification = use('App/Models/Notification')
 const NotificationHook = exports = module.exports = {}
 
 NotificationHook.send = async (notification) => {
+    let planeNotifications = ['UserDiamondOnCheck']
+    if(planeNotifications.indexOf(notification.type)>=0) {
+        return true
+    }
     async function readClients(username, password, url, page_size) {
         try {
           if(typeof page_size=='undefined') {

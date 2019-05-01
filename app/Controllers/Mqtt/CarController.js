@@ -803,6 +803,20 @@ class CarController {
             PGiftNotification.save()  
           }
         }
+
+        ownerProperty = await Property.query().where('user_id', theOwner.id).first()
+        ownerProperty.diamond+=settings.user_diamond_on_check
+        ownerProperty.save()
+        let DiamondNotification = new Notification
+        DiamondNotification.user_id = theOwner.id
+        DiamondNotification.title = Env.get('PUSH_USER_DIAMOND_TITLE')
+        DiamondNotification.message = Env.get('PUSH_USER_DIAMOND_MESSAGE')
+        DiamondNotification.message = DiamondNotification.message.replace('|diamond|', settings.user_diamond_on_check)
+        DiamondNotification.type = 'UserDiamondOnCheck'
+        DiamondNotification.data = JSON.stringify({
+          diamond: settings.user_diamond_on_check,
+        })
+        DiamondNotification.save() 
       }else {
         isNotReDone = 0
         return [{
