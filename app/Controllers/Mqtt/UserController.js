@@ -806,14 +806,6 @@ class UserController {
         if(!todayReport) {
           todayReport = 0
         }
-        if(minimum_report>0 && todayReport>=minimum_report) {
-          star = 1
-          if(todayReport>minimum_report + settings.ranger_star_change_1 && todayReport<=minimum_report + settings.ranger_star_change_2) {
-            star = 2
-          }else if(todayReport>minimum_report + settings.ranger_star_change_2 && todayReport<=minimum_report + settings.ranger_star_change_3) {
-            star = 3
-          }
-        }
         console.log('Today Reports', todayReport)
         console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
       }else {
@@ -834,7 +826,13 @@ class UserController {
           has_daily_gift: dailyGift,
           daily_gift_remaining_time: remaining_time,
           has_random_gift: randomGift,
-          random_gift_ranger_start: star,
+          random_gift_ranger_star: {
+            minimum_report: minimum_report,
+            today_report: todayReport,
+            ranger_star_change_1: settings.ranger_star_change_1,
+            ranger_star_change_2: settings.ranger_star_change_2,
+            ranger_star_change_3: settings.ranger_star_change_3,
+          },
           random_gift_user_percent: park_percent,
         }
       }]
