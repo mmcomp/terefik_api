@@ -11,6 +11,8 @@ const UserCar = use('App/Models/UserCar')
 const Message = use('App/Models/Message')
 const RangerRandomGift = use('App/Models/RangerRandomGift')
 const Notification = use('App/Models/Notification')
+const UserFindableGift = use('App/Models/UserFindableGift')
+const UserPfindableGift = use('App/Models/UserPfindableGift')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -728,7 +730,7 @@ class UserController {
         }
       }
 
-      if(params && params.consume && params.consume===false) {
+      if(params && typeof params.consume=='boolean' && params.consume===false) {
         return [{
           status: 1,
           messages: [],
@@ -769,6 +771,54 @@ class UserController {
         data: {
           loots: loots,
           remaining_time: 0,
+        }
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "UnknowError",
+          message: JSON.stringify(e)
+        }],
+        data: {}
+      }]
+    }
+  }
+
+  static async allGift (params, user) {
+    try{
+      let rangerFindableGift = null
+      let userFindableGift = await UserPfindableGift.query().with('gift').where('user_id', user.id).fetch()
+      let dailyGift = true
+      if(user.last_daily_gift && user.last_daily_gift!=null) {
+        if(Time(user.last_daily_gift).format('YYYY-MM-DD')==Time().format('YYYY-MM-DD')) {
+          let tomarrow = Time().add(1, 'days').format('YYYY-MM-DD 00:00:00')
+          let remaining_time = Time(tomarrow).diff(Time().format('YYYY-MM-DD HH:mm:ss'), 'seconds')
+          dailyGift = false
+        }
+      }
+      let randomGift = true
+      if(user.is_parking_ranger==4) {
+        let todayRandomGift = await RangerRandomGift.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
+        if(todayRandomGift) {
+          randomGift = false
+        }
+        rangerFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
+      }else {
+        let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
+        if(transactions % settings.park_count_for_gift != 0) {
+          randomGift = false
+        }
+      }
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          user_findable_gifts: userFindableGift,
+          ranger_findable_gifts: rangerFindableGift,
+          has_daily_gift: dailyGift,
+          has_random_gift: randomGift,
         }
       }]
     }catch(e) {
