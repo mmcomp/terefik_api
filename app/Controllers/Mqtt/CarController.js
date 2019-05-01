@@ -1159,11 +1159,11 @@ class CarController {
     try{
       let settings = await Setting.get()
       let results = await Car.getCarsAround(params.lon_gps, params.lat_gps, settings.arrest_lookup_distance)
-      let theCar, cars = [], shieldFinish, shieldDiff
+      let theCar, cars = [], shieldFinish, shieldDiff, leaveDiff, leaveFinish
       for(let i = 0;i < results.length;i++) {
         shieldFinish = Time(results[i].shield_start).add(results[i].shield_duration, 'minutes')
         shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
-        let leaveDiff = 0
+        leaveDiff = 0
         if(results[i].leave_time) {
           leaveFinish = Time(results[i].leave_time).add(10, 'minutes')
           leaveDiff = leaveFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
