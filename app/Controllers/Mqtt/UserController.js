@@ -802,8 +802,6 @@ class UserController {
           }
         }
         console.log('Minimum Report', minimum_report)
-        console.log('Today Reports', todayReport)
-        console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
         todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
         if(!todayReport) {
           todayReport = 0
@@ -816,7 +814,8 @@ class UserController {
             star = 3
           }
         }
-
+        console.log('Today Reports', todayReport)
+        console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
       }else {
         let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
         console.log('User Parks', transactions, 'Park Count', settings.park_count_for_gift)
