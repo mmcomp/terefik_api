@@ -772,6 +772,7 @@ class UserController {
 
   static async allGift (params, user) {
     try{
+      let settings = await Setting.get()
       await user.loadMany(['zones.zone'])
       let userData = user.toJSON()
       let rangerFindableGift = null
@@ -800,6 +801,9 @@ class UserController {
             }
           }
         }
+        console.log('Minimum Report', minimum_report)
+        console.log('Today Reports', todayReport)
+        console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
         todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
         if(!todayReport) {
           todayReport = 0
@@ -815,6 +819,7 @@ class UserController {
 
       }else {
         let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
+        console.log('User Parks', transactions, 'Park Count', settings.park_count_for_gift)
         if(transactions % settings.park_count_for_gift != 0) {
           randomGift = false
           park_percent = parseInt((transactions % settings.park_count_for_gift)*100/settings.park_count_for_gift, 10)
