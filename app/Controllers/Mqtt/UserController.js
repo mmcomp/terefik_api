@@ -792,22 +792,35 @@ class UserController {
         let todayRandomGift = await RangerRandomGift.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
         if(todayRandomGift) {
           randomGift = false
-        }
-        rangerFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
-        if(userData.zones && userData.zones.length>0) {
-          for(let uZ of userData.zones) {
-            if(uZ.zone) {
-              minimum_report += uZ.zone.desired_reports
+          console.log('You Got Random Ranger Gift')
+        }else {
+          rangerFindableGift = await UserFindableGift.query().with('gift').where('user_id', user.id).fetch()
+          if(userData.zones && userData.zones.length>0) {
+            for(let uZ of userData.zones) {
+              if(uZ.zone) {
+                minimum_report += uZ.zone.desired_reports
+              }
             }
           }
+          console.log('Minimum Report', minimum_report)
+          todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
+          if(!todayReport) {
+            todayReport = 0
+          }
+          console.log('Today Reports', todayReport)
+          console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
+          randomGift = false
+          if(minimum_report>0 && todayReport>=minimum_report) {
+            star = 1
+            if(todayReport>minimum_report + settings.ranger_star_change_1 && todayReport<=minimum_report + settings.ranger_star_change_2) {
+              star = 2
+            }else if(todayReport>minimum_report + settings.ranger_star_change_2 && todayReport<=minimum_report + settings.ranger_star_change_3) {
+              star = 3
+              randomGift = true
+            }
+          }
+          console.log('Ranger Star', star)
         }
-        console.log('Minimum Report', minimum_report)
-        todayReport = await InspectorDailyReport.query().where('user_id', user.id).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').getSum('report_count')
-        if(!todayReport) {
-          todayReport = 0
-        }
-        console.log('Today Reports', todayReport)
-        console.log('Ranger Star Changes', settings.ranger_star_change_1, settings.ranger_star_change_2, settings.ranger_star_change_3)
       }else {
         let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
         console.log('User Parks', transactions, 'Park Count', settings.park_count_for_gift)
