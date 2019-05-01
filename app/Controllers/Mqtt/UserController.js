@@ -813,7 +813,7 @@ class UserController {
           console.log('Start Comparision', todayReport - minimum_report)
           if(minimum_report>0 && todayReport>=minimum_report) {
             star = 1
-            console.log(todayReport, minimum_report)
+            console.log(todayReport, minimum_report + 11, (todayReport<=(minimum_report + 11)))
             if(todayReport>(minimum_report + 2) && todayReport<=(minimum_report + 5)) {
               star = 2
             }else if(todayReport>(minimum_report + 5) && todayReport<=(minimum_report + 11)) {
