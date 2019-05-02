@@ -1020,6 +1020,9 @@ class CarController {
 
         let userProperty = await  Property.query().where('user_id', theOwner.id).first()
         userProperty.diamond -= settings.diamond_lose_on_arrest
+        if(userProperty.diamond<0) {
+          userProperty.diamond = 0
+        }
         await userProperty.save()
 
         if(rangerWork.zone_id==0) {
