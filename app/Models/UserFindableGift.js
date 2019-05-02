@@ -29,7 +29,7 @@ class UserFindableGift extends Model {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  static async tryToGetGift (user_id, zone_id) {
+  static async tryToGetGift (user_id, zone_id, vehicle_id) {
     let chance = await FindableChance.getCurrentChance()
     console.log('current chance', chance)
     let userChance = UserFindableGift.getRandomInt(0, 100)
@@ -81,6 +81,7 @@ class UserFindableGift extends Model {
       userFindableGift.findable_gifts_id = gift_id
       userFindableGift.findable_chances_id = theActive.id
       userFindableGift.user_id = user_id
+      userFindableGift.vehicle_id = vehicle_id
       await userFindableGift.save()
 
       return gift_id

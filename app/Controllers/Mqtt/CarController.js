@@ -782,11 +782,11 @@ class CarController {
         userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
         userCar.checker_id = user.id
         await userCar.save()
-        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
         if(gift_id) {
           loot.findable_gift = true
         }
-        let pgift_id = await UserPfindableGift.tryToGetGift(theOwner.id, theZoneId)
+        let pgift_id = await UserPfindableGift.tryToGetGift(theOwner.id, theZoneId, userCar.vehicle_id)
         if(pgift_id) {
           //push to driver
           let PGIFT = await PfindableGift.query().where('id', pgift_id).first()
@@ -947,7 +947,7 @@ class CarController {
           userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
           userCar.checker_id = user.id
           await userCar.save()
-          let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+          let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
           if(gift_id) {
             loot.findable_gift = true
           }
@@ -1056,7 +1056,7 @@ class CarController {
 
         Achievment.achieve(user.id, 'ranger')
 
-        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
         if(gift_id) {
           loot.findable_gift = true
         }
@@ -1085,7 +1085,7 @@ class CarController {
         silver_coin: userData.property.silver_coin + loot.silver_coin + extraSilver
       })
 
-      let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId)
+      let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, params.car_id)
       if(gift_id) {
         loot.findable_gift = true
       }
