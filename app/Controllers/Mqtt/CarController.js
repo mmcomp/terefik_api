@@ -721,6 +721,18 @@ class CarController {
       }]
     }
 
+    let rangerZone = await UserZone.query().where('users_id', user.id).first()
+    if(!rangerZone) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'NoZones',
+          message: 'شما به هیچ ناحیه ای دسترسی ندارید'
+        }],
+        data: {}
+      }]
+    }
+
     let carOwner = {}, rangerSilver = 0, isNotReDone = 1
     let carStatus = 'NotRegistered'
 
