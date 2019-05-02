@@ -172,7 +172,7 @@ class CarController {
       clean: settings.park_clean,
       water: settings.park_water,
     }
-    user.property().update({
+    await user.property().update({
       bronze_coin: userData.property.bronze_coin - totalPay,
       diamond: userData.property.diamond + settings.diamond_earn_on_shielding + extraDiamond,
       experience_score: userData.property.experience_score + settings.car_park_exp,
@@ -190,7 +190,7 @@ class CarController {
     }
 
     user.is_sheild = 1
-    user.save()
+    await user.save()
 
     userCar.shield_start = Moment.now("YYYY-MM-DD HH:mm:ss")
     userCar.shield_duration = units * settings.unit_to_minute
@@ -200,7 +200,7 @@ class CarController {
     userCar.total_coin = totalPay
     userCar.leave_time = null
     userCar.leave_unit = 0
-    userCar.save()
+    await userCar.save()
 
     // if(params.crowd && (params.crowd=='green_reports' || params.crowd=='yellow_reports' || params.crowd=='red_reports')) {
     //   let query = "SELECT id FROM zone WHERE intersects(shape, point(" + userCar.lon + ", " + userCar.lat + "))=1"
