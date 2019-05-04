@@ -56,7 +56,7 @@ NotificationHook.send = async (notification) => {
           return []
         }
     }
-
+    let planeNotifications = ['UserDiamondOnCheck']
     let response, pusheData = {
         applications: [Env.get('PUSH_PACKAGE')],
         notification: {
