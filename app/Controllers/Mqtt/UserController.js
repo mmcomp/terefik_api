@@ -128,7 +128,7 @@ class UserController {
     
     let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').fetch()
     notifications = notifications.toJSON()
-    let notificationIds = [], theNotifications, data
+    let notificationIds = [], theNotifications = [], data
     for(let notification of notifications) {
       try{
         data = JSON.parse(notification.data)
