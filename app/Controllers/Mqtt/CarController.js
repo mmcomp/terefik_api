@@ -821,6 +821,7 @@ class CarController {
         if(gift_id) {
           loot.findable_gift = true
         }
+        console.log('DRIVER FINDABLE GIFT')
         let pgift_id = await UserPfindableGift.tryToGetGift(theOwner.id, theZoneId, userCar.vehicle_id)
         if(pgift_id) {
           //push to driver
