@@ -807,7 +807,7 @@ class CarController {
           let PGIFT = await PfindableGift.query().where('id', pgift_id).first()
           if(PGIFT) {
             let PGiftNotification = new Notification
-            PGiftNotification.user_id = theOwner.id
+            PGiftNotification.users_id = theOwner.id
             PGiftNotification.title = Env.get('PUSH_USER_FINDABLE_TITLE')
             PGiftNotification.message = Env.get('PUSH_USER_FINDABLE_MESSAGE')
             PGiftNotification.type = 'UserFindableGiftNotification'
@@ -823,7 +823,7 @@ class CarController {
         ownerProperty.diamond+=settings.user_diamond_on_check
         ownerProperty.save()
         let DiamondNotification = new Notification
-        DiamondNotification.user_id = theOwner.id
+        DiamondNotification.users_id = theOwner.id
         DiamondNotification.title = Env.get('PUSH_USER_DIAMOND_TITLE')
         DiamondNotification.message = Env.get('PUSH_USER_DIAMOND_MESSAGE')
         DiamondNotification.message = DiamondNotification.message.replace('|diamond|', settings.user_diamond_on_check)
