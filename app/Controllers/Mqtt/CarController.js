@@ -46,6 +46,20 @@ class CarController {
     return unitsTotal
   }
 
+  static p2e(inp) {
+    let out = inp.replace(/۰/g, '0')
+    out = out.replace(/۱/g, '1')
+    out = out.replace(/۲/g, '2')
+    out = out.replace(/۳/g, '3')
+    out = out.replace(/۴/g, '4')
+    out = out.replace(/۵/g, '5')
+    out = out.replace(/۶/g, '6')
+    out = out.replace(/۷/g, '1')
+    out = out.replace(/۸/g, '1')
+    out = out.replace(/۹/g, '1')
+    return out
+  }
+
   static async shield(params, user) {
     const rules = {
       car_id: 'required',
@@ -469,6 +483,9 @@ class CarController {
         }]
       }
   
+      for(let i in params) {
+        params[i] = CarController.p2e(params[i])
+      }
   
       let car = await Car.query().where({
         number_2: params.number_2,
@@ -742,6 +759,9 @@ class CarController {
     await user.loadMany(['property'])
     let userData = user.toJSON()
 
+    for(let i in params) {
+      params[i] = CarController.p2e(params[i])
+    }
     let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir).where('number_extra', params.number_extra).first()
 
     if(!car) {
