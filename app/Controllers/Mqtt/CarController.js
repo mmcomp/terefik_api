@@ -47,7 +47,7 @@ class CarController {
   }
 
   static p2e(inp) {
-    let out = inp.replace(/۰/g, '0')
+    let out = String(inp).replace(/۰/g, '0')
     out = out.replace(/۱/g, '1')
     out = out.replace(/۲/g, '2')
     out = out.replace(/۳/g, '3')
