@@ -143,6 +143,7 @@ class UserController {
         data: data,
       })
     }
+    console.log('Notification Id', notificationIds)
     Notification.query().whereIn('id', notificationIds).update({
       status: 'sent',
     })
