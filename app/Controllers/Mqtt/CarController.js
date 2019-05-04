@@ -819,7 +819,7 @@ class CarController {
           }
         }
 
-        ownerProperty = await Property.query().where('user_id', theOwner.id).first()
+        let ownerProperty = await Property.query().where('user_id', theOwner.id).first()
         ownerProperty.diamond+=settings.user_diamond_on_check
         ownerProperty.save()
         let DiamondNotification = new Notification
