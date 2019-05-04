@@ -8,10 +8,6 @@ const Notification = use('App/Models/Notification')
 const NotificationHook = exports = module.exports = {}
 
 NotificationHook.send = async (notification) => {
-    let planeNotifications = ['UserDiamondOnCheck']
-    if(planeNotifications.indexOf(notification.type)>=0) {
-        return true
-    }
     async function readClients(username, password, url, page_size) {
         try {
           if(typeof page_size=='undefined') {
@@ -72,7 +68,7 @@ NotificationHook.send = async (notification) => {
             }
         }
     }
-    console.log('Sending PUSH')
+    console.log('Sending Notification')
     try{
         if(notification.type === 'user_arrest') {
             pusheData.notification['icon'] = Env.get('PUSH_USER_ARREST_ICON')
@@ -81,28 +77,6 @@ NotificationHook.send = async (notification) => {
             console.log('User ID = ', notification.users_id)
             let theUser = await User.query().where('id', notification.users_id).first()
             if(theUser) {
-                console.log('Pushe Id ', theUser.pushe_id)
-                if(theUser.pushe_id!='') {
-                    pusheData['filter'] = {
-                        pushe_id: [theUser.pushe_id]
-                    }
-
-                    console.log('Push Data')
-                    console.log(pusheData)
-
-                    response = /*await*/ axios({
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Token ' + Env.get('PUSH_TOKEN'),
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                        url : Env.get('PUSH_URL'), 
-                        data: pusheData,
-                    })
-                    // console.log('Push response')
-                    // console.log(response.data)
-                }
                 let onLineClients = await readClients(Env.get('EMQTT_DASHBOARD_USER'), Env.get('EMQTT_DASHBOARD_PASSWORD'), Env.get('EMQTT_API_CLIENTS'), 1000)
                 let isOnline = false
                 for(let cli of onLineClients) {
@@ -111,6 +85,7 @@ NotificationHook.send = async (notification) => {
                     }
                 }
                 if(isOnline) {
+                    console.log('Sending MQTT')
                     let pubTopic = 'client_' + theUser.token + '/ArrestNotification'
                     let data = {}
                     try{
@@ -137,6 +112,30 @@ NotificationHook.send = async (notification) => {
                     console.log(theUser.mobile ,messageData, notification)
                     notification.status = 'sent'
                     notification.save()
+                }else if(planeNotifications.indexOf(notification.type)<0){
+                    console.log('Sending PUSH')
+                    console.log('Pushe Id ', theUser.pushe_id)
+                    if(theUser.pushe_id!='') {
+                        pusheData['filter'] = {
+                            pushe_id: [theUser.pushe_id]
+                        }
+    
+                        console.log('Push Data')
+                        console.log(pusheData)
+    
+                        response = /*await*/ axios({
+                            method: 'POST',
+                            headers: {
+                                'Authorization': 'Token ' + Env.get('PUSH_TOKEN'),
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                            url : Env.get('PUSH_URL'), 
+                            data: pusheData,
+                        })
+                        // console.log('Push response')
+                        // console.log(response.data)
+                    }
                 }
             }else {
                 return false
