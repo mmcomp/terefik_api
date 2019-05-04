@@ -84,7 +84,7 @@ class CarController {
 
     let extraDiamond = 0
     console.log('5 Min age', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss'))
-    let rangerWork = await RangerWork.query().where('user_vehicle_id', userCar.id).where('created_at', '<=', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss')).first()
+    let rangerWork = await RangerWork.query().where('user_vehicle_id', userCar.id).where('created_at', '>=', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss')).first()
     if(rangerWork) {
       extraDiamond = settings.diamond_earn_on_reshielding
     }
