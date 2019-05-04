@@ -863,7 +863,7 @@ class CarController {
           let res = await Database.raw(query)
           if(res[0].length>0) {
               zone_id = res[0][0].id
-              let theZone = await zones.query().where('id', zone_id).first()
+              let theZone = await Zone.query().where('id', zone_id).first()
               theZone.reports++
               await theZone.save()
           }
