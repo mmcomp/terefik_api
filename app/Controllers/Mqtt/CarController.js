@@ -19,6 +19,7 @@ const ParkingRegister = use('App/Models/ParkingRegister')
 const UserFindableGift = use('App/Models/UserFindableGift')
 const UserPfindableGift = use('App/Models/UserPfindableGift')
 const PfindableGift = use('App/Models/PfindableGift')
+const InspectorTrafficOffence = use('App/Models/InspectorTrafficOffence')
 const Database = use('Database')
 
 const Env = use('Env')
@@ -1287,6 +1288,127 @@ class CarController {
       }],
       data: {}
     }]
+  }
+
+  static async trafficOffence(params, user) {
+    try {
+
+      let settings = await Setting.get() 
+  
+      const rules = {
+        number_2: 'required',
+        number_ch: 'required',
+        number_3: 'required',
+        number_ir: 'required',
+        number_extra: 'required',
+        lon_gps: 'required',
+        lat_gps: 'required',
+        image_path: 'required',
+        description: 'required',
+      }
+  
+      let check = await Validations.check(params, rules)
+      if (check.err) {
+        return [{
+          status: 0,
+          messages: check.messages,
+          data: {}
+        }]
+      }
+
+          
+      if(user.is_parking_ranger!=4) {
+        return [{
+          status: 0,
+          messages: [{
+            code: 'NotRanger',
+            message: 'شما پارکیار نمی باشید'
+          }],
+          data: {}
+        }]
+      }
+  
+      let currentHour = parseInt(Time().format('HH'), 10)
+    
+      if(currentHour>=settings.time_limit_end || currentHour<=settings.time_limit_start) {
+        return [{
+          status: 0,
+          messages: [{
+            code: 'OutOfWorkingHours',
+            message: 'خارج از محدوده زمانی فعالیت ثبت امکان پذیر نمی باشد'
+          }],
+          data: {}
+        }]
+      }
+
+      let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
+      if(theZoneId<=0) {
+        return [{
+          status: 0,
+          messages: [{
+            code: 'OutOfZones',
+            message: 'خارج از محدوده های مکانی گزارش نمی توانید ارسال کنید'
+          }],
+          data: {}
+        }]
+      }
+
+      let rangerZone = await UserZone.query().where('users_id', user.id).first()
+      if(!rangerZone) {
+        return [{
+          status: 0,
+          messages: [{
+            code: 'NoZones',
+            message: 'شما به هیچ ناحیه ای دسترسی ندارید'
+          }],
+          data: {}
+        }]
+      }
+
+      let userCar
+      let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir).where('number_extra', params.number_extra).first()
+      if(!car) {
+        let car= new Car
+        car.number_2 = params.number_2
+        car.number_ch = params.number_ch
+        car.number_3 = params.number_3
+        car.number_ir = params.number_ir
+        car.number_extra = params.number_extra
+        await car.save()
+      }else {
+        userCar = await UserCar.query().where('vehicle_id', car.id).with('user').first()
+      }
+
+      let inspectorTrafficOffence = new InspectorTrafficOffence
+      inspectorTrafficOffence.ranger_id = user.id
+      inspectorTrafficOffence.lon = params.lon_gps
+      inspectorTrafficOffence.lat = params.lat_gps
+      if(userCar) {
+        inspectorTrafficOffence.user_vehicle_id = userCar.id
+      }
+      inspectorTrafficOffence.vehicle_id = car.id
+      inspectorTrafficOffence.zone_id = theZoneId
+      inspectorTrafficOffence.image_path = params.image_path
+      inspectorTrafficOffence.description = params.description
+      await inspectorTrafficOffence.save()
+
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {}
+      }]
+    }catch(e) {
+      console.log(e)
+      return [{
+        status: 0,
+        messages: [{
+          code: "SystemError",
+          message: JSON.stringify(e),
+        }],
+        data: {}
+      }]
+    }
   }
 }
 
