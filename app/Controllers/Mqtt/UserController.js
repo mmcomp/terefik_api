@@ -125,28 +125,7 @@ class UserController {
         attacked: todayAttacked,
       },
     }
-    
-    let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').fetch()
-    notifications = notifications.toJSON()
-    let notificationIds = [], theNotifications = [], data
-    for(let notification of notifications) {
-      try{
-        data = JSON.parse(notification.data)
-      }catch(e) {
-        data = {}
-      }
-      notificationIds.push(notification.id)
-      theNotifications.push({
-        title: notification.title,
-        message: notification.message,
-        type: notification.type,
-        data: data,
-      })
-    }
-    console.log('Notification Id', notificationIds)
-    await Notification.query().whereIn('id', notificationIds).update({
-      status: 'sent',
-    })
+
 
     delete userData.zones
     return [{
@@ -155,9 +134,51 @@ class UserController {
       data: {
         profile: userData,
         last_arrest: lastArrest,
-        notifications: theNotifications,
       }
     }]
+  }
+
+  static async notifications (params, user) {
+    try{
+      let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').fetch()
+      notifications = notifications.toJSON()
+      let notificationIds = [], theNotifications = [], data
+      for(let notification of notifications) {
+        try{
+          data = JSON.parse(notification.data)
+        }catch(e) {
+          data = {}
+        }
+        notificationIds.push(notification.id)
+        theNotifications.push({
+          title: notification.title,
+          message: notification.message,
+          type: notification.type,
+          data: data,
+        })
+      }
+      console.log('Notification Id', notificationIds)
+      await Notification.query().whereIn('id', notificationIds).update({
+        status: 'sent',
+      })
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          notifications: theNotifications,
+        }
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "SystemError",
+          message : JSON.stringify(e),
+        }],
+        data: {}
+      }]
+    }
   }
 
   static async path (params, user) {

@@ -56,6 +56,7 @@ const routes = {
   'DailyGift': 'User/dailyGift',
   'ExcuseArrest': 'User/excuse',
   'AllGift': 'User/allGift',
+  'UserNotifications': 'User/notifications',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',
