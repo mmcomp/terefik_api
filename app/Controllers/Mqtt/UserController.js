@@ -228,7 +228,10 @@ class UserController {
     try{
       let settings = await Setting.get()
       await user.loadMany(['zones.zone', 'car'])
-      let userData = user.toJSON()
+      let userData = {
+        image_path: user.image_path,
+        is_parking_ranger: user.is_parking_ranger,
+      }
       let minimum_report = null
       userData['ranger_data'] = null
       if(userData.is_parking_ranger==4) {
