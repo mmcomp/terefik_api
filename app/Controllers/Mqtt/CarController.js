@@ -1379,6 +1379,8 @@ class CarController {
         userCar = await UserCar.query().where('vehicle_id', car.id).with('user').first()
       }
 
+      console.log('car', car)
+
       let inspectorTrafficOffence = new InspectorTrafficOffence
       inspectorTrafficOffence.ranger_id = user.id
       inspectorTrafficOffence.lon = params.lon_gps
