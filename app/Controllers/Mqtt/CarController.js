@@ -1368,7 +1368,7 @@ class CarController {
       let userCar
       let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir).where('number_extra', params.number_extra).first()
       if(!car) {
-        let car= new Car
+        car= new Car
         car.number_2 = params.number_2
         car.number_ch = params.number_ch
         car.number_3 = params.number_3
