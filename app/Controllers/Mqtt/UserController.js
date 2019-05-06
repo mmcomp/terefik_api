@@ -150,6 +150,7 @@ class UserController {
             silver_coin: userProperty.silver_coin,
             diamond: userProperty.diamond,
             is_parking_ranger: user.is_parking_ranger,
+            is_sheild: user.is_sheild,
           }
         }
       }]
