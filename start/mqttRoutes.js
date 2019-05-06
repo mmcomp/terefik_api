@@ -59,6 +59,8 @@ const routes = {
   'AllGift': 'User/allGift',
   'UserNotifications': 'User/notifications',
   'UserResource': 'User/resource',
+  'UserProfileData': 'User/profileData',
+  'UserLastArrest': 'User/lastArrest',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',
