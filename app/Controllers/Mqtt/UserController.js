@@ -227,10 +227,18 @@ class UserController {
   static async profileData (params, user) {
     try{
       let settings = await Setting.get()
-      await user.loadMany(['zones.zone', 'car'])
+      await user.loadMany(['zones.zone', 'car', 'property'])
+      let userD = user.toJSON()
       let userData = {
         image_path: user.image_path,
         is_parking_ranger: user.is_parking_ranger,
+        fname: user.fname,
+        lname: user.lname,
+        username: user.username,
+        inspector_score: userD.property.inspector_score,
+        inspector_level: userD.property.inspector_level,
+        experience_score: userD.property.experience_score,
+        experience_level: userD.property.experience_level,
       }
       let minimum_report = null
       userData['ranger_data'] = null
