@@ -683,8 +683,10 @@ class CarController {
       silver_coin: 0,
       gasoline: 0,
       health: 0,
-      cleaning: 0
+      cleaning: 0,
     }
+
+    let findable_gift = false
 
     const rules = {
       number_2: 'required',
@@ -820,7 +822,7 @@ class CarController {
         await userCar.save()
         let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
         if(gift_id) {
-          loot.findable_gift = true
+          findable_gift = true
         }
         console.log('DRIVER FINDABLE GIFT')
         let pgift_id = await UserPfindableGift.tryToGetGift(theOwner.id, theZoneId, userCar.vehicle_id)
@@ -913,7 +915,8 @@ class CarController {
         messages: [],
         data: {
           car_status: carStatus,
-          loot: loot
+          loot: loot,
+          findable_gift: findable_gift,
         }
       }]
     }
@@ -938,7 +941,6 @@ class CarController {
       gasoline: 0,
       health: 0,
       cleaning: 0,
-      findable_gift: false,
     }
     let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
 
@@ -986,7 +988,7 @@ class CarController {
           await userCar.save()
           let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
           if(gift_id) {
-            loot.findable_gift = true
+            findable_gift = true
           }
         }
       }
@@ -1006,7 +1008,8 @@ class CarController {
         data: {
           car_status: 'Shielded',
           in_out : is_out,
-          loot: loot
+          loot: loot,
+          findable_gift: findable_gift,
         }
       }]
     }
@@ -1098,7 +1101,7 @@ class CarController {
 
         let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
         if(gift_id) {
-          loot.findable_gift = true
+          findable_gift = true
         }
 
         return [{
@@ -1107,7 +1110,8 @@ class CarController {
           data: {
             car_status: 'NotShielded',
             in_out : is_out,
-            loot: loot
+            loot: loot,
+            findable_gift: findable_gift,
           }
         }]
       }
@@ -1127,7 +1131,7 @@ class CarController {
 
       let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, params.car_id)
       if(gift_id) {
-        loot.findable_gift = true
+        findable_gift = true
       }
 
       return [{
@@ -1136,7 +1140,8 @@ class CarController {
         data: {
           car_status: 'RegisteredByRanger',
           in_out : is_out,
-          loot: loot
+          loot: loot,
+          findable_gift: findable_gift,
         }
       }]
     }
