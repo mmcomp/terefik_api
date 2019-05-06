@@ -44,6 +44,8 @@ const routes = {
 
   // Profile
   'UserProfile': 'User/profile',
+  'UserFastProfile': 'User/fastProfile',
+  'UserProfileData': 'User/profileData',
   'GetUserPath' : 'User/path',
   'SetUserPath' : 'User/setPath',
   'SetUsername' : 'User/setUsername',
@@ -59,7 +61,6 @@ const routes = {
   'AllGift': 'User/allGift',
   'UserNotifications': 'User/notifications',
   'UserResource': 'User/resource',
-  'UserProfileData': 'User/profileData',
   'UserLastArrest': 'User/lastArrest',
 
   // Sub Game
