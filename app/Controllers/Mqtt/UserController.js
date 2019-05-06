@@ -149,7 +149,7 @@ class UserController {
             bronze_coin: userProperty.bronze_coin,
             silver_coin: userProperty.silver_coin,
             diamond: userProperty.diamond,
-            is_ranger: (user.is_parking_ranger==4),
+            is_parking_ranger: user.is_parking_ranger,
           }
         }
       }]
