@@ -58,6 +58,7 @@ const routes = {
   'ExcuseArrest': 'User/excuse',
   'AllGift': 'User/allGift',
   'UserNotifications': 'User/notifications',
+  'UserResource': 'User/resource',
 
   // Sub Game
   'GetSubGames' : 'SubGame/index',

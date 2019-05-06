@@ -138,6 +138,33 @@ class UserController {
     }]
   }
 
+  static async resource (params, user) {
+    try {
+      let userProperty = await Property.query().where('user_id', user.id).first()
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          resources: {
+            bronze_coin: userProperty.bronze_coin,
+            silver_coin: userProperty.silver_coin,
+            diamond: userProperty.diamond,
+            is_ranger: (user.is_parking_ranger==4),
+          }
+        }
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "SystemError",
+          message : JSON.stringify(e),
+        }],
+        data: {}
+      }]
+    }
+  }
+
   static async notifications (params, user) {
     try{
       let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').fetch()
