@@ -228,6 +228,17 @@ class ProductController {
       }]
     }
 
+    if(userProperty.bronze_coin<=0) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "ShortOnBronzeCoin",
+          message: "سکه نقره شما تمام شده است"
+        }],
+        data: {}
+      }]
+    }
+
     let othetType = params.type
     if(othetType=='health_oil') {
       othetType = 'oil'
