@@ -942,6 +942,7 @@ class CarController {
       health: 0,
       cleaning: 0,
     }
+    let findable_gift = false
     let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
 
     let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
