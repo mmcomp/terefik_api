@@ -810,6 +810,7 @@ class CarController {
     console.log('Vehicle ID', car.id)
     console.log('User Vehicle Id', userCar.id)
     console.log('ShieldDiff', shieldDiff, 'Sheild Start', userCar.shield_start)
+    console.log((shieldDiff>0 && !isNaN(shieldDiff)))
     if(shieldDiff>0 && !isNaN(shieldDiff)) {
       carStatus = 'Shielded'
 
@@ -1038,8 +1039,8 @@ class CarController {
 
       let theOwner = await User.query().where('id', driver.id).with('property').first()
       let theOwnerData = theOwner.toJSON()
-      // console.log('Shield Start')
-      // console.log(userCar.shield_start, !userCar.shield_start)
+      console.log('Shield Start')
+      console.log(userCar.shield_start, shieldDiff)
       if(shieldDiff<=0 || userCar.shield_start=='Invalid date') {
         rangerWork.user_vehicle_id = userCar.id
 
