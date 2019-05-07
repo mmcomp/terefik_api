@@ -808,6 +808,7 @@ class CarController {
 
     let theOwner = await User.find(carOwner.id)
 
+    console.log('ShieldDiff', shieldDiff, 'Sheild Start', userCar.shield_start)
     if(shieldDiff>0 && userCar.shield_start) {
       carStatus = 'Shielded'
 
