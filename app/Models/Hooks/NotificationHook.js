@@ -141,7 +141,7 @@ NotificationHook.send = async (notification) => {
                 return false
             }
         }
-        return response.data
+        return 'OK'//response.data
     }catch(e) {
         console.log('Notification Send Hook Error')
         console.log(e)
