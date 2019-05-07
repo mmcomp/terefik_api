@@ -961,6 +961,7 @@ class CarController {
     let rangerExp = settings.car_check_exp
     let isNotReDone = 1, rangerWork = await RangerWork.query().where('vehicle_id', params.car_id).orderBy('created_at', 'DESC').first()
     if(rangerWork && rangerWork.ranger_id==user.id) {
+      console.log('Fase 1')
       let settings = await Setting.get()
       let lastArrestTime = Time(rangerWork.created_at)
       if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
@@ -975,6 +976,7 @@ class CarController {
         }]
       }
     }else if(rangerWork && rangerWork.ranger_id!=user.id) {
+      console.log('Fase 2')
       let inspectorDailyReport = await InspectorDailyReport.query().where('user_id', user.id).whereRaw("created_at like  '" + Moment.now('YYYY-MM-DD') + "%'").first()
       if(!inspectorDailyReport) {
           inspectorDailyReport = new InspectorDailyReport
