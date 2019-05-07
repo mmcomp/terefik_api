@@ -807,7 +807,8 @@ class CarController {
     let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
 
     let theOwner = await User.find(carOwner.id)
-
+    console.log('Vehicle ID', car.id)
+    console.log('User Vehicle Id', userCar.id)
     console.log('ShieldDiff', shieldDiff, 'Sheild Start', userCar.shield_start)
     if(shieldDiff>0 && userCar.shield_start) {
       carStatus = 'Shielded'
