@@ -680,6 +680,397 @@ class CarController {
     let settings = await Setting.get() 
 
     let loot = {
+      silver_coin: settings.silver_when_not_reported,
+      gasoline: 0,
+      health: 0,
+      cleaning: 0,
+    }
+
+    let findable_gift = false
+
+    const rules = {
+      number_2: 'required',
+      number_ch: 'required',
+      number_3: 'required',
+      number_ir: 'required',
+      number_extra: 'required',
+      lon_gps: 'required',
+      lat_gps: 'required',
+      image_path: 'required'
+    }
+
+    let check = await Validations.check(params, rules)
+    if (check.err) {
+      return [{
+        status: 0,
+        messages: check.messages,
+        data: {}
+      }]
+    }
+    
+    if(user.is_parking_ranger!=4) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'NotRanger',
+          message: 'شما پارکیار نمی باشید'
+        }],
+        data: {}
+      }]
+    }
+     
+    let currentHour = parseInt(Time().format('HH'), 10)
+    
+    if(currentHour>=settings.time_limit_end || currentHour<=settings.time_limit_start) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'OutOfWorkingHours',
+          message: 'خارج از محدوده زمانی فعالیت ثبت امکان پذیر نمی باشد'
+        }],
+        data: {}
+      }]
+    }
+
+    let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
+    if(theZoneId<=0) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'OutOfZones',
+          message: 'خارج از محدوده های مکانی گزارش نمی توانید ارسال کنید'
+        }],
+        data: {}
+      }]
+    }
+
+    let rangerZone = await UserZone.query().where('users_id', user.id).first()
+    if(!rangerZone) {
+      return [{
+        status: 0,
+        messages: [{
+          code: 'NoZones',
+          message: 'شما به هیچ ناحیه ای دسترسی ندارید'
+        }],
+        data: {}
+      }]
+    }
+
+    let rangerSilverTime = await RangerSilverTime.query().where('start_time', Time().format('HH:00:00')).first()
+    if(rangerSilverTime) {
+      loot.silver_coin += rangerSilverTime.extra_silver
+    }
+
+    await user.loadMany(['property'])
+    let userData = user.toJSON()
+
+    let carStatus = 'NotRegistered'
+    
+    for(let i in params) {
+      params[i] = CarController.p2e(params[i])
+    }
+
+    theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
+    let theZone = await Zone.query().where('id', theZoneId).first()
+
+    let is_out = true
+    rangerZone = await UserZone.query().where('users_id', user.id).where('zone_id', theZoneId).first()
+    if(rangerZone) {
+      is_out = false
+    }
+
+    let inspectorDailyReport = await InspectorDailyReport.query().where('user_id', user.id).whereRaw("created_at like  '" + Moment.now('YYYY-MM-DD') + "%'").first()
+    if(!inspectorDailyReport) {
+        inspectorDailyReport = new InspectorDailyReport
+        inspectorDailyReport.user_id = user.id
+        inspectorDailyReport.report_count = 0
+    }
+
+    console.log('Car Params', 'number_2', params.number_2, 'number_ch', params.number_ch, 'number_3', params.number_3, 'number_ir', params.number_ir)
+    let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir)/*.where('number_extra', params.number_extra)*/.first()
+    if(!car) {
+      inspectorDailyReport.report_count += 1
+      await inspectorDailyReport.save()
+
+      let car= new Car
+      car.number_2 = params.number_2
+      car.number_ch = params.number_ch
+      car.number_3 = params.number_3
+      car.number_ir = params.number_ir
+      car.number_extra = params.number_extra
+      await car.save()
+
+
+      await user.property().update({
+        silver_coin: userData.property.silver_coin + loot.silver_coin
+      })
+
+      let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, car.id)
+      if(gift_id) {
+        findable_gift = true
+      }
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          car_status: carStatus,
+          loot: loot,
+          findable_gift: findable_gift,
+          is_out: is_out,
+        }
+      }]
+    }
+
+    carStatus = 'RegisteredByRanger'
+
+    let userCar = await UserCar.query().where('vehicle_id', car.id).with('user').first()
+    if(!userCar) {
+      inspectorDailyReport.report_count += 1
+      await inspectorDailyReport.save()
+
+      await user.property().update({
+        silver_coin: userData.property.silver_coin + loot.silver_coin
+      })
+
+      let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, car.id)
+      if(gift_id) {
+        findable_gift = true
+      }
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {
+          car_status: carStatus,
+          loot: loot,
+          findable_gift: findable_gift,
+          is_out: is_out,
+        }
+      }]
+    }
+
+    carStatus = 'NotShielded'
+
+    let carOwner = userCar.toJSON().user
+    if(userCar.shield_start!='Invalid date') {
+      let shieldFinish = Time(userCar.shield_start).add(userCar.shield_duration, 'minutes')
+      let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+      if(shieldDiff>0) {
+        carStatus = 'Shielded'
+      }
+    }
+
+    let theOwner = await User.find(carOwner.id)
+    await theOwner.loadMany(['property'])
+    let theOwnerData = theOwner.toJSON()
+
+    let rangerExp = settings.car_check_exp
+
+    if(carStatus=='Shielded') {
+      theOwner.is_sheild = 1
+      await theOwner.save()
+
+      
+      let checkFinish = Time(userCar.check_time).add(settings.check_timeout, 'minutes')
+
+      let checkDiff = checkFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+
+      if(checkDiff<0 || userCar.checker_id!=user.id) {
+        inspectorDailyReport.report_count += 1
+        await inspectorDailyReport.save()
+
+        userCar.check_time = Moment.now('YYYY-MM-DD HH:mm:ss')
+        userCar.checker_id = user.id
+        await userCar.save()
+        let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
+        if(gift_id) {
+          findable_gift = true
+        }
+        console.log('DRIVER FINDABLE GIFT')
+        let pgift_id = await UserPfindableGift.tryToGetGift(theOwner.id, theZoneId, userCar.vehicle_id)
+        if(pgift_id) {
+          //push to driver
+          let PGIFT = await PfindableGift.query().where('id', pgift_id).first()
+          if(PGIFT) {
+            let PGiftNotification = new Notification
+            PGiftNotification.users_id = theOwner.id
+            PGiftNotification.title = Env.get('PUSH_USER_FINDABLE_TITLE')
+            PGiftNotification.message = Env.get('PUSH_USER_FINDABLE_MESSAGE')
+            PGiftNotification.type = 'UserFindableGiftNotification'
+            PGiftNotification.data = JSON.stringify({
+              id: pgift_id,
+              name: PGIFT.name,
+            })
+            PGiftNotification.save()  
+          }
+        }
+
+        let ownerProperty = await Property.query().where('user_id', theOwner.id).first()
+        ownerProperty.diamond+=settings.user_diamond_on_check
+        ownerProperty.save()
+        let DiamondNotification = new Notification
+        DiamondNotification.users_id = theOwner.id
+        DiamondNotification.title = Env.get('PUSH_USER_DIAMOND_TITLE')
+        DiamondNotification.message = Env.get('PUSH_USER_DIAMOND_MESSAGE')
+        DiamondNotification.message = DiamondNotification.message.replace('|diamond|', settings.user_diamond_on_check)
+        DiamondNotification.type = 'UserDiamondOnCheck'
+        DiamondNotification.data = JSON.stringify({
+          diamond: settings.user_diamond_on_check,
+        })
+        DiamondNotification.save() 
+  
+        await user.property().update({
+          silver_coin: userData.property.silver_coin + loot.silver_coin,
+          inspector_score: userData.property.inspector_score + rangerExp,
+        })
+
+        theZone.reports++
+        await theZone.save()
+
+        return [{
+          status: 1,
+          messages: [],
+          data: {
+            car_status: carStatus,
+            loot: loot,
+            findable_gift: findable_gift,
+            is_out: is_out,
+          }
+        }]
+      }else {
+        return [{
+          status: 0,
+          messages: [{
+            code: "ReCheckError",
+            message: "این خودرو رو خودت همین الان ثبت کردی",
+          }],
+          data: {}
+        }]
+      }
+    }
+    
+    // Not Shielded
+    theZone.reports++
+    await theZone.save()
+
+    let rangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
+    if(rangerWork && rangerWork.ranger_id==user.id) {
+      let lastArrestTime = Time(rangerWork.created_at)
+      if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "AlreadyArrested",
+            message: "این خودرو به تازگی گزارش شده است"
+          }],
+          data: {}
+        }]
+      }
+    }
+
+    inspectorDailyReport.report_count += 1
+    await inspectorDailyReport.save()
+
+    rangerExp +=settings.car_arrest_exp
+
+    loot.silver_coin -= settings.silver_when_not_reported
+    if(is_out) {
+      loot.silver_coin += settings.silver_when_not_shield_outofzone
+    }else {
+      loot.silver_coin += settings.silver_when_not_shield
+    }
+
+    rangerWork = new RangerWork
+    rangerWork.vehicle_id = car.id
+    rangerWork.ranger_id = user.id
+    rangerWork.lon_gps = params.lon_gps
+    rangerWork.lat_gps = params.lat_gps
+    rangerWork.image_path = params.image_path
+    rangerWork.silver_coin = loot.silver_coin
+    rangerWork.user_vehicle_id = userCar.id
+    if(is_out) {
+      rangerWork.gasoline = settings.arrest_outofzone_loot_percent * theOwnerData.property.gasoline / 100
+      rangerWork.health = settings.arrest_outofzone_loot_percent * theOwnerData.property.health_oil / 100
+      rangerWork.cleaning = settings.arrest_outofzone_loot_percent * theOwnerData.property.cleaning_soap / 100
+    }else {
+      rangerWork.gasoline = settings.arrest_loot * theOwnerData.property.gasoline / 100
+      rangerWork.health = settings.arrest_loot * theOwnerData.property.health_oil / 100
+      rangerWork.cleaning = settings.arrest_loot * theOwnerData.property.cleaning_soap / 100  
+    }
+
+    theOwner.is_sheild = 0
+    await theOwner.save()
+    
+    await rangerWork.save()
+
+    loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
+    loot.gasoline = parseInt(rangerWork.gasoline, 10)
+    loot.health = parseInt(rangerWork.health, 10)
+    loot.cleaning = parseInt(rangerWork.cleaning, 10)
+
+    await user.property().update({
+      silver_coin: userData.property.silver_coin + loot.silver_coin,
+      gasoline : userData.property.gasoline + loot.gasoline,
+      health_oil: userData.property.health_oil + loot.health,
+      cleaning_soap : userData.property.cleaning_soap + loot.cleaning,
+      inspector_score: userData.property.inspector_score + rangerExp
+    })
+
+    let userProperty = await  Property.query().where('user_id', theOwner.id).first()
+    userProperty.diamond -= settings.diamond_lose_on_arrest
+    if(userProperty.diamond<0) {
+      userProperty.diamond = 0
+    }
+    userProperty.gasoline -= loot.gasoline,
+    userProperty.health_oil -= loot.health,
+    userProperty.cleaning_soap -= loot.cleaning,
+    await userProperty.save()
+
+    let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, userCar.vehicle_id)
+    if(gift_id) {
+      findable_gift = true
+    }
+
+    // Driver Notification
+    let notification = new Notification
+    notification.title = Env.get('PUSH_USER_ARREST_TTILE')
+    notification.message = Env.get('PUSH_USER_ARREST_MESSAGE')
+    notification.message = notification.message.replace('|diamond_count|', settings.diamond_lose_on_arrest)
+                            .replace('|recharge_time|', settings.reshielding_time)
+                            .replace('|diamond_recharge|', settings.diamond_earn_on_reshielding)
+    notification.users_id = theOwner.id
+    notification.data = JSON.stringify({
+      gasoline: -1*loot.gasoline,
+      health: -1*loot.health,
+      cleaning: -1*loot.cleaning,
+      diamond: -1*settings.diamond_lose_on_arrest,
+      arrest_id: rangerWork.id,
+    })
+    notification.type = 'user_arrest'
+    notification.save()
+
+    // Achiement Check
+    Achievment.achieve(user.id, 'ranger')
+
+    return [{
+      status: 1,
+      messages: [],
+      data: {
+        car_status: 'NotShielded',
+        in_out : is_out,
+        loot: loot,
+        findable_gift: findable_gift,
+      }
+    }]
+  }
+/*
+  static async oldarrest(params, user) {
+    console.log('Arrest start', params)
+
+    let settings = await Setting.get() 
+
+    let loot = {
       silver_coin: 0,
       gasoline: 0,
       health: 0,
@@ -986,6 +1377,8 @@ class CarController {
       inspectorDailyReport.report_count += 1
       await inspectorDailyReport.save()
 
+      let carStatus = 'NotShielded'
+
       if(userCar) {
         let checkFinish = Time(userCar.check_time).add(settings.check_timeout, 'minutes')
 
@@ -1167,7 +1560,7 @@ class CarController {
       }
     }]
   }
-
+*/
   static async arrestList(params, user) {
     if(user.is_parking_ranger!=4) {
       return [{
