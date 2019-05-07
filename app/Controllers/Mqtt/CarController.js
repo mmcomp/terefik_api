@@ -810,7 +810,7 @@ class CarController {
     console.log('Vehicle ID', car.id)
     console.log('User Vehicle Id', userCar.id)
     console.log('ShieldDiff', shieldDiff, 'Sheild Start', userCar.shield_start)
-    if(shieldDiff>0 && userCar.shield_start) {
+    if(shieldDiff>0 && !isNaN(shieldDiff)) {
       carStatus = 'Shielded'
 
       theOwner.is_sheild = 1
