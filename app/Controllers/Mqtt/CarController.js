@@ -102,6 +102,8 @@ class CarController {
     let rangerWork = await RangerWork.query().where('user_vehicle_id', userCar.id).where('created_at', '>=', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss')).first()
     if(rangerWork) {
       extraDiamond = settings.diamond_earn_on_reshielding
+      rangerWork.report_to_police = 0
+      rangerWork.save()
     }
     console.log('Extra Diamond', extraDiamond)
     console.log('Total Diamond', settings.diamond_earn_on_shielding + extraDiamond)
