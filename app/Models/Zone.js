@@ -4,6 +4,7 @@ const Setting = use('App/Models/Setting')
 const ZoneCar = use('App/Models/ZoneCar')
 const Database = use('Database')
 const Moment = use('App/Libs/Moment')
+const Setting = use('App/Models/Setting')
 const Time = Moment.moment()
 
 const Redis = use('Redis')
@@ -70,11 +71,11 @@ class Zone extends Model {
       zoneCar.appearance++
       await zoneCar.save()
       */
+      let settings = await Setting.get()
       const stageKey = `car_${ car_id }_${ zone_id }`
       await Redis.select(1)
       let tmp = await Redis.hgetall(stageKey)
-      if(tmp.zone_id) {
-      }else {
+      if(typeof tmp.zone_id=='undefined') {
         await Redis.hmset(stageKey, ['zone_id', zone_id])
         let theZone = await Zone.find(zone_id)
         if(theZone) {
@@ -85,7 +86,7 @@ class Zone extends Model {
           await theZone.save()
         }
       }
-      await Redis.expire(stageKey, 10)
+      await Redis.expire(stageKey, settings.arrest_timeout * 60)
     }catch(e) {
       console.log('Zone addCar Error', e)
     }
