@@ -677,7 +677,7 @@ class CarController {
   }
 
   static async arrest(params, user) {
-    console.log('Arrest start', params)
+    // console.log('Arrest start', params)
 
     let settings = await Setting.get() 
 
@@ -772,7 +772,6 @@ class CarController {
       params[i] = CarController.p2e(params[i])
     }
 
-    theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
     let theZone = await Zone.query().where('id', theZoneId).first()
 
     let is_out = true
@@ -823,6 +822,8 @@ class CarController {
         }
       }]
     }
+
+    Zone.addCar(car.id, theZoneId)
 
     carStatus = 'RegisteredByRanger'
 

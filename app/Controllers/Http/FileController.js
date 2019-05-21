@@ -11,6 +11,10 @@ const UserFindableGift = use('App/Models/UserFindableGift')
 const UserPfindableGift = use('App/Models/UserPfindableGift')
 const Notification = use('App/Models/Notification')
 
+const Redis = use('Redis')
+
+const Zone = use('App/Models/Zone')
+
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
 
@@ -223,19 +227,42 @@ class FileController {
     try{
       // let gift_id = await UserPfindableGift.tryToGetGift(3, 4)
       // console.log('test gift result', gift_id)
-      let notification = new Notification
-      notification.title = 'AAAA'
-      notification.message = 'BBB'
-      notification.users_id = 3
-      notification.data = JSON.stringify({
-        gasoline: -100,
-        health: -19,
-        cleaning: -14,
-        diamond: -12,
-        arrest_id: 120,
-      })
-      notification.type = 'user_arrest'
-      notification.save()
+      // let notification = new Notification
+      // notification.title = 'AAAA'
+      // notification.message = 'BBB'
+      // notification.users_id = 3
+      // notification.data = JSON.stringify({
+      //   gasoline: -100,
+      //   health: -19,
+      //   cleaning: -14,
+      //   diamond: -12,
+      //   arrest_id: 120,
+      // })
+      // notification.type = 'user_arrest'
+      // notification.save()
+      // await Zone.addCar(1 ,1)
+      const zone_id = 3
+      const car_id = 1
+
+      const stageKey = `car_${ car_id }_${ zone_id }`
+      await Redis.select(1)
+      let tmp = await Redis.hgetall(stageKey)
+      if(tmp.zone_id) {
+      }else {
+        await Redis.hmset(stageKey, ['zone_id', zone_id])
+        let theZone = await Zone.find(zone_id)
+        if(theZone) {
+          theZone.current_car_count++
+          if(theZone.current_car_count>theZone.max_car_count) {
+            theZone.max_car_count = theZone.current_car_count
+          }
+          await theZone.save()
+        }
+      }
+      await Redis.expire(stageKey, 10)
+      // console.log(tmp)
+
+
     }catch(e) {
       console.log('test gift error')
       console.log(e)

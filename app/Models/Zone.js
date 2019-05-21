@@ -1,10 +1,12 @@
 'use strict'
 
 const Setting = use('App/Models/Setting')
+const ZoneCar = use('App/Models/ZoneCar')
 const Database = use('Database')
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
 
+const Redis = use('Redis')
 const Model = use('Model')
 
 class Zone extends Model {
@@ -50,6 +52,43 @@ class Zone extends Model {
         zone_id = res[0][0].id
     }
     return zone_id
+  }
+
+  static async addCar (car_id, zone_id) {
+    try {
+      /*
+      let zoneCar = await ZoneCar.query().where({
+        vehicle_id: car_id,
+        zone_id: zone_id,
+      }).where('created_at', 'like', Time().format('YYYY-MM-DD') + '%').first()
+      if(!zoneCar) {
+        zoneCar = new ZoneCar
+        zoneCar.vehicle_id = car_id
+        zoneCar.zone_id = zone_id
+        zoneCar.appearance = 0
+      }
+      zoneCar.appearance++
+      await zoneCar.save()
+      */
+      const stageKey = `car_${ car_id }_${ zone_id }`
+      await Redis.select(1)
+      let tmp = await Redis.hgetall(stageKey)
+      if(tmp.zone_id) {
+      }else {
+        await Redis.hmset(stageKey, ['zone_id', zone_id])
+        let theZone = await Zone.find(zone_id)
+        if(theZone) {
+          theZone.current_car_count++
+          if(theZone.current_car_count>theZone.max_car_count) {
+            theZone.max_car_count = theZone.current_car_count
+          }
+          await theZone.save()
+        }
+      }
+      await Redis.expire(stageKey, 10)
+    }catch(e) {
+      console.log('Zone addCar Error', e)
+    }
   }
 }
 

@@ -9,6 +9,7 @@ const GameSession = use('App/Models/GameSession')
 const Property = use('App/Models/Property')
 const Message = use('App/Models/Message')
 const User = use('App/Models/User')
+const Zone = use('App/Models/Zone')
 
 const Redis = use('Redis')
 
@@ -17,34 +18,17 @@ Redis.psubscribe('__keyevent@?__:expired', async (message, channel, pattern) => 
   try {
     const channelParse = channel.split('_')
     let gameSession
-
     switch (channelParse[0]) {
-      // برای هندل بازی های سیستمی
-      // case 'game':
-      //   gameSession = await GameSession.query().where('type', 'system').where('session_id', channel).with('game').with('user').with('user.property').first()
-      //   if (gameSession) {
-      //     let gameSessionData = gameSession.toJSON()
-      //     let changes = {}
-
-          // if (gameSessionData.depo_type != 'none') {
-          //   changes[gameSessionData.depo_type] = gameSessionData.user.property[gameSessionData.depo_type] + gameSessionData.depo_amount
-          // }
-
-          // if (gameSessionData.game.cancel_type != 'none') {
-          //   changes[gameSessionData.game.cancel_type] = gameSessionData.user.property[gameSessionData.game.cancel_type] + gameSessionData.game.cancel_amount
-          // }
-
-          // await Property.query().where('user_id', gameSessionData.user.id).update(changes)
-          // await gameSession.user().update({
-          //   game_lose: gameSessionData.user.game_lose++,
-          //   courage_stat: gameSessionData.user.courage_stat--
-          // })
-
-        //   await gameSession.delete()
-        // }
-        // break
-
-      // برای هندل حمله ها و انتقام ها
+      case 'car':
+        if(channelParse.length===3) {
+          const zone_id = channelParse[2]
+          let theZone = await Zone.find(zone_id)
+          if(theZone && theZone.current_car_count>0) {
+            theZone.current_car_count--
+            theZone.save()
+          }
+        }
+        break
       case 'attack':
         gameSession = await GameSession.query().where('type', '!=', 'system').where('session_id', channel).first()
         if (gameSession) {

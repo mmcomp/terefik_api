@@ -118,6 +118,9 @@ exec('service emqttd start', (err, stdout, stderr) => {
     console.log('MQTT connected ...')
   })
   client.on('message', require('./mqttRoutes'))
+  client.on('error', function(err) {
+    console.log('MQTT ERROR', err)
+  })
 /*
   console.log(stdout)
   console.log(stderr)
