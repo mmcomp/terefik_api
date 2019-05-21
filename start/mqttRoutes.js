@@ -60,6 +60,7 @@ const routes = {
   'ExcuseArrest': 'User/excuse',
   'AllGift': 'User/allGift',
   'UserNotifications': 'User/notifications',
+  'UserReadNotifications': 'User/readNotifications',
   'UserResource': 'User/resource',
   'UserLastArrest': 'User/lastArrest',
 

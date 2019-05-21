@@ -141,7 +141,7 @@ class UserController {
   static async fastProfile (params, user) {
     await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap'])
     let userData = user.toJSON()
-    let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').getCount()
+    let notifications = await Notification.query().where('users_id', user.id).whereIn('status', ['created', 'transmit']).getCount()
 
     return [{
       status: 1,
@@ -347,7 +347,7 @@ class UserController {
 
   static async notifications (params, user) {
     try{
-      let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').fetch()
+      let notifications = await Notification.query().where('users_id', user.id).whereIn('status', ['created', 'transmit']).fetch()
       notifications = notifications.toJSON()
       let notificationIds = [], theNotifications = [], data
       for(let notification of notifications) {
@@ -365,9 +365,9 @@ class UserController {
         })
       }
       // console.log('Notification Id', notificationIds)
-      // await Notification.query().whereIn('id', notificationIds).update({
-      //   status: 'sent',
-      // })
+      await Notification.query().whereIn('id', notificationIds).update({
+        status: 'trasmit',
+      })
 
       return [{
         status: 1,
@@ -375,6 +375,29 @@ class UserController {
         data: {
           notifications: theNotifications,
         }
+      }]
+    }catch(e) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "SystemError",
+          message : JSON.stringify(e),
+        }],
+        data: {}
+      }]
+    }
+  }
+
+  static async readNotifications (params, user) {
+    try{
+      await Notification.query().where('users_id', user.id).where('status', 'transmit').update({
+        status: 'sent',
+      })
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {}
       }]
     }catch(e) {
       return [{
