@@ -4,7 +4,6 @@ const Setting = use('App/Models/Setting')
 const ZoneCar = use('App/Models/ZoneCar')
 const Database = use('Database')
 const Moment = use('App/Libs/Moment')
-const Setting = use('App/Models/Setting')
 const Time = Moment.moment()
 
 const Redis = use('Redis')
