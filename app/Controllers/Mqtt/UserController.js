@@ -141,12 +141,14 @@ class UserController {
   static async fastProfile (params, user) {
     await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap'])
     let userData = user.toJSON()
+    let notifications = await Notification.query().where('users_id', user.id).where('status', 'created').getCount()
 
     return [{
       status: 1,
       messages: [],
       data: {
         profile: userData,
+        notification: notifications,
       }
     }]
   }
@@ -362,10 +364,10 @@ class UserController {
           data: data,
         })
       }
-      console.log('Notification Id', notificationIds)
-      await Notification.query().whereIn('id', notificationIds).update({
-        status: 'sent',
-      })
+      // console.log('Notification Id', notificationIds)
+      // await Notification.query().whereIn('id', notificationIds).update({
+      //   status: 'sent',
+      // })
 
       return [{
         status: 1,
