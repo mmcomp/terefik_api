@@ -142,13 +142,13 @@ class UserController {
     await user.loadMany(['property.experience', 'property.inspector', 'terefik', 'traps.trap'])
     let userData = user.toJSON()
     let notifications = await Notification.query().where('users_id', user.id).whereIn('status', ['created', 'transmit']).getCount()
-
+    userData['notifications'] = notifications
     return [{
       status: 1,
       messages: [],
       data: {
         profile: userData,
-        notification: notifications,
+        // notification: notifications,
       }
     }]
   }
