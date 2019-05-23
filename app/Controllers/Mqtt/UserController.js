@@ -366,7 +366,7 @@ class UserController {
       }
       // console.log('Notification Id', notificationIds)
       await Notification.query().whereIn('id', notificationIds).update({
-        status: 'trasmit',
+        status: 'transmit',
       })
 
       return [{
