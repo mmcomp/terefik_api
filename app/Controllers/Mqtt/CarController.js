@@ -55,9 +55,9 @@ class CarController {
     out = out.replace(/۴/g, '4')
     out = out.replace(/۵/g, '5')
     out = out.replace(/۶/g, '6')
-    out = out.replace(/۷/g, '1')
-    out = out.replace(/۸/g, '1')
-    out = out.replace(/۹/g, '1')
+    out = out.replace(/۷/g, '7')
+    out = out.replace(/۸/g, '8')
+    out = out.replace(/۹/g, '9')
     return out
   }
 
