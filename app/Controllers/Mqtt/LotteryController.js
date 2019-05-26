@@ -144,7 +144,7 @@ class LotteryController {
         }]
       }
 
-      let lottery = await Lottery.query().where('id', params.lottery_id).with('awards').first()
+      let lottery = await Lottery.query().where('id', params.lottery_id).whereNotIn('status', ['done', 'finishin']).with('awards').first()
       if(!lottery) {
         return [{
           status: 0,
@@ -246,6 +246,111 @@ class LotteryController {
 
       lottery.status = 'haveuser'
       await lottery.save()
+
+      return [{
+        status: 1,
+        messages: [],
+        data: {}
+      }]
+    }catch(e){
+      console.log(e)
+      return [{
+        status: 0,
+        messages: [{
+          code: "UnknowError",
+          message: JSON.stringify(e)
+        }],
+        data: {}
+      }]
+    }
+  }
+
+  static async addRequest (params, user) {
+    try{
+      const rules = {
+        lottery_id: 'required',
+        amount: 'required'
+      }
+  
+      let check = await Validations.check(params, rules)
+      if (check.err) {
+        return [{
+          status: 0,
+          messages: check.messages,
+          data: {}
+        }]
+      }
+
+      let lottery = await Lottery.query().where('id', params.lottery_id).whereNotIn('status', ['done', 'finishin']).with('awards').first()
+      if(!lottery) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "LotteryNotFound",
+            message: "قرعه کشی مورد نظر پیدا نشد"
+          }],
+          data: {}
+        }]
+      }
+
+      let userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
+      if(!userLottery) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "NotInThisLottery",
+            message: "شما قبلا در این قرعه کشی شرکت نکرده اید"
+          }],
+          data: {}
+        }]
+      }
+
+      let userProperty = await Property.query().where('user_id', user.id).first()
+      if(!userProperty) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "UserNotFound",
+            message: "اطلاعات کاربر ناقص می باشد"
+          }],
+          data: {}
+        }]
+      }
+
+      if(lotteryData.type=='rangers') {
+        if(userProperty.silver_coin < params.amount) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "SilverCoinNotEnough",
+              message: "میزان سکه نقره شما کافی نیست"
+            }],
+            data: {}
+          }]
+        }
+
+        console.log('decrease silver', params.amount, userProperty.silver_coin)
+        userProperty.silver_coin -= params.amount
+        await userProperty.save()
+      }else {
+        if(userProperty.diamond < params.amount) {
+          return [{
+            status: 0,
+            messages: [{
+              code: "DiamondNotEnough",
+              message: "میزان الماس شما کافی نیست"
+            }],
+            data: {}
+          }]
+        }
+
+        console.log('decrease diamond', params.amount, userProperty.diamond)
+        userProperty.diamond -= params.amount
+        await userProperty.save()
+      }
+      
+      userLottery.in_chance += params.amount
+      await userLottery.save()
 
       return [{
         status: 1,
