@@ -64,8 +64,8 @@ class CarController {
   static async shield(params, user) {
     const rules = {
       car_id: 'required',
-      lon_gps: 'required',
-      lat_gps: 'required',
+      // lon_gps: 'required',
+      // lat_gps: 'required',
       units: 'required',
       use_discount: 'required'
     }
@@ -98,7 +98,7 @@ class CarController {
     }
 
     let extraDiamond = 0
-    console.log('5 Min age', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss'))
+    // console.log('5 Min age', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss'))
     let rangerWork = await RangerWork.query().where('user_vehicle_id', userCar.id).where('created_at', '>=', Time(Moment.now("YYYY-MM-DD HH:mm:ss")).subtract(settings.reshielding_time, 'minutes').format('YYYY-MM-DD HH:mm:ss')).first()
     if(rangerWork) {
       extraDiamond = settings.diamond_earn_on_reshielding
@@ -115,8 +115,18 @@ class CarController {
         }]
       }
     }
-    console.log('Extra Diamond', extraDiamond)
-    console.log('Total Diamond', settings.diamond_earn_on_shielding + extraDiamond)
+    if(!params.lon_gps) {
+      params['lon_gps'] = 0
+    }
+    if(!params.lat_gps) {
+      params['lat_gps'] = 0
+    }
+    if(params.lon_gps!=0 && params.lon_gps!=null && params.lat_gps!=0 && params.lat_gps!=null) {
+      extraDiamond += settings.user_diamond_gps
+      console.log('Reward beacuse of GPS')
+    }
+    // console.log('Extra Diamond', extraDiamond)
+    // console.log('Total Diamond', settings.diamond_earn_on_shielding + extraDiamond)
 
     let shieldFinish = Time(userCar.shield_start).add(userCar.shield_duration, 'minutes')
     
