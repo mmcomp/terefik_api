@@ -104,6 +104,16 @@ class CarController {
       extraDiamond = settings.diamond_earn_on_reshielding
       rangerWork.report_to_police = 0
       rangerWork.save()
+      if(params.extend) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "CarWasNotShield",
+            message: "خودرو شما پارک نمی باشد"
+          }],
+          data: {}
+        }]
+      }
     }
     console.log('Extra Diamond', extraDiamond)
     console.log('Total Diamond', settings.diamond_earn_on_shielding + extraDiamond)
@@ -112,7 +122,7 @@ class CarController {
     
     let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
 
-    if(shieldDiff>0) {
+    if(shieldDiff>0 && !params.extend) {
       return [{
         status: 0,
         messages: [{
@@ -122,6 +132,16 @@ class CarController {
         data: {
           shield_remained: shieldDiff
         }
+      }]
+    }
+    if(shieldDiff<=0 && params.extend) {
+      return [{
+        status: 0,
+        messages: [{
+          code: "CarWasNotShield",
+          message: "خودرو شما پارک نمی باشد"
+        }],
+        data: {}
       }]
     }
 
@@ -145,7 +165,13 @@ class CarController {
       unitsTotal += unitCost * (units - 10)
     }
     */
+    if(params.extend) {
+      units += userCar.total_unit
+    }
     let unitsTotal = CarController.unitCost(units, settings)
+    if(params.extend) {
+      unitsTotal -= userCar.total_coin
+    }
 
     let totalPay = Math.ceil(unitsTotal * discountPercent, 10)
 
@@ -247,6 +273,11 @@ class CarController {
         loot: loot,
       }
     }]
+  }
+
+  static async extendShield(params, user) {
+    params['extend'] = true
+    return CarController.shield(params, user)
   }
 
   static async crowd(params, user) {

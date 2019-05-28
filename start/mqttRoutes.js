@@ -26,6 +26,7 @@ const routes = {
   'RemoveCar': 'Car/remove',
   'ArrestList': 'Car/arrestList',
   'ShieldCar': 'Car/shield',
+  'ExtendShieldCar': 'Car/extendShield',
   'ShieldList': 'Car/shieldList',
   'LeaveSooner': 'Car/leave',
   'LeaveSoonerList': 'Car/leaveList',
