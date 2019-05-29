@@ -103,7 +103,7 @@ NotificationHook.send = async (notification) => {
                         type: (notification.type === 'user_arrest')?'ArrestNotification':notification.type,
                     }
 
-                    // Mqtt.publish(pubTopic, JSON.stringify(messageData))
+                    Mqtt.publish(pubTopic, JSON.stringify(messageData))
                     if(notification.type === 'user_arrest') {
                         console.log('Sent Arrent Mqtt Notification ')
                     }else {
