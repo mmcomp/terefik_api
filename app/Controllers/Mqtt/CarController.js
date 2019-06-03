@@ -828,6 +828,12 @@ class CarController {
         inspectorDailyReport.report_count = 0
     }
 
+    let rangerWork = new RangerWork
+    rangerWork.ranger_id = user.id
+    rangerWork.lon_gps = params.lon_gps
+    rangerWork.lat_gps = params.lat_gps
+    rangerWork.image_path = params.image_path
+    rangerWork.silver_coin = loot.silver_coin
     console.log('Car Params', 'number_2', params.number_2, 'number_ch', params.number_ch, 'number_3', params.number_3, 'number_ir', params.number_ir)
     let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir)/*.where('number_extra', params.number_extra)*/.first()
     if(!car) {
@@ -847,11 +853,14 @@ class CarController {
         silver_coin: userData.property.silver_coin + loot.silver_coin
       })
 
+      rangerWork.vehicle_id = car.id
+
       let gift_id = await UserFindableGift.tryToGetGift(user.id, theZoneId, car.id)
       if(gift_id) {
         findable_gift = true
       }
 
+      await rangerWork.save()
       return [{
         status: 1,
         messages: [],
@@ -864,6 +873,8 @@ class CarController {
       }]
     }
 
+    rangerWork.vehicle_id = car.id
+
     Zone.addCar(car.id, theZoneId)
 
     carStatus = 'RegisteredByRanger'
@@ -871,11 +882,11 @@ class CarController {
     theZone.reports++
     await theZone.save()
 
-    let rangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
+    let theRangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
     console.log('rangerWork  for', car.id)
-    console.log(rangerWork.toJSON())
-    if(rangerWork && rangerWork.ranger_id==user.id) {
-      let lastArrestTime = Time(rangerWork.created_at)
+    console.log(theRangerWork.toJSON())
+    if(theRangerWork && theRangerWork.ranger_id==user.id) {
+      let lastArrestTime = Time(theRangerWork.created_at)
       console.log(Time().diff(lastArrestTime, 'minutes'), 'minutes age')
       if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
         return [{
@@ -1030,13 +1041,7 @@ class CarController {
       loot.silver_coin += settings.silver_when_not_shield
     }
 
-    rangerWork = new RangerWork
-    rangerWork.vehicle_id = car.id
-    rangerWork.ranger_id = user.id
-    rangerWork.lon_gps = params.lon_gps
-    rangerWork.lat_gps = params.lat_gps
-    rangerWork.image_path = params.image_path
-    rangerWork.silver_coin = loot.silver_coin
+
     rangerWork.user_vehicle_id = userCar.id
     if(is_out) {
       rangerWork.gasoline = settings.arrest_outofzone_loot_percent * theOwnerData.property.gasoline / 100
