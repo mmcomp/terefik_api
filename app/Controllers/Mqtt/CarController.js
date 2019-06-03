@@ -868,6 +868,24 @@ class CarController {
 
     carStatus = 'RegisteredByRanger'
 
+    theZone.reports++
+    await theZone.save()
+
+    let rangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
+    if(rangerWork && rangerWork.ranger_id==user.id) {
+      let lastArrestTime = Time(rangerWork.created_at)
+      if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
+        return [{
+          status: 0,
+          messages: [{
+            code: "AlreadyArrested",
+            message: "این خودرو به تازگی گزارش شده است"
+          }],
+          data: {}
+        }]
+      }
+    }
+
     let userCar = await UserCar.query().where('vehicle_id', car.id).with('user').first()
     if(!userCar) {
       inspectorDailyReport.report_count += 1
@@ -995,23 +1013,7 @@ class CarController {
     }
     
     // Not Shielded
-    theZone.reports++
-    await theZone.save()
 
-    let rangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
-    if(rangerWork && rangerWork.ranger_id==user.id) {
-      let lastArrestTime = Time(rangerWork.created_at)
-      if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
-        return [{
-          status: 0,
-          messages: [{
-            code: "AlreadyArrested",
-            message: "این خودرو به تازگی گزارش شده است"
-          }],
-          data: {}
-        }]
-      }
-    }
 
     inspectorDailyReport.report_count += 1
     await inspectorDailyReport.save()
