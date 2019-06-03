@@ -25,6 +25,7 @@ class SettingController {
           unit_max: settings.unit_max,
           last_critical_version: settings.last_critical_version,
           last_version: settings.last_version,
+          user_diamond_gps: settings.user_diamond_gps,
         }
       }
     }]
