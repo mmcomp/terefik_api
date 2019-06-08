@@ -1804,26 +1804,26 @@ class CarController {
 
       let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
       if(theZoneId<=0) {
-        return [{
-          status: 0,
-          messages: [{
-            code: 'OutOfZones',
-            message: 'خارج از محدوده های مکانی گزارش نمی توانید ارسال کنید'
-          }],
-          data: {}
-        }]
+        // return [{
+        //   status: 0,
+        //   messages: [{
+        //     code: 'OutOfZones',
+        //     message: 'خارج از محدوده های مکانی گزارش نمی توانید ارسال کنید'
+        //   }],
+        //   data: {}
+        // }]
       }
 
       let rangerZone = await UserZone.query().where('users_id', user.id).first()
       if(!rangerZone) {
-        return [{
-          status: 0,
-          messages: [{
-            code: 'NoZones',
-            message: 'شما به هیچ ناحیه ای دسترسی ندارید'
-          }],
-          data: {}
-        }]
+        // return [{
+        //   status: 0,
+        //   messages: [{
+        //     code: 'NoZones',
+        //     message: 'شما به هیچ ناحیه ای دسترسی ندارید'
+        //   }],
+        //   data: {}
+        // }]
       }
 
       let userCar
