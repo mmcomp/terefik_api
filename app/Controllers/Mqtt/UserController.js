@@ -1070,6 +1070,9 @@ class UserController {
         }
       }else {
         let transactions = Transaction.query().where('user_id', user.id).where('type', 'shield').where('status', 'success').getCount()
+        if(!transactions) {
+          transactions = 0
+        }
         console.log('User Parks', transactions, 'Park Count', settings.park_count_for_gift)
         if(transactions % settings.park_count_for_gift != 0) {
           randomGift = false
