@@ -883,11 +883,11 @@ class CarController {
     await theZone.save()
 
     let theRangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
-    console.log('rangerWork  for', car.id)
-    console.log(theRangerWork.toJSON())
+    // console.log('rangerWork  for', car.id)
+    // console.log(theRangerWork.toJSON())
     if(theRangerWork && theRangerWork.ranger_id==user.id) {
       let lastArrestTime = Time(theRangerWork.created_at)
-      console.log(Time().diff(lastArrestTime, 'minutes'), 'minutes age')
+      // console.log(Time().diff(lastArrestTime, 'minutes'), 'minutes age')
       if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
         return [{
           status: 0,
