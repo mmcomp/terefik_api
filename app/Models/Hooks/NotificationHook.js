@@ -110,7 +110,7 @@ NotificationHook.send = async (notification) => {
                         console.log('Sent ' + notification.type + ' Mqtt Notification ')
                     }
                     console.log(theUser.mobile ,messageData, notification)
-                    notification.status = 'sent'
+                    // notification.status = 'sent'
                     notification.save()
                 }else if(planeNotifications.indexOf(notification.type)<0){
                     console.log('Sending PUSH')
