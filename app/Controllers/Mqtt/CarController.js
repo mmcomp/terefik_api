@@ -122,8 +122,17 @@ class CarController {
       params['lat_gps'] = 0
     }
     if(params.lon_gps!=0 && params.lon_gps!=null && params.lat_gps!=0 && params.lat_gps!=null) {
+      console.log('Reward beacuse of GPS', settings.user_diamond_gps)
       extraDiamond += settings.user_diamond_gps
-      console.log('Reward beacuse of GPS')
+      let zone_id = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
+      if(zone_id>0) {
+        let theZone = await Zone.find(zone_id)
+        if(theZone) {
+          extraDiamond += theZone.extra_diamond
+          console.log('Reward for the zone id', zone_id, theZone.extra_diamond)
+        }
+      }
+      
     }
     // console.log('Extra Diamond', extraDiamond)
     // console.log('Total Diamond', settings.diamond_earn_on_shielding + extraDiamond)
