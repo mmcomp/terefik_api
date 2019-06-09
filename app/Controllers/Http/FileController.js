@@ -89,7 +89,7 @@ class FileController {
             status: 0,
             messages: [{
               code: 'UploadError',
-              message: 'حداکثر حجم عکس می بایست حداکثر ۲ مگابایت باشد'
+              message: 'حجم عکس می بایست حداکثر ۲ مگابایت باشد'
             }],
             data: {}
           })  
