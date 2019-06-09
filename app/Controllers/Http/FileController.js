@@ -81,12 +81,13 @@ class FileController {
       })
   
       if (!profilePic.moved()) {
-
+        console.log('Upload Error')
+        console.log(profilePic.error())
         return response.status(400).send({
           status: 0,
           messages: [{
             code: 'UploadError',
-            message: 'ارسال تصویر با مشکل مواجه شد'
+            message: 'ذخیره تصویر در سرور با مشکل مواجه شد'
           }],
           data: {}
         })
@@ -137,6 +138,7 @@ class FileController {
         }
       })
     }catch(e) {
+      console.log('Upload Error:')
       console.log(e)
       return response.status(400).send({
         status: 0,
