@@ -83,14 +83,26 @@ class FileController {
       if (!profilePic.moved()) {
         console.log('Upload Error')
         console.log(profilePic.error())
-        return response.status(400).send({
-          status: 0,
-          messages: [{
-            code: 'UploadError',
-            message: 'ذخیره تصویر در سرور با مشکل مواجه شد'
-          }],
-          data: {}
-        })
+        let err = profilePic.error()
+        if(err.type=='size') {
+          return response.status(400).send({
+            status: 0,
+            messages: [{
+              code: 'UploadError',
+              message: 'حداکثر حجم عکس  2MB باید باشد'
+            }],
+            data: {}
+          })  
+        }else {
+          return response.status(400).send({
+            status: 0,
+            messages: [{
+              code: 'UploadError',
+              message: 'ذخیره تصویر در سرور با مشکل مواجه شد'
+            }],
+            data: {}
+          })  
+        }
       }
   
       if(doc_type=='profile') {
