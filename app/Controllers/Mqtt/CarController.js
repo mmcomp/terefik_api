@@ -200,7 +200,7 @@ class CarController {
           status: 0,
           messages: [{
             code: "ShortOnBronzeEvenWithExtra",
-            message: "سکه شما کافی نمی باشد و اعتبار سکه شما منفی شده است"
+            message: "اعتبار شما کافی نمی باشد و اعتبار شما منفی شده است"
           }],
           data: {}
         }]
@@ -211,7 +211,7 @@ class CarController {
           status: 0,
           messages: [{
             code: "ShortOnBronze",
-            message: "سکه شما کافی نمی باشد"
+            message: "اعتبار شما کافی نمی باشد"
           }],
           data: {}
         }]

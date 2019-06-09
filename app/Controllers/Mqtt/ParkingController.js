@@ -81,7 +81,7 @@ class ParkingController {
         status: 0,
         messages: [{
           code: "BronzeCoinNotEnough",
-          message: "سکه برنز شما برای رزرو کافی نمی باشد",
+          message: "اعتبارشما برای رزرو کافی نمی باشد",
         }],
         data: {}
       }]

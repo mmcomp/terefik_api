@@ -299,7 +299,7 @@ class AttackController {
         status: 0,
         messages: [{
           code: "NotEnoughBronze",
-          message: "سکه برنز شما برای حمله مجدد کافی نیست",
+          message: "اعتبارشما برای حمله مجدد کافی نیست",
         }],
         data: {}
       }]
@@ -644,7 +644,7 @@ class AttackController {
         status: 0,
         messages: [{
           code: "ShortOnBronzeCoin",
-          message: "سکه برونز شما کافی نمی باشد",
+          message: "اعتبار شما کافی نمی باشد",
         }],
         data: {
         }
