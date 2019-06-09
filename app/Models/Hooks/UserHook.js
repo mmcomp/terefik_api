@@ -12,8 +12,9 @@ UserHook.loadExperienceLevel = async (property) => {
     console.log('Property update')
     let theUser = await User.find(property.user_id)
     if(theUser) {
+        let insLevel
         if(theUser.is_parking_ranger===4) {
-            let insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
+            insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
             if(insLevel) {
                 if(property.inspector_level < insLevel.id) {
                     property.silver_coin += parseInt(property.silver_coin * insLevel.level_order / 100, 10)
@@ -58,8 +59,9 @@ UserHook.loadExperienceLevels = async (properties) => {
     for(let property of tmp) {
         let theUser = await User.find(property.user_id)
         if(theUser) {
+            let insLevel
             if(theUser.is_parking_ranger===4) {
-                let insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
+                insLevel = await InspectorLevel.query().where('min', '<=', property.inspector_score).where('max', '>=', property.inspector_score).first()
                 if(insLevel) {
                     if(property.inspector_level < insLevel.id) {
                         property.silver_coin += parseInt(property.silver_coin * insLevel.level_order / 100, 10)
