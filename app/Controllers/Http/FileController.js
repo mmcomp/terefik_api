@@ -275,7 +275,7 @@ class FileController {
       // }
       // await Redis.expire(stageKey, 10)
       // console.log(tmp)
-      Notification.sendSms('09120172768', 'test')
+      Notification.sendSms('09120172768', 'test2')
 
     }catch(e) {
       console.log('test gift error')
