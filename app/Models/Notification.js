@@ -23,7 +23,7 @@ class Notification extends Model {
     return 'updated_at'
   }
 
-  static sendSms (mobile, message) {
+  static async sendSms (mobile, message) {
     console.log('URL', 'https://api.kavenegar.com/v1/' + Env.get('SMS_KAVENEGAR_API_KEY') + '/sms/send.json?receptor=' + mobile.replace('+98','0')
     + '&message=' + encodeURIComponent(message) + '&')
     try{
