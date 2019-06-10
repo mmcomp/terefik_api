@@ -255,27 +255,27 @@ class FileController {
       // notification.type = 'user_arrest'
       // notification.save()
       // await Zone.addCar(1 ,1)
-      const zone_id = 3
-      const car_id = 1
+      // const zone_id = 3
+      // const car_id = 1
 
-      const stageKey = `car_${ car_id }_${ zone_id }`
-      await Redis.select(1)
-      let tmp = await Redis.hgetall(stageKey)
-      if(tmp.zone_id) {
-      }else {
-        await Redis.hmset(stageKey, ['zone_id', zone_id])
-        let theZone = await Zone.find(zone_id)
-        if(theZone) {
-          theZone.current_car_count++
-          if(theZone.current_car_count>theZone.max_car_count) {
-            theZone.max_car_count = theZone.current_car_count
-          }
-          await theZone.save()
-        }
-      }
-      await Redis.expire(stageKey, 10)
+      // const stageKey = `car_${ car_id }_${ zone_id }`
+      // await Redis.select(1)
+      // let tmp = await Redis.hgetall(stageKey)
+      // if(tmp.zone_id) {
+      // }else {
+      //   await Redis.hmset(stageKey, ['zone_id', zone_id])
+      //   let theZone = await Zone.find(zone_id)
+      //   if(theZone) {
+      //     theZone.current_car_count++
+      //     if(theZone.current_car_count>theZone.max_car_count) {
+      //       theZone.max_car_count = theZone.current_car_count
+      //     }
+      //     await theZone.save()
+      //   }
+      // }
+      // await Redis.expire(stageKey, 10)
       // console.log(tmp)
-
+      Notification.sendSms('09120172768', 'test')
 
     }catch(e) {
       console.log('test gift error')
