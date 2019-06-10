@@ -34,8 +34,7 @@ class Notification extends Model {
       })
       console.log('SMS OK', response.data)
     }catch(e){  
-      console.log('SMS NOK', e.response.data)
-      sms_res = e.response.data.return.status + ':' + e.response.data.return.message
+      console.log('SMS NOK', e)
     }
   }
 }
