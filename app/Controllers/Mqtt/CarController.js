@@ -139,14 +139,14 @@ class CarController {
 
     let shieldFinish = Time(userCar.shield_start).add(userCar.shield_duration, 'minutes')
     
-    let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'seconds')
+    let shieldDiff = shieldFinish.diff(Moment.now('YYYY-MM-DD HH:mm:ss'), 'minutes')
 
     if(shieldDiff>0 && !params.extend) {
       return [{
         status: 0,
         messages: [{
           code: "AlreadyShielded",
-          message: "خودرو شما تا " + shieldDiff + " ثانیه شیلد است "
+          message: "خودرو شما تا " + shieldDiff + " دقیقه شیلد است "
         }],
         data: {
           shield_remained: shieldDiff
