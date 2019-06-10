@@ -46,7 +46,7 @@ class Zone extends Model {
 
   static async zoneByCords (lon, lat) {
     let zone_id = 0
-    let query = "SELECT id FROM zone WHERE intersects(shape, point(" + lon + ", " + lat + "))=1"
+    let query = "SELECT id FROM zone WHERE DISJOINT(shape, point(" + lon + ", " + lat + "))=0"
     let res = await Database.raw(query)
     if(res[0].length>0) {
         zone_id = res[0][0].id
