@@ -259,8 +259,10 @@ class CarController {
 
     userCar.shield_start = Moment.now("YYYY-MM-DD HH:mm:ss")
     userCar.shield_duration = units * settings.unit_to_minute
-    userCar.lon = params.lon_gps
-    userCar.lat = params.lat_gps
+    if(!params.extend) {
+      userCar.lon = params.lon_gps
+      userCar.lat = params.lat_gps
+    }
     userCar.total_unit = units
     userCar.total_coin = totalPay
     userCar.leave_time = null
