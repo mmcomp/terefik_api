@@ -122,7 +122,7 @@ class UserPfindableGift extends Model {
       const user = await User.find(user_id)
       if(user) {
         const mobile = user.mobile
-        const theFindableGift = await FindableGift.find(gift_id)
+        const theFindableGift = await PfindableGift.find(gift_id)
         if(theFindableGift) {
           if(theFindableGift.gift_type!='noaction') {
             let message = theFindableGift.message
