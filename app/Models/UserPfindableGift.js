@@ -118,7 +118,7 @@ class UserPfindableGift extends Model {
       userPfindableGift.vehicle_id = vehicle_id
       await userPfindableGift.save()
 
-      const theCode = Base64.fromNumber(userFindableGift.id)
+      const theCode = Base64.fromNumber(userPfindableGift.id)
       const user = await User.find(user_id)
       if(user) {
         const mobile = user.mobile
