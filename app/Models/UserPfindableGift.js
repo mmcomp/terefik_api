@@ -6,6 +6,8 @@ const PfindableChance = use('App/Models/PfindableChance')
 const PfindableGift = use('App/Models/PfindableGift')
 const PfindableGiftDaterange = use('App/Models/PfindableGiftDaterange')
 const Setting = use('App/Models/Setting')
+const Notification = use('App/Models/Notification')
+const User = use('App/Models/User')
 
 const Moment = use('App/Libs/Moment')
 const Time = Moment.moment()
@@ -30,6 +32,38 @@ class UserPfindableGift extends Model {
   }
 
   static async tryToGetGift (user_id, zone_id, vehicle_id) {
+    const Base64 = {
+      _Rixits : "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/",
+      fromNumber : function(number) {
+          if (isNaN(Number(number)) || number === null ||
+              number === Number.POSITIVE_INFINITY)
+              throw "The input is not valid";
+          if (number < 0)
+              throw "Can't represent negative numbers now";
+  
+          var rixit;
+          var residual = Math.floor(number);
+          var result = '';
+          while (true) {
+              rixit = residual % 64
+              result = this._Rixits.charAt(rixit) + result;
+              residual = Math.floor(residual / 64);
+              if (residual == 0)
+                  break;
+              }
+          return result;
+      },
+  
+      toNumber : function(rixits) {
+          var result = 0;
+          rixits = rixits.split('');
+          for (var e = 0; e < rixits.length; e++) {
+              result = (result * 64) + this._Rixits.indexOf(rixits[e]);
+          }
+          return result;
+      }
+    }
+
     let chance = await PfindableChance.getCurrentChance()
     console.log('current chance', chance)
     let userChance = UserPfindableGift.getRandomInt(0, 100)
@@ -83,6 +117,22 @@ class UserPfindableGift extends Model {
       userPfindableGift.user_id = user_id
       userPfindableGift.vehicle_id = vehicle_id
       await userPfindableGift.save()
+
+      const theCode = Base64.fromNumber(userFindableGift.id)
+      const user = await User.find(user_id)
+      if(user) {
+        const mobile = user.mobile
+        const theFindableGift = await FindableGift.find(gift_id)
+        if(theFindableGift) {
+          if(theFindableGift.gift_type!='noaction') {
+            let message = theFindableGift.message
+            if(theFindableGift.gift_type=='messagewithcode') {
+              message = message.replace(/#code#/g, theCode)
+            }
+            await Notification.sendSms(mobile, message)
+          }
+        }
+      }
 
       return gift_id
     }
