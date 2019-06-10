@@ -26,6 +26,7 @@ class Notification extends Model {
   static async sendSms (mobile, message) {
     console.log('URL', 'https://api.kavenegar.com/v1/' + Env.get('SMS_KAVENEGAR_API_KEY') + '/sms/send.json?receptor=' + mobile.replace('+98','0')
     + '&message=' + encodeURIComponent(message) + '&')
+    let response
     try{
       response = await axios({
         method: 'get',
@@ -36,6 +37,7 @@ class Notification extends Model {
     }catch(e){  
       console.log('SMS NOK', e)
     }
+    return response
   }
 }
 
