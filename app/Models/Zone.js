@@ -46,7 +46,7 @@ class Zone extends Model {
 
   static async zoneByCords (lon, lat) {
     let zone_id = 0
-    let query = "SELECT id FROM zone WHERE DISJOINT(shape, point(" + lon + ", " + lat + "))=0"
+    let query = "SELECT id FROM zone WHERE ST_CONTAINS(shape, point(" + lon + ", " + lat + "))"
     console.log('Zone query')
     console.log(query)
     let res = await Database.raw(query)
