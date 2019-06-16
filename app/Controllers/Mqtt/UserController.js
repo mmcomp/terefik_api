@@ -485,7 +485,7 @@ class UserController {
     //   }]
     // }
 
-    user.username = username
+    user.username = params.username
     await user.save()
 
     return [{
