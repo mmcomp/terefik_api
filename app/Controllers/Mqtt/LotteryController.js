@@ -28,12 +28,12 @@ class LotteryController {
         userLotteries: []
       }
       if(user.is_parking_ranger==0){
-        lotteries.userLotteries = await Lottery.query().with('awards').whereIn('type', ['users', 'norangers']).where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.orderBy('created_at', 'DESC').fetch()
+        lotteries.userLotteries = await Lottery.query().with('awards').whereIn('type', ['users', 'norangers']).where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.where('status', '!=', 'hidden').orderBy('created_at', 'DESC').fetch()
         lotteries.userLotteries = lotteries.userLotteries.toJSON()
       }else {
-        lotteries.userLotteries = await Lottery.query().with('awards').where('type', 'users').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.orderBy('created_at', 'DESC').fetch()
+        lotteries.userLotteries = await Lottery.query().with('awards').where('type', 'users').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.where('status', '!=', 'hidden').orderBy('created_at', 'DESC').fetch()
         lotteries.userLotteries = lotteries.userLotteries.toJSON()
-        lotteries['rangerLotteries'] = await Lottery.query().with('awards').where('type', 'rangers').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.orderBy('created_at', 'DESC').fetch()
+        lotteries['rangerLotteries'] = await Lottery.query().with('awards').where('type', 'rangers').where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.where('status', '!=', 'hidden').orderBy('created_at', 'DESC').fetch()
         lotteries.rangerLotteries = lotteries.rangerLotteries.toJSON()
         for(let i = 0;i < lotteries.rangerLotteries.length;i++) {
           lottery = lotteries.rangerLotteries[i]
@@ -144,7 +144,7 @@ class LotteryController {
         }]
       }
 
-      let lottery = await Lottery.query().where('id', params.lottery_id).whereNotIn('status', ['done', 'finishin']).with('awards').first()
+      let lottery = await Lottery.query().where('status', '!=', 'hidden').where('id', params.lottery_id).whereNotIn('status', ['done', 'finishin']).with('awards').first()
       if(!lottery) {
         return [{
           status: 0,
@@ -281,7 +281,7 @@ class LotteryController {
         }]
       }
 
-      let lottery = await Lottery.query().where('id', params.lottery_id).whereNotIn('status', ['done', 'finishin']).with('awards').first()
+      let lottery = await Lottery.query().where('status', '!=', 'hidden').where('id', params.lottery_id).whereNotIn('status', ['done', 'finishin']).with('awards').first()
       if(!lottery) {
         return [{
           status: 0,
