@@ -5,8 +5,8 @@ const Model = use('Model')
 class Property extends Model {
   static boot () {
     super.boot()
-    this.addHook('afterFind', 'UserHook.loadExperienceLevel')
-    this.addHook('afterFetch', 'UserHook.loadExperienceLevels')
+    // this.addHook('afterFind', 'UserHook.loadExperienceLevel')
+    // this.addHook('afterFetch', 'UserHook.loadExperienceLevels')
   }
 
   static get table () {
