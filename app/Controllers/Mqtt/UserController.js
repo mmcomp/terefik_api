@@ -558,7 +558,7 @@ class UserController {
         })
         indx++
       }
-
+/*
       if(!userFound) {
         let userProperty = await Property.query().where('user_id', user.id).first()
         if(!userProperty) {
@@ -611,7 +611,7 @@ class UserController {
 
         leads.user_position = user_position
       }
-
+*/
       console.timeLog('expleaders', leads)
       return [{
         status: 1,
