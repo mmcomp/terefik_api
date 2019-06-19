@@ -536,7 +536,7 @@ class UserController {
     try{
       let leaderField = 'experience_score'
       console.time('expleaders')
-/*
+
       let users = await Property.query().with('user').orderBy(leaderField, 'desc').limit(20).fetch()
       users = users.toJSON()
       let leads = {
@@ -611,13 +611,13 @@ class UserController {
 
         leads.user_position = user_position
       }
-*/
+
       console.timeEnd('expleaders')
       return [{
         status: 1,
         messages: [],
         data: {
-          // experience_leaders: leads
+          experience_leaders: leads
         }
       }]
     }catch(e){
