@@ -182,7 +182,9 @@ module.exports = async(topic, message) => {
     let controller = use('App/Controllers/Mqtt/' + splitedRoute[0] + 'Controller')
     let result = await controller[splitedRoute[1]](params['data'], user)
     
-
+    tmpTime = new Date()
+    end_time = tmpTime.getTime()  
+    Logger.info('Time No Log : [' + process.pid + ']' + (end_time - start_time))
     if (result.length < 2) {
       if (_.has(params, 'client')) {
         result[0]['client'] = params['client']
