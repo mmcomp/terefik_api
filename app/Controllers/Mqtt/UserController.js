@@ -612,7 +612,7 @@ class UserController {
         leads.user_position = user_position
       }
 */
-      console.timeLog('expleaders', leads)
+      console.timeEnd('expleaders', leads)
       return [{
         status: 1,
         messages: [],
