@@ -178,6 +178,8 @@ module.exports = async(topic, message) => {
     user.last_activity = Moment.now('YYYY-MM-DD HH:mm:ss')
     user.save()
 
+    tmpTime = new Date()
+    start_time = tmpTime.getTime()
     // Send request to controller
     let controller = use('App/Controllers/Mqtt/' + splitedRoute[0] + 'Controller')
     let result = await controller[splitedRoute[1]](params['data'], user)
