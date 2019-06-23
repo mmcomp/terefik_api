@@ -120,7 +120,7 @@ const routes = {
 
 const fastTypes = [
   'ExperienceLeaderBoard',
-  // 'InspectorLeaderBoard'
+  'InspectorLeaderBoard'
 ]
 
 module.exports = async(topic, message) => {

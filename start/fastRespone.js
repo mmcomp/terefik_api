@@ -114,6 +114,94 @@ class responseClass {
       })
     })
   }
+  async InspectorLeaderBoard() {
+    console.log('InspectorLeaderBoard for', this.user_id)
+    const user_id = this.user_id
+    let output = {
+      tops: [],
+      user_position: [],
+    }
+    return new Promise(function(resolve, reject) {
+      let foundOnTop = false
+      connection.query(`SELECT image_path, inspector_score, username, user_id FROM user_property LEFT JOIN users ON (users.id=user_id) ORDER BY inspector_score DESC  limit 20 `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        let indx = 1
+        for(const usr of result) {
+          output.tops.push({
+            index: indx,
+            image_path: usr.image_path,
+            score: usr.inspector_score,
+            username: usr.username,
+            its_you: (usr.user_id==user_id),
+          })
+          if(usr.user_id==user_id) {
+            foundOnTop = true
+          }
+        }
+        if(!foundOnTop) {
+          connection.query(`SELECT image_path, inspector_score, username, user_id FROM user_property LEFT JOIN users ON (users.id=user_id) WHERE user_id = ${ user_id } `, function(err, result) {
+            if(err) {
+              reject(err)
+            }
+
+            let theUserScore = result[0]
+            connection.query(`SELECT COUNT(id) cid FROM user_property WHERE inspector_score>=${ theUserScore.inspector_score } AND user_id != ${ user_id } `, function(err, result) {
+              if(err) {
+                reject(err)
+              }
+
+              theUserScore['index'] = result[0].cid + 1
+              connection.query(`SELECT image_path, inspector_score, username, user_id FROM user_property LEFT JOIN users ON (users.id=user_id) WHERE inspector_score>=${ theUserScore.inspector_score } AND user_id != ${ user_id } ORDER BY inspector_score ASC LIMIT 5`, function(err, result) {
+                if(err) {
+                  reject(err)
+                }
+
+                const uppers = result
+                connection.query(`SELECT image_path, inspector_score, username, user_id FROM user_property LEFT JOIN users ON (users.id=user_id) WHERE inspector_score<${ theUserScore.inspector_score } ORDER BY inspector_score DESC LIMIT 5`, function(err, result) {
+                  if(err) {
+                    reject(err)
+                  }
+    
+                  const downers = result
+                  for(let i = uppers.length-1;i >= 0;i--) {
+                    output.user_position.push({
+                      index: theUserScore.index - 1 - i,
+                      image_path: uppers[i].image_path,
+                      score: uppers[i].inspector_score,
+                      username: uppers[i].username,
+                      its_you: false,
+                    })
+                  }
+                  output.user_position.push({
+                    index: theUserScore.index,
+                    image_path: theUserScore.image_path,
+                    score: theUserScore.inspector_score,
+                    username: theUserScore.username,
+                    its_you: true,
+                  })
+                  for(let i = 0;i < downers.length;i++) {
+                    output.user_position.push({
+                      index: theUserScore.index + 1 + i,
+                      image_path: downers[i].image_path,
+                      score: downers[i].inspector_score,
+                      username: downers[i].username,
+                      its_you: false,
+                    })
+                  }
+
+                  resolve(output)
+                })
+              })
+            })
+          })
+        }else {
+          resolve(output)
+        }
+      })
+    })
+  }
 }
 
 
