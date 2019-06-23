@@ -147,6 +147,7 @@ fastclient.on('message', async function(topic, message) {
         status: 1,
         messages: [],
         data: output,
+        type: message.type,
       }
       console.log('Exec', message.type)
       console.log(output)
