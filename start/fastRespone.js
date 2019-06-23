@@ -276,7 +276,6 @@ class responseClass {
       })
     })
   }
-
   async StartUp() {
     let output = {
       profile: null,
