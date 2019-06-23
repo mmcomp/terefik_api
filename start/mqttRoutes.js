@@ -118,6 +118,11 @@ const routes = {
   'Test': 'Test/test'
 }
 
+const fastTypes = [
+  'ExperienceLeaderBoard',
+  // 'InspectorLeaderBoard'
+]
+
 module.exports = async(topic, message) => {
   let request_log = new RequestLog()
   request_log.type = topic
@@ -137,6 +142,10 @@ module.exports = async(topic, message) => {
     if(params.type=='ping'){
       pubTopic = 'client_0On4IJ6EXizGBZM/'
       return Mqtt.publish(pubTopic + params.type, message.toString())
+    }else if(fastTypes.indexOf(params.type)>=0) {
+      console.log('Redirect to Fast')
+      pubTopic = 'fast'
+      return Mqtt.publish(pubTopic, message.toString())
     }
     request_log.type = params.type
     // Check Params

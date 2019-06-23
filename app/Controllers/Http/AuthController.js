@@ -621,6 +621,7 @@ class AuthController {
     request,
     response
   }) {
+    // console.log('MQTT SIGNIN', request.all())
     try {
       const rules = {
         username: 'required',
@@ -637,8 +638,8 @@ class AuthController {
           data: {}
         })
       }
-
-      if (Env.get('SERVER_CLIENT') == request.input('clientid') || Env.get('SERVER_CLIENT') == 'ad_' + request.input('clientid') || request.input('clientid') == 'terefik') {
+      // console.log('MQTT SignIn', request.input('clientid'), Env.get('FAST_CLIENT'))
+      if (Env.get('SERVER_CLIENT') == request.input('clientid') || Env.get('SERVER_CLIENT') == 'ad_' + request.input('clientid') || request.input('clientid') == 'terefik' || Env.get('FAST_CLIENT') == request.input('clientid')) {
         return response.send({})
         /*
         if (Env.get('SERVER_USERNAME') == request.input('username') && Env.get('SERVER_PASSWORD') == request.input('password')) {
@@ -698,7 +699,7 @@ class AuthController {
     request,
     response
   }) {
-    console.log('MQTT ACL', request.all())
+    // console.log('MQTT ACL', request.all())
     try {
       const rules = {
         username: 'required',
@@ -717,7 +718,7 @@ class AuthController {
         })
       }
 
-      if (Env.get('SERVER_CLIENT') == request.input('clientid') || Env.get('SERVER_CLIENT') == 'ad_' + request.input('clientid') || request.input('clientid') == 'terefik') {
+      if (Env.get('SERVER_CLIENT') == request.input('clientid') || Env.get('SERVER_CLIENT') == 'ad_' + request.input('clientid') || request.input('clientid') == 'terefik' || Env.get('FAST_CLIENT') == request.input('clientid')) {
         return response.send({})
       }
 

@@ -116,6 +116,8 @@ exec('service emqttd start', (err, stdout, stderr) => {
   client.on('connect', function () {
     client.subscribe(Env.get('SERVER_SENDER_TOPIC'))
     console.log('MQTT connected ...')
+    require('./fastRespone')
+
   })
   client.on('message', require('./mqttRoutes'))
   client.on('error', function(err) {
