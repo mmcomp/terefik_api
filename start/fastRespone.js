@@ -339,9 +339,9 @@ fastclient.on('message', async function(topic, message) {
         data: output,
         type: message.type,
       }
+      fastclient.publish(`client_${ message.token }/${ message.type }`, JSON.stringify(output))
       console.log('Exec', message.type)
       console.log(JSON.stringify(output))
-      fastclient.publish(`client_${ message.token }/${ message.type }`, JSON.stringify(output))
     }catch(e){
       console.log('FAST MQTT: User Error')
       console.log(e)
