@@ -103,13 +103,17 @@ class responseClass {
                     })
                   }
 
-                  resolve(output)
+                  resolve({
+                    experience_leaders: output
+                  })
                 })
               })
             })
           })
         }else {
-          resolve(output)
+          resolve({
+            experience_leaders: output
+          })
         }
       })
     })
@@ -191,13 +195,17 @@ class responseClass {
                     })
                   }
 
-                  resolve(output)
+                  resolve({
+                    inspector_leaders: output
+                  })
                 })
               })
             })
           })
         }else {
-          resolve(output)
+          resolve({
+            inspector_leaders: output
+          })
         }
       })
     })
@@ -234,9 +242,7 @@ fastclient.on('message', async function(topic, message) {
       output = {
         status: 1,
         messages: [],
-        data: {
-          experience_leaders: output,
-        },
+        data: output,
         type: message.type,
       }
       console.log('Exec', message.type)
