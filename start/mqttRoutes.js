@@ -122,7 +122,7 @@ const fastTypes = [
   'ExperienceLeaderBoard',
   'InspectorLeaderBoard',
   'StartUp',
-  'AllGift1',
+  'AllGift',
 ]
 
 module.exports = async(topic, message) => {
