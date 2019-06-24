@@ -335,9 +335,9 @@ class responseClass {
         }
         output.user_findable_gifts = theresult
         if(last_daily_gift && last_daily_gift!=null) {
-          if(moment(last_daily_gift).format('YYYY-MM-DD')==Time().format('YYYY-MM-DD')) {
+          if(moment(last_daily_gift).format('YYYY-MM-DD')==moment().format('YYYY-MM-DD')) {
             let tomarrow = moment().add(1, 'days').format('YYYY-MM-DD 00:00:00')
-            output.daily_gift_remaining_time = moment(tomarrow).diff(Time().format('YYYY-MM-DD HH:mm:ss'), 'seconds')
+            output.daily_gift_remaining_time = moment(tomarrow).diff(moment().format('YYYY-MM-DD HH:mm:ss'), 'seconds')
             output.has_daily_gift = false
           }
         }
@@ -405,7 +405,7 @@ class responseClass {
               transactions = result[0].co
             }
             if(transactions % settings.park_count_for_gift != 0) {
-              randomGift = false
+              output.has_random_gift = false
               output.random_gift_user_percent = parseInt((transactions % settings.park_count_for_gift)*100/settings.park_count_for_gift, 10)
             }
 
