@@ -27,7 +27,7 @@ class LotteryController {
       let userLottery, lottery, lotteries = {
         userLotteries: []
       }
-      if(user.is_parking_ranger==0){
+      if(user.is_parking_ranger!=4){
         lotteries.userLotteries = await Lottery.query().with('awards').whereIn('type', ['users', 'norangers']).where('start_date', '<=', Moment.now('YYYY-MM-DD 00:00:00'))/*.where('finish_in_date', '>', Moment.now('YYYY-MM-DD 23:59:59'))*/.where('status', '!=', 'hidden').orderBy('created_at', 'DESC').fetch()
         lotteries.userLotteries = lotteries.userLotteries.toJSON()
       }else {

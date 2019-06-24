@@ -445,6 +445,141 @@ class responseClass {
     output.server_time = new Date()
     return output
   }
+  async LotteryList() {
+    function hideMobile (inp) {
+      if(!inp) {
+        return inp
+      }
+      inp = inp.replace('+98', '0')
+      let out = inp
+      if(inp.indexOf('+')==0) {
+        out = inp.substring(0, 4) + '***' + inp.substring(9)
+      }else if(inp.length==11) {
+        out = inp.substring(0, 4) + '***' + inp.substring(7)
+      }else if(inp.length==11) {
+        out = inp.substring(0, 3) + '***' + inp.substring(6)
+      }
+      return out
+    }
+    console.log('FastLotteryList for', this.user_id)
+    const is_parking_ranger = this.is_parking_ranger
+    const user_id = this.user_id
+    return new Promise(function(resolve, reject) {
+      const theQuery = `SELECT lottery.type \`ltype\`, lottery.id lid, lottery.name lname, lottery.start_date, lottery.finish_in_date, lottery.exec_date, lottery.type, lottery.status, lottery_award.id, lottery_award.name, lottery_award.description, lottery_award.image_path, lottery_award.min_chance, lottery_user.users_id, lottery_user.lottary_award_id, users.mobile FROM lottery LEFT JOIN lottery_award ON (lottery_award.lottery_id=lottery.id) LEFT JOIN lottery_user ON (lottery_user.lottery_id=lottery.id) LEFT JOIN users ON (users.id=lottery_user.users_id) WHERE status != 'hidden' AND start_date <= '${ moment().format('YYYY-MM-DD HH:mm:ss') }'`
+      // console.log(theQuery)
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        let output = {
+          lotteries: {
+            userLotteries: [],
+            rangerLotteries: [],
+            current_time: null,
+          }
+        }
+        let tmpLotteries = []
+        let tmpAwards = []
+        let awards = {}
+        let users = {}
+        let userData = {}
+        let awardData = {}
+        let isIn = []
+        let userAwards = {}
+        for(let inp of result) {
+          if(tmpLotteries.indexOf(inp.lid)<0) {
+            tmpLotteries.push(inp.lid)
+            awards[inp.lid] = []
+            users[inp.lid] = []
+            userAwards[inp.lid] = {}
+            if((inp.ltype=='norangers' && is_parking_ranger!=4)||(inp.ltype=='users')) {
+              output.lotteries.userLotteries.push({
+                id: inp.lid,
+                name: inp.lname,
+                start_date: inp.start_date,
+                finish_in_date: inp.finish_in_date,
+                exec_date: inp.exec_date,
+                type: inp.ltype,
+                status: inp.status,
+                start_date_remaining: -1 * moment().diff(moment(inp.start_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
+                finish_in_date_remaining:  -1 * moment().diff(moment(inp.finish_in_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
+                exec_date_remaining:  -1 * moment().diff(moment(inp.exec_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
+                is_closed: (moment(moment().format('YYYY-MM-DD 00:00:00')).diff(inp.finish_in_date, 'seconds')>0)
+              })
+            }else if(inp.ltype=='rangers') {
+              output.lotteries.rangerLotteries.push({
+                id: inp.lid,
+                name: inp.lname,
+                start_date: inp.start_date,
+                finish_in_date: inp.finish_in_date,
+                exec_date: inp.exec_date,
+                type: inp.ltype,
+                status: inp.status,
+                start_date_remaining: -1 * moment().diff(moment(inp.start_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
+                finish_in_date_remaining:  -1 * moment().diff(moment(inp.finish_in_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
+                exec_date_remaining:  -1 * moment().diff(moment(inp.exec_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
+                is_closed: (moment(moment().format('YYYY-MM-DD 00:00:00')).diff(inp.finish_in_date, 'seconds')>0)
+              })
+            }
+          }
+          if(inp.id && tmpAwards.indexOf(inp.id)<0) {
+            tmpAwards.push(inp.id)
+            awards[inp.lid].push({
+              id: inp.id,
+              name: inp.name,
+              image_path: inp.image_path,
+              min_chance: inp.min_chance,
+            })
+            awardData[inp.id] = {
+              name: inp.name,
+              image_path: inp.image_path,
+              min_chance: inp.min_chance,
+            }
+          }
+          if(inp.users_id && users[inp.lid].indexOf(inp.users_id)<0) {
+            users[inp.lid].push(inp.users_id)
+            if(inp.users_id==user_id && isIn.indexOf(inp.lid)<0) {
+              isIn.push(inp.lid)
+            }
+            userData[inp.users_id] = {
+              mobile: hideMobile(inp.mobile)
+            }
+            if(inp.lottary_award_id && inp.lottary_award_id>0) {
+              userAwards[inp.lid][inp.users_id] = inp.lottary_award_id
+            }
+          }
+        }
+        for(let i = 0;i < output.lotteries.userLotteries.length;i++) {
+          output.lotteries.userLotteries[i]['award'] = awards[output.lotteries.userLotteries[i].id]
+          output.lotteries.userLotteries[i]['is_in'] = (isIn.indexOf(output.lotteries.userLotteries[i].id)>=0)
+          if(output.lotteries.userLotteries[i].status=='done') {
+            output.lotteries.userLotteries[i]['winners'] = []
+            for(let uWin in userAwards[output.lotteries.userLotteries[i].id]) {
+              output.lotteries.userLotteries[i]['winners'].push({
+                user: userData[uWin],
+                award: awardData[userAwards[output.lotteries.userLotteries[i].id][uWin]]
+              })
+            }
+          }
+        }
+        for(let i = 0;i < output.lotteries.rangerLotteries.length;i++) {
+          output.lotteries.rangerLotteries[i]['award'] = awards[output.lotteries.rangerLotteries[i].id]
+          output.lotteries.rangerLotteries[i]['is_in'] = (isIn.indexOf(output.lotteries.rangerLotteries[i].id)>=0)
+          if(output.lotteries.rangerLotteries[i].status=='done') {
+            output.lotteries.rangerLotteries[i]['winners'] = []
+            for(let uWin in userAwards[output.lotteries.rangerLotteries[i].id]) {
+              output.lotteries.rangerLotteries[i]['winners'].push({
+                user: userData[uWin],
+                award: awardData[userAwards[output.lotteries.rangerLotteries[i].id][uWin]]
+              })
+            }
+          }
+        }
+        output.lotteries.current_time = new Date
+        resolve(output)
+      })
+    })
+  }
 }
 
 
