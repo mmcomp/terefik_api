@@ -222,7 +222,7 @@ class responseClass {
           reject(err)
         }
         let profile = result[0]
-        connection.query(`SELECT COUNT(id) cid FROM notifications WHERE users_id = ${ user_id }`, function(err, res) {
+        connection.query(`SELECT COUNT(id) cid FROM notifications WHERE users_id = ${ user_id } AND status IN ('created', 'transmit')`, function(err, res) {
           if(err) {
             reject(err)
           }
