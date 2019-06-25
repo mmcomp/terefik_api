@@ -580,7 +580,7 @@ class responseClass {
       })
     })
   }
-  async FastListCar() {
+  async ListCar() {
     console.log('FastListCar for', this.user_id)
     let output = {
       cars: [],
