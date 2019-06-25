@@ -624,6 +624,60 @@ class responseClass {
       })
     })
   }
+  async ChnageNotifications(ids, status) {
+    if(!status) {
+      status = 'transmit'
+    }
+    console.log('ChnageNotifications for', this.user_id)
+    return new Promise(function(resolve, reject) {
+      if(!ids || !ids[0]) {
+        reject('Invalid IDS')
+      }
+      connection.query(`UPDATE notifications SET status = '${status}' WHERE id in (${ ids.join(',') }) `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve()
+      })
+    })
+  }
+  async LoadUserNotifications() {
+    console.log('LoadUserNotifications for', this.user_id)
+    const user_id = this.user_id
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT * FROM notifications WHERE users_id = ${ user_id } AND status in ()`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        let output = {
+          notifications: [],
+          ids: ids,
+        }
+        let ids = []
+        for(let noti of result) {
+          ids.push(noti.id)
+          output.notifications.push({
+            title: noti.title,
+            message: noti.message,
+            type: noti.type,
+            data: noti.data,
+          })
+        }
+        resolve(output)
+      })
+    })
+  }
+  async UserNotifications() {
+    console.log('UserNotifications for', this.user_id)
+    const output = await this.LoadUserNotifications
+    if(output.ids && output.ids[0]) {
+      this.ChnageNotifications(output.ids)
+    }
+    return {
+      notifications: output.notifications,
+    }
+  }
 }
 
 
