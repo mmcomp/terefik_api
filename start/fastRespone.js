@@ -550,7 +550,7 @@ class responseClass {
           }
         }
         for(let i = 0;i < output.lotteries.userLotteries.length;i++) {
-          output.lotteries.userLotteries[i]['award'] = awards[output.lotteries.userLotteries[i].id]
+          output.lotteries.userLotteries[i]['awards'] = awards[output.lotteries.userLotteries[i].id]
           output.lotteries.userLotteries[i]['is_in'] = (isIn.indexOf(output.lotteries.userLotteries[i].id)>=0)
           if(output.lotteries.userLotteries[i].status=='done') {
             output.lotteries.userLotteries[i]['winners'] = []
@@ -563,7 +563,7 @@ class responseClass {
           }
         }
         for(let i = 0;i < output.lotteries.rangerLotteries.length;i++) {
-          output.lotteries.rangerLotteries[i]['award'] = awards[output.lotteries.rangerLotteries[i].id]
+          output.lotteries.rangerLotteries[i]['awards'] = awards[output.lotteries.rangerLotteries[i].id]
           output.lotteries.rangerLotteries[i]['is_in'] = (isIn.indexOf(output.lotteries.rangerLotteries[i].id)>=0)
           if(output.lotteries.rangerLotteries[i].status=='done') {
             output.lotteries.rangerLotteries[i]['winners'] = []
