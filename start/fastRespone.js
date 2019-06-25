@@ -610,7 +610,9 @@ fastclient.on('message', async function(topic, message) {
       user_id = user_id[0].id
       console.log('FAST MQTT: User ID',user_id)
       const theResponse = new responseClass(user_id, is_parking_ranger, last_daily_gift)
+      console.time('ReqTime')
       let output = await theResponse[message.type]()
+      console.timeEnd('ReqTime')
       output = {
         status: 1,
         messages: [],
