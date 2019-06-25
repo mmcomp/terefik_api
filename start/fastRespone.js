@@ -235,7 +235,7 @@ class responseClass {
   }
   async GetSettings(all) {
     console.log('GetSettings for', this.user_id)
-    let fields = `unit_to_minute, unit_to_bronze_coin, unit_to_bronze_coin_2, unit_to_bronze_coin_3, unit_to_bronze_coin_4, unit_to_bronze_coin_5, unit_to_bronze_coin_6, unit_to_bronze_coin_7, unit_to_bronze_coin_8, unit_to_bronze_coin_9, unit_to_bronze_coin_10, unit_max, last_critical_version, last_version, user_diamond_gps`
+    let fields = `unit_to_minute, unit_to_bronze_coin, unit_to_bronze_coin_2, unit_to_bronze_coin_3, unit_to_bronze_coin_4, unit_to_bronze_coin_5, unit_to_bronze_coin_6, unit_to_bronze_coin_7, unit_to_bronze_coin_8, unit_to_bronze_coin_9, unit_to_bronze_coin_10, unit_max, last_critical_version, last_version, user_diamond_gps, total_discount`
     if(all) {
       fields = '*'
     }
