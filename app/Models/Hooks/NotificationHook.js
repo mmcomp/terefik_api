@@ -97,8 +97,9 @@ NotificationHook.send = async (notification) => {
                         status: 1,
                         messages: [],
                         data: {
+                            title: notification.title,
                             message: notification.message,
-                            loot: data,
+                            data: data,
                         },
                         type: (notification.type === 'user_arrest')?'ArrestNotification':notification.type,
                     }
