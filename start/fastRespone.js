@@ -262,8 +262,8 @@ class responseClass {
       })
     })
   }
-  async ListCar() {
-    console.log('ListCar for', this.user_id)
+  async StartListCar() {
+    console.log('StartListCar for', this.user_id)
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
       connection.query(`SELECT vehicle.*, shield_start, shield_duration, leave_time FROM user_vehicle LEFT JOIN vehicle ON (vehicle.id=vehicle_id) WHERE user_id = ${ user_id }`,async function(err, result) {
@@ -426,7 +426,7 @@ class responseClass {
     output.profile =  await this.UserFastProfile()
     output.settings = await this.GetSettings()
     if(this.is_parking_ranger!=4) {
-      output.cars = await this.ListCar()
+      output.cars = await this.StartListCar()
       const parking_register = await this.ParkingRegister()
       for(let i = 0;i < output.cars.length;i++) {
         output.cars[i]['parking_register'] = null
@@ -461,7 +461,7 @@ class responseClass {
       }
       return out
     }
-    console.log('FastLotteryList for', this.user_id)
+    console.log('LotteryList for', this.user_id)
     const is_parking_ranger = this.is_parking_ranger
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
@@ -579,6 +579,28 @@ class responseClass {
         resolve(output)
       })
     })
+  }
+  async FastListCar() {
+    console.log('FastListCar for', this.user_id)
+    let output = {
+      cars: [],
+      server_time: null,
+    }
+    output.cars = await this.StartListCar()
+    const parking_register = await this.ParkingRegister()
+    for(let i = 0;i < output.cars.length;i++) {
+      output.cars[i]['parking_register'] = null
+      for(let j = 0;j < parking_register.length;j++) {
+        if(parking_register[j].vehicle_id==output.cars[i].id) {
+          if(!output.cars[i]['parking_register']){
+            output.cars[i]['parking_register'] = []
+          }
+          output.cars[i]['parking_register'].push(parking_register[j])
+        }
+      }
+    }
+    output.server_time = new Date()
+    return output
   }
 }
 
