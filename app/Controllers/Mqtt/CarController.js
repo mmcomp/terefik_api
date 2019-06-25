@@ -173,7 +173,7 @@ class CarController {
       }
     }
     */
-    discountPercent = settings.total_discount
+    let discountPercent = settings.total_discount
 
     discountPercent = (100 - discountPercent)/100
 
@@ -258,7 +258,7 @@ class CarController {
       userDiscounter.save()
     }
     */
-   
+
     user.is_sheild = 1
     await user.save()
 
