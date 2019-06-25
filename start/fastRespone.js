@@ -645,24 +645,25 @@ class responseClass {
     console.log('LoadUserNotifications for', this.user_id)
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT * FROM notifications WHERE users_id = ${ user_id } AND status in ()`, function(err, result) {
+      connection.query(`SELECT * FROM notifications WHERE users_id = ${ user_id } AND status in ('created', 'transmit')`, function(err, result) {
         if(err) {
           reject(err)
         }
 
         let output = {
           notifications: [],
-          ids: ids,
+          ids: [],
         }
-        let ids = []
-        for(let noti of result) {
-          ids.push(noti.id)
-          output.notifications.push({
-            title: noti.title,
-            message: noti.message,
-            type: noti.type,
-            data: noti.data,
-          })
+        if(result && result[0]) {
+          for(let noti of result) {
+            output.ids.push(noti.id)
+            output.notifications.push({
+              title: noti.title,
+              message: noti.message,
+              type: noti.type,
+              data: noti.data,
+            })
+          }
         }
         resolve(output)
       })
@@ -670,7 +671,7 @@ class responseClass {
   }
   async UserNotifications() {
     console.log('UserNotifications for', this.user_id)
-    const output = await this.LoadUserNotifications
+    const output = await this.LoadUserNotifications()
     if(output.ids && output.ids[0]) {
       this.ChnageNotifications(output.ids)
     }
