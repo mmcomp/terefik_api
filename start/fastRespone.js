@@ -611,14 +611,14 @@ class responseClass {
           reject(err)
         }
         let output = {
-          achievments: {}
+          achiements: {}
         }
         for(let ach of result) {
-          if(!output.achievments[ach.tag]) {
-            output.achievments[ach.tag] = []
+          if(!output.achiements[ach.tag]) {
+            output.achiements[ach.tag] = []
           }
 
-          output.achievments[ach.tag].push(ach)
+          output.achiements[ach.tag].push(ach)
         }
         resolve(output)
       })
