@@ -250,7 +250,7 @@ class responseClass {
     })
   }
   async ParkingRegister() {
-    console.log('GetSettings for', this.user_id)
+    console.log('ParkingRegister for', this.user_id)
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
       connection.query(`SELECT * FROM parking_registers WHERE users_id = ${ user_id } AND expired_at > '${ moment().format('YYYY-MM-DD HH:mm:ss') }'`, function(err, result) {
@@ -601,6 +601,28 @@ class responseClass {
     }
     output.server_time = new Date()
     return output
+  }
+  async AchievmentList() {
+    console.log('AchievmentList for', this.user_id)
+    const user_id = this.user_id
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT achievments.*, IF(users_achievment.achieved IS null,0,users_achievment.achieved) achieved, IF(users_achievment.collected IS null,0,users_achievment.collected) collected FROM achievments LEFT JOIN users_achievment ON (achievments_id=achievments.id AND users_id=${user_id}) order by tag ASC,\`level\` ASC`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        let output = {
+          achievments: {}
+        }
+        for(let ach of result) {
+          if(!output.achievments[ach.tag]) {
+            output.achievments[ach.tag] = []
+          }
+
+          output.achievments[ach.tag].push(ach)
+        }
+        resolve(output)
+      })
+    })
   }
 }
 
