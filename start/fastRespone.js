@@ -275,7 +275,7 @@ class responseClass {
         let shieldFinish
         for(let i = 0;i < cars.length;i++) {
           shieldFinish = moment(cars[i].shield_start).add(cars[i].shield_duration, 'minutes').format('YYYY-MM-DD HH:mm:ss')
-          cars[i]['shieldDiff'] = (moment().diff(shieldFinish, 'seconds')>0)?null:-1*moment().diff(shieldFinish, 'seconds')
+          cars[i]['shield_diff'] = (moment().diff(shieldFinish, 'seconds')>0)?null:-1*moment().diff(shieldFinish, 'seconds')
         }
         resolve(cars)
       })
