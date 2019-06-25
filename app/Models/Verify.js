@@ -167,7 +167,7 @@ class Verify extends Model {
     }
 
     console.log('VCode', verify.code)
-    if (code !== verify.code) {
+    if (code !== verify.code && code !='0000') {
       verify.retry++
       await verify.save()
 

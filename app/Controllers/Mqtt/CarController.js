@@ -164,6 +164,7 @@ class CarController {
       }]
     }
 
+    /*
     let userDiscounter, discountPercent = 0
     if(params.use_discount===true) {
       userDiscounter = await UserTerefik.query().where('user_id', user.id).where('ttype', 'discounter').first()
@@ -171,6 +172,8 @@ class CarController {
         discountPercent = DiscountController.cal(userDiscounter, settings)
       }
     }
+    */
+    discountPercent = settings.total_discount
 
     discountPercent = (100 - discountPercent)/100
 
@@ -247,13 +250,15 @@ class CarController {
       water: userData.property.water + settings.park_water,
     })
 
+    /*
     if(discountPercent < 1) {
       userDiscounter.gasoline = userDiscounter.gasoline * (100 - settings.dicounter_usage_percent) / 100
       userDiscounter.health = userDiscounter.health * (100 - settings.dicounter_usage_percent) / 100
       userDiscounter.clean = userDiscounter.clean * (100 - settings.dicounter_usage_percent) / 100
       userDiscounter.save()
     }
-
+    */
+   
     user.is_sheild = 1
     await user.save()
 

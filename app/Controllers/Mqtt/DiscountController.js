@@ -7,6 +7,7 @@ const Setting = use('App/Models/Setting')
 class DiscountController {
   static async get(params, user) {
     let settings = await Setting.get()
+    /*
     console.log('user_id', user.id)
     let userDiscounter = await UserTerefik.query().where('user_id', user.id).where('ttype', 'discounter').first()
 
@@ -22,7 +23,9 @@ class DiscountController {
     }
 
     let discount = DiscountController.cal(userDiscounter, settings)
-
+    */
+  
+    let discount = settings.total_discount
     return [{
       status: 1,
       messages: [],
@@ -32,9 +35,10 @@ class DiscountController {
     }]
   }
   static cal(userDiscounter, settings) {
-    let discount = settings.discounter_health_weight * userDiscounter.health + settings.discounter_clean_weight * userDiscounter.clean + settings.discounter_gasoline_weight * userDiscounter.gasoline
-    discount = discount * settings.discounter_max_discount / 100
-    return parseInt(discount, 10)
+    // let discount = settings.discounter_health_weight * userDiscounter.health + settings.discounter_clean_weight * userDiscounter.clean + settings.discounter_gasoline_weight * userDiscounter.gasoline
+    // discount = discount * settings.discounter_max_discount / 100
+    // return parseInt(discount, 10)
+    return settings.total_discount
   }
 }
 
