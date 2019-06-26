@@ -1018,7 +1018,7 @@ module.exports = class responseClass {
   async StoreList() {
     console.log('StoreList for', this.user_id)
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT  FROM store WHERE status = 'active'`, function(err, result) {
+      connection.query(`SELECT * FROM store WHERE status = 'active'`, function(err, result) {
         if(err) {
           reject(err)
         }
