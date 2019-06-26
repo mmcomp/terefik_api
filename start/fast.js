@@ -1015,6 +1015,20 @@ module.exports = class responseClass {
       loot: loot,
     }
   }
+  async StoreList() {
+    console.log('StoreList for', this.user_id)
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT  FROM store WHERE status = 'active'`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve({
+          products: result,
+        })
+      })
+    })
+  }
   static async loadUser(clientId, token) {
     return new Promise(function(resolve, reject) {
       connection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`token\` = '${ token }' `, function(err, result) {
