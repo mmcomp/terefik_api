@@ -423,7 +423,7 @@ module.exports = class responseClass {
         output.cars[i]['parking_register'] = null
         for(let j = 0;j < parking_register.length;j++) {
           if(parking_register[j] && parking_register[j].vehicle_id==output.cars[i].id && parking_register[j].users_id==this.user_id) {
-            output.cars[i]['parking_register'].push(parking_register[j][0])
+            output.cars[i]['parking_register'] = parking_register[j][0]
           }
         }
       }
@@ -581,11 +581,8 @@ module.exports = class responseClass {
     for(let i = 0;i < output.cars.length;i++) {
       output.cars[i]['parking_register'] = null
       for(let j = 0;j < parking_register.length;j++) {
-        if(parking_register[j].vehicle_id==output.cars[i].id) {
-          if(!output.cars[i]['parking_register']){
-            output.cars[i]['parking_register'] = []
-          }
-          output.cars[i]['parking_register'].push(parking_register[j][0])
+        if(parking_register[j] && parking_register[j].vehicle_id==output.cars[i].id) {
+          output.cars[i]['parking_register'] = parking_register[j][0]
         }
       }
     }
