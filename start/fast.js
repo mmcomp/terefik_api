@@ -424,7 +424,7 @@ module.exports = class responseClass {
             if(!output.cars[i]['parking_register']){
               output.cars[i]['parking_register'] = []
             }
-            output.cars[i]['parking_register'].push(parking_register[j])
+            output.cars[i]['parking_register'].push(parking_register[j][0])
           }
         }
       }
