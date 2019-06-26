@@ -28,9 +28,14 @@ class Achievment extends Model {
               status: 1,
               messages: [],
               data: {
-                  achievment: uAch.achievment,
+                  type: 'AchievmentNotification',
+                  title: 'دستاورد جدید',
+                  message: 'شما موفق به کسب دستاوردی دیگر شدید',
+                  data: {
+                    achievment: uAch.achievment,
+                  }
               },
-              type: 'AchievmentNotification',
+              type: 'Notification',
             }
 
             Mqtt.publish(pubTopic, JSON.stringify(messageData))
