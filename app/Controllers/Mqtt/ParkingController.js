@@ -104,6 +104,7 @@ class ParkingController {
         parkingRegister.vehicle_id = params.car_id
         parkingRegister.parkings_id = params.parking_id
         parkingRegister.expired_at = Time(regTime).add(parking.minimum_reserve_minutes, 'minutes').format('YYYY-MM-DD HH:mm:ss')
+        parkingRegister.users_id = user.id
         await parkingRegister.save()
         parkingRegister.loadMany(['car', 'parking'])
   
