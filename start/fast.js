@@ -577,6 +577,8 @@ module.exports = class responseClass {
     }
     output.cars = await this.StartListCar()
     const parking_register = await this.ParkingRegister()
+    console.log('Parking Register', parking_register)
+    console.log('cars', output.cars)
     for(let i = 0;i < output.cars.length;i++) {
       output.cars[i]['parking_register'] = null
       for(let j = 0;j < parking_register.length;j++) {
