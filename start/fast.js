@@ -420,7 +420,7 @@ module.exports = class responseClass {
       for(let i = 0;i < output.cars.length;i++) {
         output.cars[i]['parking_register'] = null
         for(let j = 0;j < parking_register.length;j++) {
-          if(parking_register[j].vehicle_id==output.cars[i].id) {
+          if(arking_register[j] && parking_register[j].vehicle_id==output.cars[i].id) {
             if(!output.cars[i]['parking_register']){
               output.cars[i]['parking_register'] = []
             }
