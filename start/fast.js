@@ -242,12 +242,22 @@ module.exports = class responseClass {
     console.log('ParkingRegister for', this.user_id)
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT * FROM parking_registers WHERE users_id = ${ user_id } AND expired_at > '${ moment().format('YYYY-MM-DD HH:mm:ss') }'`, function(err, result) {
+      connection.query(`SELECT parking_registers.expired_at, parking_registers.created_at, parkings.name FROM parking_registers LEFT JOIN parkings ON (parkings_id=parkings.id) WHERE users_id = ${ user_id } AND expired_at > '${ moment().format('YYYY-MM-DD HH:mm:ss') }'`, function(err, result) {
         if(err) {
           reject(err)
         }
 
-        resolve(result)
+        let output = []
+        for(let tmp of result) {
+          output.push({
+            created_at: tmp.created_at,
+            expired_at: tmp.expired_at,
+            parking: {
+              name: tmp.name
+            }
+          })
+        }
+        resolve(output)
       })
     })
   }
