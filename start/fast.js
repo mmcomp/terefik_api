@@ -250,6 +250,8 @@ module.exports = class responseClass {
         let output = []
         for(let tmp of result) {
           output.push({
+            vehicle_id: tmp.vehicle_id,
+            users_id: tmp.users_id,
             created_at: tmp.created_at,
             expired_at: tmp.expired_at,
             parking: {
