@@ -417,10 +417,12 @@ module.exports = class responseClass {
     if(this.is_parking_ranger!=4) {
       output.cars = await this.StartListCar()
       const parking_register = await this.ParkingRegister()
+      console.log('Parking Register')
+      console.log(parking_register)
       for(let i = 0;i < output.cars.length;i++) {
         output.cars[i]['parking_register'] = null
         for(let j = 0;j < parking_register.length;j++) {
-          if(parking_register[j] && parking_register[j].vehicle_id==output.cars[i].id) {
+          if(parking_register[j] && parking_register[j].vehicle_id==output.cars[i].id && parking_register[j].users_id==this.user_id) {
             if(!output.cars[i]['parking_register']){
               output.cars[i]['parking_register'] = []
             }
