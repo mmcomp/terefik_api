@@ -12,7 +12,8 @@
 | http://adonisjs.com/guides/routing
 |
 */
-const Raven = require('raven')
+require('./fastAuth')
+// const Raven = require('raven')
 const Env = use('Env')
 
 // Sentry
