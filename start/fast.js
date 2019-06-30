@@ -10,7 +10,13 @@ var connection = mysql.createPool({
   password : Env.get('DB_PASSWORD'),
   database : Env.get('DB_DATABASE')
 });
-
+var otherConnection = mysql.createPool({
+  connectionLimit : 10,
+  host     : Env.get('DB_HOST'),
+  user     : Env.get('DB_USER'),
+  password : Env.get('DB_PASSWORD'),
+  database : Env.get('DB_OTHER_DATABASE')
+});
 
 module.exports = class responseClass {
   constructor(user_id, is_parking_ranger, last_daily_gift) {
@@ -1040,8 +1046,12 @@ module.exports = class responseClass {
     })
   }
   static async loadUser(clientId, token) {
+    let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`token\` = '${ token }' `, function(err, result) {
+      if(clientId.indexOf('terefik')<0) {
+        theCnnection = otherConnection
+      }
+      theCnnection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`token\` = '${ token }' `, function(err, result) {
         if(err) {
           reject(err)
         }
@@ -1050,8 +1060,12 @@ module.exports = class responseClass {
     })
   }
   static async loadUserByUsername(token, username) {
+    let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`mobile\` = '${ username }' AND \`token\` = '${ token }' `, function(err, result) {
+      if(clientId.indexOf('terefik')<0) {
+        theCnnection = otherConnection
+      }
+      theCnnection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`mobile\` = '${ username }' AND \`token\` = '${ token }' `, function(err, result) {
         if(err) {
           reject(err)
         }
@@ -1060,8 +1074,12 @@ module.exports = class responseClass {
     })
   }
   static async loadClientId(clientId, id) {
+    let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT \`id\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`id\` != ${id}`, function(err, result) {
+      if(clientId.indexOf('terefik')<0) {
+        theCnnection = otherConnection
+      }
+      theCnnectionالا.query(`SELECT \`id\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`id\` != ${id}`, function(err, result) {
         if(err) {
           reject(err)
         }
