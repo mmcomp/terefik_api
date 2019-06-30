@@ -471,7 +471,7 @@ module.exports = class responseClass {
     const is_parking_ranger = this.is_parking_ranger
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
-      const theQuery = `SELECT lottery.type \`ltype\`, lottery.id lid, lottery.name lname, lottery.start_date, lottery.finish_in_date, lottery.exec_date, lottery.type, lottery.status, lottery_award.id, lottery_award.name, lottery_award.description, lottery_award.image_path, lottery_award.min_chance, lottery_user.users_id, lottery_user.lottary_award_id, users.mobile FROM lottery LEFT JOIN lottery_award ON (lottery_award.lottery_id=lottery.id) LEFT JOIN lottery_user ON (lottery_user.lottery_id=lottery.id) LEFT JOIN users ON (users.id=lottery_user.users_id) WHERE status != 'hidden' AND start_date <= '${ moment().format('YYYY-MM-DD HH:mm:ss') }'`
+      const theQuery = `SELECT lottery.type \`ltype\`, lottery.id lid, lottery.name lname, lottery.start_date, lottery.finish_in_date, lottery.exec_date, lottery.type, lottery.status, lottery_award.id, lottery_award.name, lottery_award.description, lottery_award.image_path, lottery_award.min_chance, lottery_user.users_id, lottery_user.in_chance, lottery_user.lottary_award_id, users.mobile FROM lottery LEFT JOIN lottery_award ON (lottery_award.lottery_id=lottery.id) LEFT JOIN lottery_user ON (lottery_user.lottery_id=lottery.id) LEFT JOIN users ON (users.id=lottery_user.users_id) WHERE status != 'hidden' AND start_date <= '${ moment().format('YYYY-MM-DD HH:mm:ss') }'`
       // console.log(theQuery)
       connection.query(theQuery, function(err, result) {
         if(err) {
@@ -491,6 +491,7 @@ module.exports = class responseClass {
         let userData = {}
         let awardData = {}
         let isIn = []
+        let inChances = []
         let userAwards = {}
         for(let inp of result) {
           if(tmpLotteries.indexOf(inp.lid)<0) {
@@ -546,6 +547,7 @@ module.exports = class responseClass {
             users[inp.lid].push(inp.users_id)
             if(inp.users_id==user_id && isIn.indexOf(inp.lid)<0) {
               isIn.push(inp.lid)
+              inChances.push(inp.in_chance)
             }
             userData[inp.users_id] = {
               mobile: hideMobile(inp.mobile)
@@ -558,6 +560,7 @@ module.exports = class responseClass {
         for(let i = 0;i < output.lotteries.userLotteries.length;i++) {
           output.lotteries.userLotteries[i]['awards'] = awards[output.lotteries.userLotteries[i].id]
           output.lotteries.userLotteries[i]['is_in'] = (isIn.indexOf(output.lotteries.userLotteries[i].id)>=0)
+          output.lotteries.userLotteries[i]['in_chance'] = (isIn.indexOf(output.lotteries.userLotteries[i].id)>=0)?inChances[isIn.indexOf(output.lotteries.userLotteries[i].id)]:0
           if(output.lotteries.userLotteries[i].status=='done') {
             output.lotteries.userLotteries[i]['winners'] = []
             for(let uWin in userAwards[output.lotteries.userLotteries[i].id]) {
@@ -571,6 +574,7 @@ module.exports = class responseClass {
         for(let i = 0;i < output.lotteries.rangerLotteries.length;i++) {
           output.lotteries.rangerLotteries[i]['awards'] = awards[output.lotteries.rangerLotteries[i].id]
           output.lotteries.rangerLotteries[i]['is_in'] = (isIn.indexOf(output.lotteries.rangerLotteries[i].id)>=0)
+          output.lotteries.rangerLotteries[i]['in_chance'] = (isIn.indexOf(output.lotteries.rangerLotteries[i].id)>=0)?inChances[isIn.indexOf(output.lotteries.rangerLotteries[i].id)]:0
           if(output.lotteries.rangerLotteries[i].status=='done') {
             output.lotteries.rangerLotteries[i]['winners'] = []
             for(let uWin in userAwards[output.lotteries.rangerLotteries[i].id]) {
