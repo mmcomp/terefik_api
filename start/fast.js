@@ -1048,9 +1048,9 @@ module.exports = class responseClass {
   static async loadUser(clientId, token) {
     let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      if(clientId.indexOf('terefik')<0) {
-        theCnnection = otherConnection
-      }
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
       theCnnection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`token\` = '${ token }' `, function(err, result) {
         if(err) {
           reject(err)
@@ -1062,9 +1062,9 @@ module.exports = class responseClass {
   static async loadUserByUsername(token, username) {
     let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      if(clientId.indexOf('terefik')<0) {
-        theCnnection = otherConnection
-      }
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
       theCnnection.query(`SELECT \`id\`, \`is_parking_ranger\`, \`last_daily_gift\` FROM \`users\` WHERE \`mobile\` = '${ username }' AND \`token\` = '${ token }' `, function(err, result) {
         if(err) {
           reject(err)
@@ -1076,9 +1076,9 @@ module.exports = class responseClass {
   static async loadClientId(clientId, id) {
     let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      if(clientId.indexOf('terefik')<0) {
-        theCnnection = otherConnection
-      }
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
       theCnnectionالا.query(`SELECT \`id\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`id\` != ${id}`, function(err, result) {
         if(err) {
           reject(err)
