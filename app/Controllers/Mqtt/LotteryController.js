@@ -292,6 +292,7 @@ class LotteryController {
           data: {}
         }]
       }
+      let lotteryData = lottery.toJSON()
 
       let userLottery = await UserLotteryAward.query().where('users_id', user.id).where('lottery_id', lottery.id).first()
       if(!userLottery) {
