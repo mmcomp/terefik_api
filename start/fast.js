@@ -1079,7 +1079,7 @@ module.exports = class responseClass {
       // if(clientId.indexOf('terefik')<0) {
       //   theCnnection = otherConnection
       // }
-      theCnnectionالا.query(`SELECT \`id\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`id\` != ${id}`, function(err, result) {
+      theCnnection.query(`SELECT \`id\` FROM \`users\` WHERE \`client_id\` = '${ clientId }' AND \`id\` != ${id}`, function(err, result) {
         if(err) {
           reject(err)
         }
