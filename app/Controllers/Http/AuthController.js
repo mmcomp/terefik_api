@@ -193,28 +193,29 @@ class AuthController {
 
       request_log.user_id = user.id
 
-      let verifyStatus = await Verify.send('signin', request.input('mobile'))
-      if (verifyStatus.err) {
-        request_log.response = JSON.stringify({
-          status: 0,
-          messages: Messages.parse(verifyStatus.messages),
-          data: {}
-        })
-        await request_log.save()
-        return response.status(400).send({
-          status: 0,
-          messages: Messages.parse(verifyStatus.messages),
-          data: {}
-        })
-      }
+      // let verifyStatus = await Verify.send('signin', request.input('mobile'))
+      // if (verifyStatus.err) {
+      //   request_log.response = JSON.stringify({
+      //     status: 0,
+      //     messages: Messages.parse(verifyStatus.messages),
+      //     data: {}
+      //   })
+      //   await request_log.save()
+      //   return response.status(400).send({
+      //     status: 0,
+      //     messages: Messages.parse(verifyStatus.messages),
+      //     data: {}
+      //   })
+      // }
 
-      request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
-      request_log.response = JSON.stringify({
-        status: 1,
-        messages: [],
-        data: {}
-      })
-      await request_log.save()
+      // request_log.response_time = Moment.now('YYYY-M-D HH:mm:ss')
+      // request_log.response = JSON.stringify({
+      //   status: 1,
+      //   messages: [],
+      //   data: {}
+      // })
+      // await request_log.save()
+      Verify.send('signin', request.input('mobile'))
 
       return response.send({
         status: 1,
