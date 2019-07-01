@@ -1091,4 +1091,33 @@ module.exports = class responseClass {
       })
     })
   }
+  static async crashReport({mobile, token, message, type, stacktrace}) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      const now = moment().format('YYYY-MM-DD HH:mm:ss')
+      theCnnection.query(`INSERT INTO crash_report (mobile, token, message, type, stacktrace, created_at, updated_at) VALUES ('${mobile}', '${token}', '${message}', '${type}', '${stacktrace}', '${now}', '${now}')`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+  static async crashReportList(data) {
+    let theCnnection = connection
+    const mobile = data.mobile
+    let limit = (data.limit)?data.limit:null
+    let theQuery = `SELECT * from crash_report WHERE mobile = '${mobile}' ORDER BY created_at DESC`
+    if(limit) {
+      theQuery += ` LIMIT ${limit}`
+    }
+    return new Promise(function(resolve, reject) {
+      theCnnection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
 }

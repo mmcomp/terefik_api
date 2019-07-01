@@ -16,7 +16,7 @@ function normalizeMobile (mobile, country = 'IR') {
 
 fastify.register(require('fastify-formbody'))
 
-
+// Mqtt Broker
 fastify.post('/mqtt/auth', async (request, reply) => {
   if (Env.get('SERVER_CLIENT') == request.body.clientid || Env.get('SERVER_CLIENT') == `ad_${request.body.clientid}` || request.body.clientid == 'terefik' || Env.get('FAST_CLIENT') == request.body.clientid) {
     return {}
@@ -50,7 +50,20 @@ fastify.get('/mqtt/acl', async (request, reply) => {
   console.log(request.params)
   return { hello: 'world' }
 })
-
+// Crash report
+fastify.post('/crashreport', async (request, reply) => {
+  responseClass.crashReport(request.body)
+  return {}
+})
+fastify.get('/crashreport/:mobile/:limit', async (request, reply) => {
+  const result = await responseClass.crashReportList(request.params)
+  return result
+})
+fastify.get('/crashreport/:mobile', async (request, reply) => {
+  const result = await responseClass.crashReportList(request.params)
+  return result
+})
+// Start
 const start = async () => {
   try {
     await fastify.listen(3334, '0.0.0.0')
