@@ -871,7 +871,7 @@ module.exports = class responseClass {
     })
   }
   async ShieldCar(params) {
-    console.log('ParkingRegister for', this.user_id, params)
+    console.log('ShieldCar for', this.user_id, params)
     if(!params.car_id || !params.units) {
       return {
         error: {

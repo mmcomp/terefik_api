@@ -766,7 +766,7 @@ class CarController {
       number_extra: 'required',
       lon_gps: 'required',
       lat_gps: 'required',
-      image_path: 'required'
+      // image_path: 'required'
     }
 
     let check = await Validations.check(params, rules)
@@ -859,7 +859,7 @@ class CarController {
     rangerWork.ranger_id = user.id
     rangerWork.lon_gps = params.lon_gps
     rangerWork.lat_gps = params.lat_gps
-    rangerWork.image_path = params.image_path
+    // rangerWork.image_path = params.image_path
     rangerWork.silver_coin = loot.silver_coin
     console.log('Car Params', 'number_2', params.number_2, 'number_ch', params.number_ch, 'number_3', params.number_3, 'number_ir', params.number_ir)
     let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir)/*.where('number_extra', params.number_extra)*/.first()
@@ -1142,6 +1142,7 @@ class CarController {
         in_out : is_out,
         loot: loot,
         findable_gift: findable_gift,
+        arrest_id: rangerWork.id,
       }
     }]
   }

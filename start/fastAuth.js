@@ -1,7 +1,7 @@
 require('./fast')
 const phone = require('phone')
 const Env = use('Env')
-const fastify = require('fastify')({ logger: true })
+const fastify = require('fastify')({ logger: false })
 const responseClass = require('./fast')
 
 function normalizeMobile (mobile, country = 'IR') {

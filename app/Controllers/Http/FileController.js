@@ -10,6 +10,7 @@ const ParkingRangerDoc = use('App/Models/ParkingRangerDoc')
 const UserFindableGift = use('App/Models/UserFindableGift')
 const UserPfindableGift = use('App/Models/UserPfindableGift')
 const Notification = use('App/Models/Notification')
+const RangerWork = use('App/Models/RangerWork')
 
 const Redis = use('Redis')
 
@@ -122,7 +123,7 @@ class FileController {
           parkingRangerDoc.users_id = user.id  
         }
 
-        await parkingRangerDoc.save()
+        parkingRangerDoc.save()
       }else if(doc_type=='texture') {
         if(request.all()['terefiki_id']) {
           let userTrefik = await UserTerefik.find(request.all()['terefiki_id'])
@@ -138,7 +139,23 @@ class FileController {
           }
           userTerefik.body_texture = filename
           userTrefik.body_texture_time = Moment.now('YYYY-MM-DD HH:mm:ss')
-          await userTrefik.save();          
+          userTrefik.save();          
+        }
+      }else if(doc_type=='arrest') {
+        if(request.all()['arrest_id']) {
+          let rangerWork= await RangerWork.find(request.all()['arrest_id'])
+          if(!rangerWork) {
+            return response.status(400).send({
+              status: 0,
+              messages: [{
+                code: 'ArrestNotFound',
+                message: 'بازداشت مورد نظر یافت نشد'
+              }],
+              data: {}
+            })
+          }
+          rangerWork.image_path = filename
+          rangerWork.save();          
         }
       }
 
