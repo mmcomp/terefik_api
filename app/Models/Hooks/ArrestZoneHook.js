@@ -34,5 +34,8 @@ ArrestZoneHook.zoneDetect = async (rangerWork) => {
         inspectorDailyReport.report_count = 0
     }
     inspectorDailyReport.report_count += 1
+    const res = await inspectorDailyReport.calculateImageProcessCount(rangerWork)
+    inspectorDailyReport.image_process_percent = res.image_process_percent
+    inspectorDailyReport.image_process_fails = res.image_process_fails
     await inspectorDailyReport.save()
 }

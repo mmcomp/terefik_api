@@ -766,7 +766,8 @@ class CarController {
       number_extra: 'required',
       lon_gps: 'required',
       lat_gps: 'required',
-      // image_path: 'required'
+      // image_path: 'required',
+      // image_processing_result: 'required',
     }
 
     let check = await Validations.check(params, rules)
@@ -862,8 +863,10 @@ class CarController {
     if(params.image_path) {
       rangerWork.image_path = params.image_path
     }
+    if(params.image_processing_result) {
+      rangerWork.image_processing_result = params.image_processing_result
+    }
     rangerWork.silver_coin = loot.silver_coin
-    console.log('Car Params', 'number_2', params.number_2, 'number_ch', params.number_ch, 'number_3', params.number_3, 'number_ir', params.number_ir)
     let car = await Car.query().where('number_2', params.number_2).where('number_ch', params.number_ch).where('number_3', params.number_3).where('number_ir', params.number_ir)/*.where('number_extra', params.number_extra)*/.first()
     if(!car) {
       inspectorDailyReport.report_count += 1
@@ -909,14 +912,11 @@ class CarController {
     carStatus = 'RegisteredByRanger'
 
     theZone.reports++
-    await theZone.save()
+    theZone.save()
 
     let theRangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
-    // console.log('rangerWork  for', car.id)
-    // console.log(theRangerWork.toJSON())
     if(theRangerWork && theRangerWork.ranger_id==user.id) {
       let lastArrestTime = Time(theRangerWork.created_at)
-      // console.log(Time().diff(lastArrestTime, 'minutes'), 'minutes age')
       if(settings.arrest_timeout >= Time().diff(lastArrestTime, 'minutes')) {
         return [{
           status: 0,
@@ -1059,7 +1059,9 @@ class CarController {
 
 
     inspectorDailyReport.report_count += 1
-    await inspectorDailyReport.save()
+    inspectorDailyReport.save()
+
+    inspectorDailyReport.calculateImageProcessCount()
 
     rangerExp +=settings.car_arrest_exp
 
@@ -1083,16 +1085,18 @@ class CarController {
     }
 
     theOwner.is_sheild = 0
-    await theOwner.save()
+    theOwner.save()
     
     await rangerWork.save()
+    // console.log('Start calculateImageProcessCount')
+    // inspectorDailyReport.calculateImageProcessCount()  
 
     loot.silver_coin = parseInt(rangerWork.silver_coin, 10)
     loot.gasoline = parseInt(rangerWork.gasoline, 10)
     loot.health = parseInt(rangerWork.health, 10)
     loot.cleaning = parseInt(rangerWork.cleaning, 10)
 
-    await user.property().update({
+    user.property().update({
       silver_coin: userData.property.silver_coin + loot.silver_coin,
       gasoline : userData.property.gasoline + loot.gasoline,
       health_oil: userData.property.health_oil + loot.health,
