@@ -128,7 +128,8 @@ const fastTypes = [
   'AchievmentList',
   'UserNotifications',
   'ShieldCar',
-  'StoreList'
+  'StoreList',
+  'RegisterParkingRanger'
 ]
 
 module.exports = async(topic, message) => {

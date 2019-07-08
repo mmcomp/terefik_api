@@ -846,6 +846,82 @@ module.exports = class responseClass {
       })
     })
   }
+  async UpdateParkingRangerDoc(params) {
+    console.log('UpdateParkingRangerDoc for', this.user_id, params)
+    const user_id = this.user_id
+    let setStatment = ''
+    params['updated_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
+    for(let i in params) {
+      if(params[i]) {
+        setStatment += `${((setStatment!='')?',':'')} \`${i}\` = '${params[i]}'`
+      }else {
+        setStatment += `${((setStatment!='')?',':'')} \`${i}\` = null`
+      }    
+    }
+    const theQuery = `UPDATE parking_ranger_docs SET ${setStatment} WHERE doc_type = '${ params.doc_type }' AND users_id = ${user_id}`
+    return new Promise(function(resolve, reject) {
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async InsertParkingRangerDoc(params) {
+    console.log('InsertParkingRangerDoc for', this.user_id)
+    const user_id = this.user_id
+    let fields = [], values = []
+    params['updated_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
+    params['created_at'] = params['updated_at']
+    params['users_id'] = user_id
+    params['details'] = ' '
+    for(let i in params) {
+      if(params[i]) {
+        fields.push(i)
+        values.push(`'${params[i]}'`)
+      }else {
+        fields.push(i)
+        values.push(`null`)
+      }    
+    }
+    return new Promise(function(resolve, reject) {
+      connection.query(`INSERT INTO parking_ranger_docs (${fields.join(',')}) VALUES (${values.join(',')}) `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async UpdateRangerWork(params) {
+    console.log('UpdateRangerWork for', this.user_id, params)
+    const user_id = this.user_id
+    let setStatment = ''
+    params['updated_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
+    for(let i in params) {
+      if(i!='id') {
+        if(params[i]) {
+          setStatment += `${((setStatment!='')?',':'')} \`${i}\` = '${params[i]}'`
+        }else {
+          setStatment += `${((setStatment!='')?',':'')} \`${i}\` = null`
+        }
+      }
+    }
+    const theQuery = `UPDATE insector_work SET ${setStatment} WHERE id = '${ params.id }' AND ranger_id = ${user_id}`
+    console.log(theQuery)
+    return new Promise(function(resolve, reject) {
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
   async UpdateUserCar(id, params) {
     console.log('UpdateUser for', this.user_id)
     let setStatment = ''
@@ -1049,6 +1125,29 @@ module.exports = class responseClass {
       })
     })
   }
+  async RegisterParkingRanger(params) {
+    console.log('RegisterParkingRanger for', this.user_id, params)
+    const user_id = this.user_id
+    if(!params.first_name || !params.last_name || !params.national_code) {
+      return {
+        error: {
+          code: 'InavlidInput',
+          message: 'ورودی صحیح نیست',
+        }
+      }
+    }
+
+    return new Promise(function(resolve, reject) {
+      connection.query(`UPDATE users SET is_parking_ranger = 1, national_code = '${params.national_code}', fname = '${params.first_name}', lname = '${params.last_name}' WHERE id = ${user_id}`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve({})
+      })
+    })
+  }
+  // Statics
   static async loadUser(clientId, token) {
     let theCnnection = connection
     return new Promise(function(resolve, reject) {
