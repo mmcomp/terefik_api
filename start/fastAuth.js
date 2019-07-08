@@ -83,6 +83,7 @@ fastify.post('/upload', async (req, reply) => {
         const doc_type = (body['doc_type'])?body['doc_type']:'profile'
         let responseObject = new responseClass(user[0].id, user[0].is_parking_ranger, user[0].last_daily_gift)
         if(doc_type=='profile') {
+          console.log('change profile')
           responseObject.UpdateUser({
             image_path: newFileName,
           })
