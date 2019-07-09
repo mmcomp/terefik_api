@@ -101,7 +101,7 @@ fastify.post('/upload', async (req, reply) => {
           }
           reply.code(200).send()
         }else if(doc_type=='arrest') {
-          console.log('Body', body)
+          // console.log('Body', body)
           if(!body.arrest_id) {
             reply.code(400).send()
           }else {
@@ -116,7 +116,7 @@ fastify.post('/upload', async (req, reply) => {
     }
   })
   mp.on('field', function (key, value) {
-    console.log('form-data', key, value)
+    // console.log('form-data', key, value)
     body[key] = value
   })
 
@@ -126,8 +126,9 @@ fastify.post('/upload', async (req, reply) => {
       fileExt = filename.split('.')[filename.split('.').length-1]
     }
     newFileName = `${Randomatic('Aa0', 15)}.${fileExt}`
-    pump(file, fs.createWriteStream('/Volumes/projects/terefiki/terefik/tmp/uploads/' + newFileName))
-    console.log(newFileName)
+    console.log('File Path', `${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`)
+    pump(file, fs.createWriteStream(`${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`))
+    // console.log(newFileName)
   }
 })
 // Start

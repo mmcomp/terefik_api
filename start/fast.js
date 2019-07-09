@@ -911,7 +911,6 @@ module.exports = class responseClass {
       }
     }
     const theQuery = `UPDATE insector_work SET ${setStatment} WHERE id = '${ params.id }' AND ranger_id = ${user_id}`
-    console.log(theQuery)
     return new Promise(function(resolve, reject) {
       connection.query(theQuery, function(err, result) {
         if(err) {
