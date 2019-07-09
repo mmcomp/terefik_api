@@ -139,11 +139,79 @@ fastify.post('/upload', async (req, reply) => {
     // console.log(newFileName)
   }
 })
+fastify.post('/Upload', async (req, reply) => {
+  let newFileName = '', body = {}
+  const mp = req.multipart(handler,async function (err) {
+    if(!normalizeMobile(body.mobile)) {
+      reply.code(400).send()
+    }else {
+      body.mobile = normalizeMobile(body.mobile)[0]
+      const user = await responseClass.loadUserByUsername(body.token, body.mobile)
+      if(!user[0]) {
+        reply.code(401).send({})
+      }else {
+        const doc_type = (body['doc_type'])?body['doc_type']:'profile'
+        let responseObject = new responseClass(user[0].id, user[0].is_parking_ranger, user[0].last_daily_gift)
+        if(doc_type=='profile') {
+          // console.log('change profile')
+          responseObject.UpdateUser({
+            image_path: newFileName,
+          })
+          reply.code(200).send()
+        }else if(doc_type!='arrest' && doc_type!='texture') {
+          let result = await responseObject.UpdateParkingRangerDoc({
+            file_path: newFileName,
+            doc_type
+          })
+          if(result.affectedRows==0 && result.changedRows==0) {
+            result = responseObject.InsertParkingRangerDoc({
+              file_path: newFileName,
+              doc_type: doc_type,
+            })
+          }
+          reply.code(200).send()
+        }else if(doc_type=='arrest') {
+          // console.log('Body', body)
+          if(!body.arrest_id) {
+            reply.code(400).send()
+          }else {
+            responseObject.UpdateRangerWork({
+              image_path: newFileName,
+              id: body.arrest_id
+            })
+            reply.code(200).send()
+          }
+        }
+      }
+    }
+  })
+  mp.on('field', function (key, value) {
+    // console.log('form-data', key, value)
+    body[key] = value
+  })
+
+  function handler (field, file, filename, encoding, mimetype) {
+    let fileExt = 'jpg'
+    if(filename.split('.').length>1) {
+      fileExt = filename.split('.')[filename.split('.').length-1]
+    }
+    newFileName = `${Randomatic('Aa0', 15)}.${fileExt}`
+    // console.log('File Path', `${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`)
+    pump(file, fs.createWriteStream(`${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`))
+    // console.log(newFileName)
+  }
+})
 // Proxies
 fastify.post('/signin', (request, reply) => {
   reply.from('/signin')
 })
 fastify.post('/verify', (request, reply) => {
+  reply.from('/verify')
+})
+fastify.post('/Signin', (request, reply) => {
+  reply.from('/signin')
+})
+fastify.post('/Verify', (request, reply) => {
   reply.from('/verify')
 })
 // Start
