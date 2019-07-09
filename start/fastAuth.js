@@ -21,6 +21,14 @@ fastify.register(require('fastify-multipart'))
 
 fastify.register(require('fastify-formbody'))
 
+fastify.register(require('fastify-static'), {
+  root: `${__dirname.replace(/start/g, 'tmp')}/uploads`,
+  prefix: '/file/', 
+})
+
+fastify.register(require('fastify-reply-from'), {
+  base: 'http://localhost:3334/'
+})
 // Mqtt Broker
 fastify.post('/mqtt/auth', async (request, reply) => {
   if (Env.get('SERVER_CLIENT') == request.body.clientid || Env.get('SERVER_CLIENT') == `ad_${request.body.clientid}` || request.body.clientid == 'terefik' || Env.get('FAST_CLIENT') == request.body.clientid) {
@@ -83,7 +91,7 @@ fastify.post('/upload', async (req, reply) => {
         const doc_type = (body['doc_type'])?body['doc_type']:'profile'
         let responseObject = new responseClass(user[0].id, user[0].is_parking_ranger, user[0].last_daily_gift)
         if(doc_type=='profile') {
-          console.log('change profile')
+          // console.log('change profile')
           responseObject.UpdateUser({
             image_path: newFileName,
           })
@@ -126,15 +134,22 @@ fastify.post('/upload', async (req, reply) => {
       fileExt = filename.split('.')[filename.split('.').length-1]
     }
     newFileName = `${Randomatic('Aa0', 15)}.${fileExt}`
-    console.log('File Path', `${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`)
+    // console.log('File Path', `${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`)
     pump(file, fs.createWriteStream(`${__dirname.replace(/start/g, 'tmp')}/uploads/${newFileName}`))
     // console.log(newFileName)
   }
 })
+// Proxies
+fastify.post('/signin', (request, reply) => {
+  reply.from('/signin')
+})
+fastify.post('/verify', (request, reply) => {
+  reply.from('/verify')
+})
 // Start
 const start = async () => {
   try {
-    await fastify.listen(3334, '0.0.0.0')
+    await fastify.listen(3333, '0.0.0.0')
     fastify.log.info(`server listening on ${fastify.server.address().port}`)
   } catch (err) {
     fastify.log.error(err)
