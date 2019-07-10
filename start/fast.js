@@ -1367,15 +1367,18 @@ module.exports = class responseClass {
             if(timePast>=2) {
               responseClass.updateVerify(result[0].id, vresult[0].code, 0)
             }else {
+              console.log('Too Long')
               return resolve(false)
             }
           }
           if(code===result[0].code) {
             return resolve(true)
           }else {
+            console.log('Code Error')
             return resolve(false)
           }
         }else{
+          console.log('No Code')
           return resolve(false)
         }
       })
