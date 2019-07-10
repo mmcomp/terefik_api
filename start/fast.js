@@ -1356,7 +1356,7 @@ module.exports = class responseClass {
   static async verifyCheck(mobile, code, type) {
     let theCnnection = connection
     const theQuery = `SELECT code FROM verifications WHERE mobile = '${ mobile }' AND \`type\` = '${ type }' `
-    console.log(theQuery)
+    // console.log(theQuery)
     return new Promise(function(resolve, reject) {
       theCnnection.query(theQuery, function(err, result) {
         if(err) {
@@ -1555,8 +1555,12 @@ module.exports = class responseClass {
     return {
       code: 200,
       data: {
-        mobile,
-        token
+        status: 1,
+        messages: [],
+        data: {
+          mobile,
+          token
+        }
       }
     }
   }
