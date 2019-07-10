@@ -1484,7 +1484,11 @@ module.exports = class responseClass {
 
     return {
       code: 200,
-      data: {}
+      data: {
+        status: 1,
+        messages: [],
+        data: {}
+      }
     }
   }
   static async verify(request) {
