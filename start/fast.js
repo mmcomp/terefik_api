@@ -1355,8 +1355,10 @@ module.exports = class responseClass {
   }
   static async verifyCheck(mobile, code, type) {
     let theCnnection = connection
+    const theQuery = `SELECT code FROM verifications WHERE mobile = '${ mobile }' AND \`type\` = '${ type }' `
+    console.log(theQuery)
     return new Promise(function(resolve, reject) {
-      theCnnection.query(`SELECT code FROM verifications WHERE mobile = '${ mobile }' AND \`type\` = '${ type }' `, function(err, result) {
+      theCnnection.query(theQuery, function(err, result) {
         if(err) {
           reject(err)
         }
@@ -1537,7 +1539,8 @@ module.exports = class responseClass {
           message: [{
             code: "WrongCode",
             message: "خطا در احراز هویت"
-          }]
+          }],
+          data: {}
         }
       } 
     }
