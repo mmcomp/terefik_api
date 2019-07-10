@@ -2,6 +2,9 @@
 const Env = use('Env')
 const mysql = require('mysql')
 const moment = require('moment')
+const Randomatic = require('randomatic')
+const phone = require('phone')
+const axios = require('axios')
 const Achievment = use('App/Models/Achievment')
 var connection = mysql.createPool({
   connectionLimit : 10,
@@ -17,7 +20,15 @@ var otherConnection = mysql.createPool({
   password : Env.get('DB_PASSWORD'),
   database : Env.get('DB_OTHER_DATABASE')
 });
+function normalizeMobile (mobile, country = 'IR') {
+  const normalMobile = phone(mobile, country)
 
+  if (normalMobile.length) {
+    return normalMobile
+  }
+
+  return false
+}
 module.exports = class responseClass {
   constructor(user_id, is_parking_ranger, last_daily_gift) {
     this.user_id = user_id
@@ -1189,6 +1200,25 @@ module.exports = class responseClass {
       })
     })
   }
+  static async loadUserByMobile(mobile, whereClause = '') {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
+      mobile = normalizeMobile(mobile)
+      if(!mobile) {
+        reject('Mobile Error')
+      }
+      mobile = mobile[0]
+      theCnnection.query(`SELECT * FROM \`users\` WHERE \`mobile\` = '${ mobile }' ${ (whereClause!='')?'AND ' + whereClause:''}`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
   static async crashReport({mobile, token, message, type, stacktrace}) {
     let theCnnection = connection
     return new Promise(function(resolve, reject) {
@@ -1217,5 +1247,307 @@ module.exports = class responseClass {
         resolve(result)
       })
     })
+  }
+  static async updateIp(ipAddress, count) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
+      theCnnection.query(`UPDATE \`ips\` SET \`count\` = ${count}, updated_at = '${moment().format('YYYY-MM-DD HH:mm:ss')}' WHERE \`ip\` = '${ ipAddress }' `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+  static async createIp(ipAddress) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
+      theCnnection.query(`INSERT INTO \`ips\` (\`ip\`, \`count\`, updated_at, created_at) VALUES ('${ ipAddress }', 1, '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${moment().format('YYYY-MM-DD HH:mm:ss')}') `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+  static async checkIp(ipAddress) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      // if(clientId.indexOf('terefik')<0) {
+      //   theCnnection = otherConnection
+      // }
+      theCnnection.query(`SELECT \`id\`, \`count\`, \`updated_at\` FROM \`ips\` WHERE \`ip\` = '${ ipAddress }' `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        // resolve(result)
+        if(result[0]) {
+          const timePast = moment().diff(result[0].updated_at, 'seconds')
+          if(timePast<=60 && result[0].count<5) {
+            responseClass.updateIp(ipAddress, result[0].count+1)
+            resolve(true)
+          }else if(timePast>60) {
+            responseClass.updateIp(ipAddress, 1)
+            resolve(true)
+          }else {
+            resolve(false)
+          }
+        }else {
+          responseClass.createIp(ipAddress)
+          resolve(true)
+        }
+      })
+    })
+  }
+  static async updateVerify(id, verifyCode, count) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      theCnnection.query(`UPDATE verifications SET \`retry\` = ${count}, code = '${verifyCode}', updated_at = '${moment().format('YYYY-MM-DD HH:mm:ss')}' WHERE \`id\` = '${ id }' `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+  static async createVerify(mobile, verifyCode) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      theCnnection.query(`INSERT INTO verifications (mobile, \`retry\`, code, type, updated_at, created_at) VALUES ('${ mobile }', 1, '${verifyCode}', 'signup', '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${moment().format('YYYY-MM-DD HH:mm:ss')}') `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        resolve(result)
+      })
+    })
+  }
+  static async verifySend(mobile, type) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      theCnnection.query(`SELECT * FROM verifications WHERE mobile = '${ mobile }' AND \`type\` = '${type}' `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+        const verifyCode = Randomatic('0', 4)
+        if(result[0]) {
+          const timePast = moment().diff(result[0].updated_at, 'hours')
+          if(result[0].retry<6) {
+            responseClass.updateVerify(result[0].id, verifyCode, result[0].retry+1)
+            resolve(verifyCode)
+          }else if(timePast>2 && result[0].retry>=6) {
+            responseClass.updateVerify(result[0].id, verifyCode, 1)
+            resolve(verifyCode)
+          }else {
+            resolve(false)
+          }
+        }else {
+          responseClass.createVerify(mobile, verifyCode)
+          resolve(verifyCode)
+        }
+      })
+    })
+  }
+  static async verifyCheck(mobile, code, type) {
+    let theCnnection = connection
+    return new Promise(function(resolve, reject) {
+      theCnnection.query(`SELECT code FROM verifications WHERE mobile = '${ mobile }' AND \`type\` = '${ type }' `, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        if(result[0]) {
+          if(result[0].retry>=5) {
+            const timePast = moment().diff(result[0].updated_at, 'hours')
+            if(timePast>=2) {
+              responseClass.updateVerify(result[0].id, vresult[0].code, 0)
+            }else {
+              return resolve(false)
+            }
+          }
+          if(code===result[0].code) {
+            return resolve(true)
+          }else {
+            return resolve(false)
+          }
+        }else{
+          return resolve(false)
+        }
+      })
+    })
+  }
+  static async settings(user_id) {
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT * FROM settings LIMIT 1`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result[0])
+      })
+    })
+  }
+  static async registerUser(mobile, token) {
+    return new Promise(function(resolve, reject) {
+      connection.query(`INSERT INTO users 
+        (token, username, mobile, lname, fname, image_path, client_id, national_code, pushe_id, created_at, updated_at) 
+        VALUES 
+        ('${token}', 'کاربر ${Randomatic('0', 6)}', '${mobile}', 'کاربر ${Randomatic('0', 6)}', '', '', '', '', '', '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${moment().format('YYYY-MM-DD HH:mm:ss')}') `,async function(err, result) {
+        if(err) {
+            reject(err)
+        }
+        const user_id = result.insertId
+        const settings = await responseClass.settings(user_id)
+        let theQuery = `INSERT INTO user_property 
+          (user_id, gasoline, health_oil, cleaning_soap, bronze_coin, silver_coin, diamond, created_at, updated_at, inspector_score, ontime_score, finance_score, experience_score, path) 
+          VALUES 
+          (${user_id}, ${settings.intial_gasoline}, ${settings.intial_health_oil}, ${settings.intial_cleaning_soap}, ${settings.intial_bronze_coin}, ${settings.intial_silver_coin}, ${settings.intial_diamond}, '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${moment().format('YYYY-MM-DD HH:mm:ss')}', 0, 0, 0, 0, '[]') `
+        connection.query(theQuery)
+
+        theQuery = `INSERT INTO user_terefik (user_id, ttype, gasoline, health, clean) VALUES`
+        const terefikis = ['discounter', 'reserver', 'notifier']
+        for(let ttype of terefikis) {
+          theQuery += `(${user_id}, '${ttype}', ${settings.intial_terefiki_gasoline}, ${settings.intial_terefiki_health}, ${settings.intial_terefiki_clean}),`
+        }
+        theQuery = theQuery.substring(0, theQuery.length-1)
+        connection.query(theQuery)
+        resolve(true)
+      })
+    })
+  }
+  static async signin(request) {
+    const checkIp = await responseClass.checkIp(request.ip)
+    if(!checkIp) {
+      return {
+        code: 400,
+        data: {
+          status : 0,
+          message: [{
+            code: "ipBlocked",
+            message: "از آی پی شما درخواست غیرمجاز ارسال شده"
+          }]
+        }
+      }      
+    }
+    request.body.mobile = normalizeMobile(request.body.mobile)
+    const mobile = request.body.mobile[0]
+    let type = 'signup'
+    const user = await responseClass.loadUserByMobile(mobile)
+    console.log(user)
+    if(user[0]) {
+      if(user[0].token.indexOf('ban_')===0) {
+        return {
+          code: 400,
+          data: {
+            status : 0,
+            message: [{
+              code: "userBanned",
+              message: "کاربری شما غیرفعال شده است"
+            }]
+          }
+        }
+      }
+      type = 'signin'
+    }
+
+    const verifyResult = await responseClass.verifySend(mobile, type)
+    if(verifyResult===false) {
+      return {
+        code: 400,
+        data: {
+          status : 0,
+          message: [{
+            code: "TryEffortAllowed",
+            message: "تلاش بیش از حد مجاز"
+          }]
+        }
+      } 
+    }
+
+    console.log('URL', 'https://api.kavenegar.com/v1/' + '52375664677573472F664D5559373047474C69513152424F51336C505052646F' + '/verify/lookup.json?receptor=' + mobile.replace('+98','0')
+    + '&token=' + verifyResult + '&template=verifytref&')
+    try{
+      const response = await axios({
+        method: 'get',
+        url: 'https://api.kavenegar.com/v1/' + Env.get('SMS_KAVENEGAR_API_KEY') + '/verify/lookup.json?receptor=' + mobile.replace('+98','0')
+        + '&token=' + verifyResult + '&template=' + Env.get('SMS_KAVENEGAR_TEMPLATE') + '&',
+      })
+      console.log('SMS OK', response.data)
+    }catch(e){  
+      console.log('SMS NOK', e.response.data)
+    }
+
+    return {
+      code: 200,
+      data: {}
+    }
+  }
+  static async verify(request) {
+    const checkIp = await responseClass.checkIp(request.ip)
+    if(!checkIp) {
+      return {
+        code: 400,
+        data: {
+          status : 0,
+          message: [{
+            code: "ipBlocked",
+            message: "از آی پی شما درخواست غیرمجاز ارسال شده"
+          }]
+        }
+      }      
+    }
+    request.body.mobile = normalizeMobile(request.body.mobile)
+    const mobile = request.body.mobile[0]
+    let type = 'signup'
+    const user = await responseClass.loadUserByMobile(mobile)
+    if(user[0]) {
+      if(user[0].token.indexOf('ban_')===0) {
+        return {
+          code: 400,
+          data: {
+            status : 0,
+            message: [{
+              code: "userBanned",
+              message: "کاربری شما غیرفعال شده است"
+            }]
+          }
+        }
+      }
+      type = 'signin'
+    }
+
+    const verifyResult = await responseClass.verifyCheck(mobile, request.body.code, type)
+    if(verifyResult===false) {
+      return {
+        code: 400,
+        data: {
+          status : 0,
+          message: [{
+            code: "WrongCode",
+            message: "خطا در احراز هویت"
+          }]
+        }
+      } 
+    }
+
+    const token = Randomatic('Aa0', 15)
+    if(user[0]) {
+      connection.query(`UPDATE users SET token = '${token}', updated_at = '${moment().format('YYYY-MM-DD HH:mm:ss')}' WHERE \`id\` = '${ user[0].id }' `)
+    }else {
+      responseClass.registerUser(mobile, token)
+    }
+
+    return {
+      code: 200,
+      data: {
+        mobile,
+        token
+      }
+    }
   }
 }

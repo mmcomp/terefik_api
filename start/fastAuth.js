@@ -202,17 +202,25 @@ fastify.post('/Upload', async (req, reply) => {
   }
 })
 // Proxies
-fastify.post('/signin', (request, reply) => {
-  reply.from('/signin')
+fastify.post('/signin', async (request, reply) => {
+  // reply.from('/signin')
+  const result = await responseClass.signin(request)
+  return reply.code(result.code).send(result.data)
 })
-fastify.post('/verify', (request, reply) => {
-  reply.from('/verify')
+fastify.post('/verify',async (request, reply) => {
+  // reply.from('/verify')
+  const result = await responseClass.verify(request)
+  return reply.code(result.code).send(result.data)
 })
-fastify.post('/Signin', (request, reply) => {
-  reply.from('/signin')
+fastify.post('/Signin', async (request, reply) => {
+  // reply.from('/signin')
+  const result = await responseClass.signin(request)
+  return reply.code(result.code).send(result.data)
 })
-fastify.post('/Verify', (request, reply) => {
-  reply.from('/verify')
+fastify.post('/Verify',async (request, reply) => {
+  // reply.from('/verify')
+  const result = await responseClass.verify(request)
+  return reply.code(result.code).send(result.data)
 })
 // Start
 const start = async () => {
