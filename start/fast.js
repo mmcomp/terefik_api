@@ -1316,10 +1316,10 @@ module.exports = class responseClass {
       })
     })
   }
-  static async createVerify(mobile, verifyCode) {
+  static async createVerify(mobile, verifyCode, type) {
     let theCnnection = connection
     return new Promise(function(resolve, reject) {
-      theCnnection.query(`INSERT INTO verifications (mobile, \`retry\`, code, type, updated_at, created_at) VALUES ('${ mobile }', 1, '${verifyCode}', 'signup', '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${moment().format('YYYY-MM-DD HH:mm:ss')}') `, function(err, result) {
+      theCnnection.query(`INSERT INTO verifications (mobile, \`retry\`, code, type, updated_at, created_at) VALUES ('${ mobile }', 1, '${verifyCode}', '${type}', '${moment().format('YYYY-MM-DD HH:mm:ss')}', '${moment().format('YYYY-MM-DD HH:mm:ss')}') `, function(err, result) {
         if(err) {
           reject(err)
         }
@@ -1347,7 +1347,7 @@ module.exports = class responseClass {
             resolve(false)
           }
         }else {
-          responseClass.createVerify(mobile, verifyCode)
+          responseClass.createVerify(mobile, verifyCode, type)
           resolve(verifyCode)
         }
       })
