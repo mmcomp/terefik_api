@@ -765,7 +765,9 @@ module.exports = class responseClass {
     let unitsTotal = parseInt(settings.unit_to_bronze_coin, 10)
 
     for(let i = 2;i <= Math.min(units, 10);i++) {
-      unitsTotal += parseInt(settings['unit_to_bronze_coin_' + i], 10)
+      if(!isNaN(parseInt(settings['unit_to_bronze_coin_' + i], 10))) {
+        unitsTotal += parseInt(settings['unit_to_bronze_coin_' + i], 10)
+      }
     }
     if(units>10) {
       unitsTotal += unitCosts * (units - 10)
