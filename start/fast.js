@@ -1039,12 +1039,16 @@ module.exports = class responseClass {
     let discountPercent = settings.total_discount
 
     discountPercent = (100 - discountPercent)/100
+    console.log('Units', units)
     if(params.extend) {
-      units += userCar.total_unit
+      console.log('past units', userCar[0])
+      units += userCar[0].total_unit
     }
+    
     let unitsTotal = this.unitCost(units, settings)
+    console.log('Unit Total', unitsTotal)
     if(params.extend) {
-      unitsTotal -= userCar.total_coin
+      unitsTotal -= userCar[0].total_coin
     }
 
     let totalPay = Math.ceil(unitsTotal * discountPercent, 10)
