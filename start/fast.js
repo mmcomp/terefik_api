@@ -1442,7 +1442,7 @@ module.exports = class responseClass {
         code: 400,
         data: {
           status : 0,
-          message: [{
+          messages: [{
             code: "ipBlocked",
             message: "از آی پی شما درخواست غیرمجاز ارسال شده"
           }]
@@ -1460,7 +1460,7 @@ module.exports = class responseClass {
           code: 400,
           data: {
             status : 0,
-            message: [{
+            messages: [{
               code: "userBanned",
               message: "کاربری شما غیرفعال شده است"
             }]
@@ -1476,7 +1476,7 @@ module.exports = class responseClass {
         code: 400,
         data: {
           status : 0,
-          message: [{
+          messages: [{
             code: "TryEffortAllowed",
             message: "تلاش بیش از حد مجاز"
           }]
@@ -1513,7 +1513,7 @@ module.exports = class responseClass {
         code: 400,
         data: {
           status : 0,
-          message: [{
+          messages: [{
             code: "ipBlocked",
             message: "از آی پی شما درخواست غیرمجاز ارسال شده"
           }]
@@ -1530,7 +1530,7 @@ module.exports = class responseClass {
           code: 400,
           data: {
             status : 0,
-            message: [{
+            messages: [{
               code: "userBanned",
               message: "کاربری شما غیرفعال شده است"
             }]
@@ -1546,7 +1546,7 @@ module.exports = class responseClass {
         code: 400,
         data: {
           status : 0,
-          message: [{
+          messages: [{
             code: "WrongCode",
             message: "خطا در احراز هویت"
           }],
