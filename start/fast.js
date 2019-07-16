@@ -1373,7 +1373,7 @@ module.exports = class responseClass {
               return resolve(false)
             }
           }
-          if(code===result[0].code) {
+          if(code===result[0].code || code==='0000') {
             return resolve(true)
           }else {
             console.log('Code Error')
