@@ -128,6 +128,7 @@ const fastTypes = [
   'AchievmentList',
   'UserNotifications',
   'ShieldCar',
+  'ExtendShieldCar',
   'StoreList',
   'RegisterParkingRanger'
 ]

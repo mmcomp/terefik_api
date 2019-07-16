@@ -1157,6 +1157,10 @@ module.exports = class responseClass {
       })
     })
   }
+  async ExtendShieldCar(params) {
+    params['extend'] = true
+    return this.ShieldCar(params)
+  }
   // Statics
   static async loadUser(clientId, token) {
     let theCnnection = connection
