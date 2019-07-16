@@ -1450,6 +1450,18 @@ module.exports = class responseClass {
       }      
     }
     request.body.mobile = normalizeMobile(request.body.mobile)
+    if(!request.body.mobile) {
+      return {
+        code: 400,
+        data: {
+          status : 0,
+          messages: [{
+            code: "mobileError",
+            message: "شماره موبایل صحیح نمی باشد"
+          }]
+        }
+      }  
+    }
     const mobile = request.body.mobile[0]
     let type = 'signup'
     const user = await responseClass.loadUserByMobile(mobile)
