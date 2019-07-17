@@ -433,6 +433,124 @@ module.exports = class responseClass {
       })
     })
   }
+  async RandomGift() {
+    console.log('RandomGift for', this.user_id)
+    const user_id = this.user_id
+    const is_parking_ranger = this.is_parking_ranger
+    const last_daily_gift = this.last_daily_gift
+    const settings = await this.GetSettings(true)
+    let loots = {}
+    return new Promise(function(resolve, reject) {
+      if(is_parking_ranger==4) {
+        connection.query(`SELECT * FROM ranger_random_gifts WHERE user_id = ${ user_id } AND created_at LIKE '${ moment().format('YYYY-MM-DD') }%'`, async function(err, result) {
+          if(err) {
+            reject(err)
+          }
+
+          if(result && result.length>0) {
+            resolve({
+              error: {
+                code: "HadGiftToday",
+                message: "هدیه امروز را دریافت کرده اید",
+              }
+            })
+          }else {
+            const userZones = await this.UserZones()
+            let minimum_report = 0
+            if(userZones && userZones.length>0) {
+              for(let uZ of userZones) {
+                minimum_report += uZ.desired_reports
+              }
+            }
+            connection.query(`SELECT SUM(report_count) re_count FROM  inspector_daily_report WHERE user_id = ${ user_id } AND created_at LIKE '${ moment().format('YYYY-MM-DD') }%'`, function(err, result) {
+              if(err) {
+                reject(err)
+              }
+              let todayReport = (result[0].re_count)?result[0].re_count:0
+              if(minimum_report>0 && todayReport>=(minimum_report+settings.ranger_star_change_1)) {
+                loots['silver_coin'] = Math.ceil(Math.random() * (settings.random_gift_silver_max - settings.random_gift_silver_min) + settings.random_gift_silver_min)
+                if(todayReport>=(minimum_report + settings.ranger_star_change_2) && todayReport<(minimum_report + settings.ranger_star_change_3)) {
+                  loots['silver_coin'] = Math.ceil(Math.random() * (settings.random_gift_silver_star2_max - settings.random_gift_silver_star2_min) + settings.random_gift_silver_star2_min)
+                }else if(todayReport>=(minimum_report + settings.ranger_star_change_3)) {
+                  loots['silver_coin'] = Math.ceil(Math.random() * (settings.random_gift_silver_star3_max - settings.random_gift_silver_star3_min) + settings.random_gift_silver_star3_min)
+                }
+              }
+              let assets = [
+                'gasoline',
+                'health_oil',
+                'cleaning_soap',
+                'water',
+                'coke',
+              ]
+              let index1 = -1, index2 = -1
+              index1 = Math.ceil(Math.random() * 4)
+              while(index2<0 || index1==index2) {
+                index2 = Math.ceil(Math.random() * 4)
+              }
+        
+              loots[assets[index1]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+              loots[assets[index2]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+              let theFields = [], theValues = [], propertySet = []
+              for(let lt in loots) {
+                theFields.push(lt)
+                theValues.push(loot[lt])
+                propertySet.push(`${lt} = ${loot[lt]}`)
+              }
+              connection.query(`INSERT INTO ranger_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`)
+              connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
+              resolve({
+                loots,
+              })
+            })
+          }
+        })
+      }else {
+        connection.query(`SELECT COUNT(*) co FROM transactions WHERE user_id = ${ user_id } AND \`type\` = 'shield' AND \`status\` = 'success' `, function(err, result) {
+          if(err) {
+            reject(err)
+          }
+
+          let transactions = 0
+          if(result && result.length>0) {
+            transactions = result[0].co
+          }
+          if(transactions % settings.park_count_for_gift != 0) {
+            resolve({
+              error: {
+                code: "NotEnoughPark",
+                message: "تعداد پارک شما به حد دریافت هدیه نرسیده است",
+              }
+            })
+          }else {
+            loots['diamond'] = Math.ceil(Math.random() * (settings.random_gift_diamond_max - settings.random_gift_diamond_min) + settings.random_gift_diamond_min)
+            let assets = [
+              'gasoline',
+              'health_oil',
+              'cleaning_soap',
+              'water',
+              'coke',
+            ]
+            let index1 = -1, index2 = -1
+            index1 = Math.ceil(Math.random() * 4)
+            while(index2<0 || index1==index2) {
+              index2 = Math.ceil(Math.random() * 4)
+            }
+      
+            loots[assets[index1]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+            loots[assets[index2]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
+            let propertySet = []
+            for(let lt in loots) {
+              propertySet.push(`${lt} = ${loot[lt]}`)
+            }
+            connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
+            resolve({
+              loots,
+            })
+          }
+        })
+      }
+    })
+  }
   async StartUp() {
     let output = {
       profile: null,
