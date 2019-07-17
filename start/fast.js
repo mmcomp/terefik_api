@@ -493,8 +493,8 @@ module.exports = class responseClass {
               let theFields = [], theValues = [], propertySet = []
               for(let lt in loots) {
                 theFields.push(lt)
-                theValues.push(loot[lt])
-                propertySet.push(`${lt} = ${loot[lt]}`)
+                theValues.push(loots[lt])
+                propertySet.push(`${lt} = ${loots[lt]}`)
               }
               connection.query(`INSERT INTO ranger_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`)
               connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
@@ -540,7 +540,7 @@ module.exports = class responseClass {
             loots[assets[index2]] = Math.ceil(Math.random() * (settings.random_gift_max - settings.random_gift_min) + settings.random_gift_min)/100
             let propertySet = []
             for(let lt in loots) {
-              propertySet.push(`${lt} = ${loot[lt]}`)
+              propertySet.push(`${lt} = ${loots[lt]}`)
             }
             connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
             resolve({
