@@ -496,7 +496,7 @@ module.exports = class responseClass {
                 theValues.push(loots[lt])
                 propertySet.push(`${lt} = ${loots[lt]}`)
               }
-              connection.query(`INSERT INTO ranger_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`)
+              connection.query(`INSERT INTO ranger_random_gifts (user_id, ${theFields.join(',')}, created_at, updated_at) VALUES (${user_id}, ${theValues.join(',')}, '${ moment().format('YYYY-MM-DD HH:mm:ss') }', '${ moment().format('YYYY-MM-DD HH:mm:ss') }')`)
               connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
               resolve({
                 loots,
@@ -559,7 +559,7 @@ module.exports = class responseClass {
                 theValues.push(loots[lt])
                 propertySet.push(`${lt} = ${loots[lt]}`)
               }
-              let theQuery = `INSERT INTO driver_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`
+              let theQuery = `INSERT INTO driver_random_gifts (user_id, ${theFields.join(',')}, created_at, updated_at) VALUES (${user_id}, ${theValues.join(',')}, '${ moment().format('YYYY-MM-DD HH:mm:ss') }', '${ moment().format('YYYY-MM-DD HH:mm:ss') }')`
               connection.query(theQuery)
               connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
               resolve({
