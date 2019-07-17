@@ -516,7 +516,7 @@ module.exports = class responseClass {
             resolve({
               error: {
                 code: "HadGiftToday",
-                message: "هدیه امروز را دریافت کرده اید",
+                message: "هنوز اونقدری پارک نکردی که جایزه بگیری!!!",
               }
             })
           }
