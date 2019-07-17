@@ -332,7 +332,7 @@ module.exports = class responseClass {
         ranger_star_change_2: settings.ranger_star_change_2,
         ranger_star_change_3: settings.ranger_star_change_3,
       },
-      random_gift_user_percent: 100,
+      random_gift_user_percent: 0,
     }
     return new Promise(function(resolve, reject) {
       connection.query(`SELECT user_pfindable_gifts.status, user_pfindable_gifts.description, user_pfindable_gifts.created_at, pfindable_gifts.name, pfindable_gifts.message FROM user_pfindable_gifts LEFT JOIN pfindable_gifts ON (pfindable_gifts.id = pfindable_gifts_id) WHERE user_id = ${ user_id } `, function(err, result) {
