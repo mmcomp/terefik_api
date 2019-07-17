@@ -557,7 +557,10 @@ module.exports = class responseClass {
                 theValues.push(loots[lt])
                 propertySet.push(`${lt} = ${loots[lt]}`)
               }
-              connection.query(`INSERT INTO driver_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`)
+              let theQuery = `INSERT INTO driver_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`
+              console.log('DRIVER')
+              console.log(theQuery)
+              connection.query(theQuery)
               connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
               resolve({
                 loots,
