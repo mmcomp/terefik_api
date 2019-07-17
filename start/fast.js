@@ -505,7 +505,7 @@ module.exports = class responseClass {
           }
         })
       }else {
-        connection.query(`SELECT * FROM diriver_random_gifts WHERE user_id = ${ user_id } AND created_at LIKE '${ moment().format('YYYY-MM-DD') }%'`, async function(err, result) {
+        connection.query(`SELECT * FROM driver_random_gifts WHERE user_id = ${ user_id } AND created_at LIKE '${ moment().format('YYYY-MM-DD') }%'`, async function(err, result) {
           if(err) {
             reject(err)
           }
