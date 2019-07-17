@@ -505,7 +505,9 @@ module.exports = class responseClass {
           }
         })
       }else {
-        connection.query(`SELECT * FROM driver_random_gifts WHERE user_id = ${ user_id } AND created_at LIKE '${ moment().format('YYYY-MM-DD') }%'`, async function(err, result) {
+        const letQ = `SELECT * FROM driver_random_gifts WHERE user_id = ${ user_id } AND created_at LIKE '${ moment().format('YYYY-MM-DD') }%'`
+        console.log(letQ)
+        connection.query(letQ, async function(err, result) {
           if(err) {
             reject(err)
           }
@@ -558,8 +560,6 @@ module.exports = class responseClass {
                 propertySet.push(`${lt} = ${loots[lt]}`)
               }
               let theQuery = `INSERT INTO driver_random_gifts (user_id, ${theFields.join(',')}) VALUES (${user_id}, ${theValues.join(',')})`
-              console.log('DRIVER')
-              console.log(theQuery)
               connection.query(theQuery)
               connection.query(`UPDATE user_property SET ${propertySet.join(', ')} WHERE user_id = ${user_id}`)
               resolve({
