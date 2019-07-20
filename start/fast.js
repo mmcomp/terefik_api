@@ -662,7 +662,7 @@ module.exports = class responseClass {
                 exec_date_remaining:  -1 * moment().diff(moment(inp.exec_date).format('YYYY-MM-DD 23:59:59'), 'seconds'),
                 is_closed: (moment(moment().format('YYYY-MM-DD 00:00:00')).diff(inp.finish_in_date, 'seconds')>0)
               })
-            }else if(inp.ltype=='rangers') {
+            }else if(inp.ltype=='rangers' && is_parking_ranger==4) {
               output.lotteries.rangerLotteries.push({
                 id: inp.lid,
                 name: inp.lname,
