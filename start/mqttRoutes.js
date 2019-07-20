@@ -133,6 +133,7 @@ const fastTypes = [
   'RegisterParkingRanger',
   'RandomGift',
   'LotteryRequest',
+  'LotteryAddRequest'
 ]
 
 module.exports = async(topic, message) => {
