@@ -1387,7 +1387,7 @@ module.exports = class responseClass {
         }
       }
     }
-    const prp = (lottery[0].type=='rangers') ?'diamond':'silver_coin'
+    const prp = (lottery[0].type=='rangers') ?'silver_coin':'diamond'
 
     if(lottery[0].type=='rangers' && is_parking_ranger!=4) {
       return {
