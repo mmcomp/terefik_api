@@ -1483,6 +1483,7 @@ module.exports = class responseClass {
         }
       }
     }
+    console.log(lottery)
     const prp = (lottery[0].type=='rangers') ?'diamond':'silver_coin'
 
     if(lottery[0].type=='rangers' && is_parking_ranger!=4) {
