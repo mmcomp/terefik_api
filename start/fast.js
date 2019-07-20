@@ -964,7 +964,8 @@ module.exports = class responseClass {
         setStatment += `${((setStatment!='')?',':'')} \`${i}\` = '${params[i]}'`
       }else {
         setStatment += `${((setStatment!='')?',':'')} \`${i}\` = null`
-      }    }
+      }    
+    }
     return new Promise(function(resolve, reject) {
       const theQuery = `UPDATE user_property SET ${setStatment} WHERE user_id = ${user_id}`
       connection.query(theQuery, function(err, result) {
@@ -1264,6 +1265,169 @@ module.exports = class responseClass {
       gift: gift,
       loot: loot,
     }
+  }
+  async loadLottery(lottery_id) {
+    console.log('loadLottery for', lottery_id)
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT lottery.name lname, lottery.*, lottery_award.name aname, lottery_award.* FROM lottery LEFT JOIN lottery_award ON (lottery.id=lottery_id) WHERE lottery.id = ${ lottery_id } AND status NOT IN ('hidden', 'finishin', 'done')`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async UpdateLottery(params, lottery_id) {
+    console.log('UpdateLottery for', lottery_id)
+    let setStatment = ''
+    params['updated_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
+    for(let i in params) {
+      if(params[i]) {
+        setStatment += `${((setStatment!='')?',':'')} \`${i}\` = '${params[i]}'`
+      }else {
+        setStatment += `${((setStatment!='')?',':'')} \`${i}\` = null`
+      }    
+    }
+    return new Promise(function(resolve, reject) {
+      const theQuery = `UPDATE lottery SET ${setStatment} WHERE id = ${lottery_id}`
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async loadUserLottery(lottery_id) {
+    console.log('loadUserLottery for', lottery_id, this.user_id)
+    const user_id = this.user_id
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT id FROM lottery_user WHERE lottery_id = ${lottery_id} AND users_id = ${user_id}`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async CreateUserLottery(params) {
+    console.log('CreateUserLottery for', params)
+    const user_id = this.user_id
+    params['created_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
+    params['updated_at'] = params['created_at']
+    const theQuery = `
+      INSERT INTO lottery_user
+        (lottery_id, users_id, in_chance, created_at, updated_at)
+      VALUES
+        (${params.lottery_id}, ${user_id}, ${params.in_chance}, '${params.created_at}', '${params.updated_at}')
+    `
+    return new Promise(function(resolve, reject) {
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async LotteryRequest(params) {
+    console.log('LotteryRequest for', this.user_id, params)
+    const is_parking_ranger = this.is_parking_ranger
+    if(!params.lottery_id || !params.amount) {
+      return {
+        error: {
+          code: 'InavlidInput',
+          message: 'ورودی صحیح نیست',
+        }
+      }
+    }
+
+    const userLottery = await this.loadUserLottery(params.lottery_id)
+    if(userLottery[0]) {
+      return {
+        error: {
+          code: "AlreadyInThisLottery",
+          message: "شما قبلا در این قرعه کشی شرکت کرده اید"
+        }
+      }
+    }
+
+    let lottery = await this.loadLottery(params.lottery_id)
+    if(!lottery[0]) {
+      return {
+        error: {
+          code: "LotteryNotFound",
+          message: "قرعه کشی مورد نظر پیدا نشد"
+        }
+      }
+    }
+    const prp = (lottery[0].type=='rangers') ?'diamond':'silver_coin'
+
+    if(lottery[0].type=='rangers' && is_parking_ranger!=4) {
+      return {
+        error: {
+          code: "LotteryNotForYou",
+          message: "شما امکان شرکت در این قرعه کشی را ندارید"
+        }
+      }
+    }
+
+    let min_chance = 0
+    for(let award of lottery) {
+      if(min_chance>0) {
+        min_chance = Math.min(min_chance, award.min_chance)
+      }else {
+        min_chance = award.min_chance
+      }
+    }
+
+    if(params.amount<min_chance) {
+      return {
+        error: {
+          code: "LotteryMinChanceError",
+          message: "حداقل شانس مورد نیاز برای شرکت در این قرعه کشی " + min_chance + " می باشد"
+        }
+      }
+    }
+
+    let userProperty = await this.UserProperty()
+    if(!userProperty[0]) {
+      return {
+        error: {
+          code: "UserNotFound",
+          message: "اطلاعات کاربر ناقص می باشد"
+        }
+      }
+    }
+    userProperty = userProperty[0]
+
+    if(userProperty[prp]<params.amount) {
+      return {
+        error: {
+          code: "NotEnough",
+          message: "موجودی شما کافی نیست"
+        }
+      }
+    }
+
+    let data = {}
+    data[prp] = userProperty[prp] - params.amount
+    this.UpdateUserProperty(data)
+
+    this.UpdateLottery({
+      status: 'haveuser'
+    }, params.lottery_id)
+
+    this.CreateUserLottery({
+      lottery_id: params.lottery_id,
+      in_chance: params.amount
+    })
+
+    return {}
   }
   async StoreList() {
     console.log('StoreList for', this.user_id)
