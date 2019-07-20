@@ -968,6 +968,7 @@ module.exports = class responseClass {
     }
     return new Promise(function(resolve, reject) {
       const theQuery = `UPDATE user_property SET ${setStatment} WHERE user_id = ${user_id}`
+      console.log(theQuery)
       connection.query(theQuery, function(err, result) {
         if(err) {
           reject(err)
