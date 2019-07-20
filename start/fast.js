@@ -968,7 +968,6 @@ module.exports = class responseClass {
     }
     return new Promise(function(resolve, reject) {
       const theQuery = `UPDATE user_property SET ${setStatment} WHERE user_id = ${user_id}`
-      console.log(theQuery)
       connection.query(theQuery, function(err, result) {
         if(err) {
           reject(err)
@@ -1483,8 +1482,7 @@ module.exports = class responseClass {
         }
       }
     }
-    console.log(lottery)
-    const prp = (lottery[0].type=='rangers') ?'diamond':'silver_coin'
+    const prp = (lottery[0].type=='rangers') ?'silver_coin':'diamond'
 
     if(lottery[0].type=='rangers' && is_parking_ranger!=4) {
       return {
