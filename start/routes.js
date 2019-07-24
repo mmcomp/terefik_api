@@ -129,3 +129,4 @@ exec('service emqttd start', (err, stdout, stderr) => {
   console.log(stderr)
 });
 */
+// require('./redis')
