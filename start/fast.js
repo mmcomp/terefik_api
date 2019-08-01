@@ -1073,7 +1073,42 @@ module.exports = class responseClass {
       })
     })
   }
-  async UpdateUserCar(id, params) {
+  async InsertUserCarHistory(id, params) {
+    console.log('InsertUserCarHistory for', this.user_id)
+    params['updated_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
+    params['created_at'] = params['updated_at']
+    params['user_vehicle_id'] = id
+    params['user_id'] = this.user_id
+    let fields = []
+    let values = []
+    for(let i in params) {
+      fields.push(`${i}`)
+      if(params[i]) {
+        values.push(`'${params[i]}'`)
+      }else if(params[i]===null){
+        values.push(`null`)
+      }else {
+        values.push(`0`)
+      }
+    }
+    return new Promise(function(resolve, reject) {
+      const theQuery = `
+        INSERT INTO
+          user_vehicle_histories
+          (${fields.join(', ')})
+        VALUES
+          (${values.join(', ')})
+      `
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  async UpdateUserCar(id, params, car_id) {
     console.log('UpdateUser for', this.user_id)
     let setStatment = ''
     params['updated_at'] = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -1086,6 +1121,7 @@ module.exports = class responseClass {
         setStatment += `${((setStatment!='')?',':'')} \`${i}\` = 0`
       }
     }
+    const that = this
     return new Promise(function(resolve, reject) {
       const theQuery = `UPDATE user_vehicle SET ${setStatment} WHERE id = ${id}`
       connection.query(theQuery, function(err, result) {
@@ -1093,6 +1129,8 @@ module.exports = class responseClass {
           reject(err)
         }
 
+        params['vehicle_id'] = car_id
+        that.InsertUserCarHistory(id, params)
         resolve(result)
       })
     })
@@ -1256,7 +1294,7 @@ module.exports = class responseClass {
       uparams['lon'] = params.lon_gps
       uparams['lat'] = params.lat_gps
     }
-    this.UpdateUserCar(userCar[0].id, uparams)
+    this.UpdateUserCar(userCar[0].id, uparams, params.car_id)
     Achievment.achieve(this.user_id, 'park')
     return {
       total_pay: totalPay,
@@ -1566,6 +1604,53 @@ module.exports = class responseClass {
   async ExtendShieldCar(params) {
     params['extend'] = true
     return this.ShieldCar(params)
+  }
+  async LoadUserCarHistory(user_vehicle_id) {
+    console.log('LoadUserCarHistory for', this.user_id, user_vehicle_id)
+    const theQuery = `
+      SELECT 
+        * 
+      FROM 
+        user_vehicle_histories
+      WHERE 
+        user_vehicle_id = ${user_vehicle_id}
+      ORDER BY
+        created_at DESC
+    `
+    return new Promise(function(resolve, reject) {
+      connection.query(theQuery, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
+  
+  async ShieldHistory(params) {
+    if(!params || !params.car_id) {
+      return {
+        error: {
+          code: 'InvalidInput',
+          message: 'ورود car_id الزامی است'
+        }
+      }
+    }
+
+    const userCar = await this.UserVehicle(params.car_id)
+    if(!userCar[0]) {
+      return {
+        error: {
+          code: "CarNotYours",
+          message: "خودرو متعلق به شما نمی باشد"
+        }
+      }
+    }
+
+    const results = await this.LoadUserCarHistory(userCar[0].id)
+
+    return results
   }
   // Statics
   static async loadUser(clientId, token) {

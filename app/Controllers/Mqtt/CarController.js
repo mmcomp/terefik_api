@@ -4,6 +4,7 @@ const Car = use('App/Models/Car')
 const CarFake = use('App/Models/CarFake')
 const User = use('App/Models/User')
 const UserCar = use('App/Models/UserCar')
+const UserCarHistory = use('App/Models/UserCarHistory')
 const RangerWork = use('App/Models/RangerWork')
 const RangerSilverTime = use('App/Models/RangerSilverTime')
 const Property = use('App/Models/Property')
@@ -398,7 +399,7 @@ class CarController {
     let settings = await Setting.get()
     let leaveTime = Time().format('YYYY-MM-DD HH:mm:ss')
     let leave_diff = Time(leaveTime).diff(userCar.shield_start, 'seconds')
-    let unit_to_bronze_coin = settings.unit_to_bronze_coin_10
+    // let unit_to_bronze_coin = settings.unit_to_bronze_coin_10
     console.log('Leave Diff', leave_diff, userCar.shield_duration)
     if(leave_diff/60<userCar.shield_duration) {
       userCar.leave_unit = userCar.total_unit - Math.ceil(leave_diff/(settings.unit_to_minute*60))
@@ -408,8 +409,23 @@ class CarController {
       }
       userCar.shield_duration = leave_diff/60
       userCar.leave_time = leaveTime
+      userCar.save()
+
+      let userCarHistory = await UserCarHistory.query().where('user_vehicle_id', userCar.id).orderBy('created_id', 'desc').first()
+      if(!userCarHistory) {
+        userCarHistory = new UserCarHistory
+        userCarHistory.user_id = userCar.user_id
+        userCarHistory.vehicle_id = userCar.vehicle_id
+        userCarHistory.user_vehicle_id = userCar.id
+      }
+      userCarHistory.leave_unit = userCar.leave_unit
+      userCarHistory.leave_coin = userCar.leave_coin
+      userCarHistory.shield_duration = userCar.shield_duration
+      userCarHistory.leave_time = userCar.leave_time
+      userCarHistory.save()  
+
     }
-    await userCar.save()
+    
 
     let loot = {
       remaining_units: userCar.leave_unit,
@@ -924,7 +940,9 @@ class CarController {
             code: "AlreadyArrested",
             message: "این خودرو به تازگی گزارش شده است"
           }],
-          data: {}
+          data: {
+            last_park: theRangerWork,
+          }
         }]
       }
     }
@@ -951,6 +969,7 @@ class CarController {
           loot: loot,
           findable_gift: findable_gift,
           is_out: is_out,
+          last_park: theRangerWork,
         }
       }]
     }
@@ -1041,6 +1060,7 @@ class CarController {
             loot: loot,
             findable_gift: findable_gift,
             is_out: is_out,
+            last_park: theRangerWork,
           }
         }]
       }else {
@@ -1050,7 +1070,9 @@ class CarController {
             code: "ReCheckError",
             message: "این خودرو رو خودت همین الان ثبت کردی",
           }],
-          data: {}
+          data: {
+            last_park: theRangerWork,
+          }
         }]
       }
     }
@@ -1149,6 +1171,7 @@ class CarController {
         loot: loot,
         findable_gift: findable_gift,
         arrest_id: rangerWork.id,
+        last_park: theRangerWork,
       }
     }]
   }

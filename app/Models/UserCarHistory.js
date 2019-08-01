@@ -1,11 +1,11 @@
 'use strict'
 
-
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-class UserCar extends Model {
+class UserCarHistory extends Model {
   static get table () {
-    return 'user_vehicle'
+    return 'user_vehicle_histories'
   }
 
   static get createdAtColumn () {
@@ -24,10 +24,6 @@ class UserCar extends Model {
   cars () {
     return this.hasOne('App/Models/Car', 'vehicle_id', 'id')
   }
-
-  history () {
-    return this.hasMany('App/Models/UserCarHistory', 'id', 'user_vehicle_id')
-  }
 }
 
-module.exports = UserCar
+module.exports = UserCarHistory
