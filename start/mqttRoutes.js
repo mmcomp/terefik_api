@@ -134,7 +134,8 @@ const fastTypes = [
   'RandomGift',
   'LotteryRequest',
   'LotteryAddRequest',
-  'ShieldHistory'
+  'ShieldHistory',
+  'CreditTransactions'
 ]
 
 module.exports = async(topic, message) => {

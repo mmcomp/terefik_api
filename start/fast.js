@@ -1651,6 +1651,19 @@ module.exports = class responseClass {
 
     return results
   }
+  async CreditTransactions() {
+    console.log('CreditTransactions for', this.user_id)
+    const user_id = this.user_id
+    return new Promise(function(resolve, reject) {
+      connection.query(`SELECT * FROM transactions WHERE user_id = ${ user_id } AND type = 'credit'`, function(err, result) {
+        if(err) {
+          reject(err)
+        }
+
+        resolve(result)
+      })
+    })
+  }
   // Statics
   static async loadUser(clientId, token) {
     let theCnnection = connection
