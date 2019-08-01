@@ -284,7 +284,7 @@ module.exports = class responseClass {
     console.log('StartListCar for', this.user_id)
     const user_id = this.user_id
     return new Promise(function(resolve, reject) {
-      connection.query(`SELECT vehicle.*, shield_start, shield_duration, leave_time FROM user_vehicle LEFT JOIN vehicle ON (vehicle.id=vehicle_id) WHERE user_id = ${ user_id }`,async function(err, result) {
+      connection.query(`SELECT vehicle.*, shield_start, shield_duration, leave_time, lon, lat FROM user_vehicle LEFT JOIN vehicle ON (vehicle.id=vehicle_id) WHERE user_id = ${ user_id }`,async function(err, result) {
         if(err) {
           reject(err)
         }
@@ -1627,7 +1627,6 @@ module.exports = class responseClass {
       })
     })
   }
-  
   async ShieldHistory(params) {
     if(!params || !params.car_id) {
       return {
