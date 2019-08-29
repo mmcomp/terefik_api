@@ -225,7 +225,7 @@ fastify.post('/Verify',async (request, reply) => {
 // Start
 const start = async () => {
   try {
-    await fastify.listen(3333, '0.0.0.0')
+    await fastify.listen(8080, '0.0.0.0')
     fastify.log.info(`server listening on ${fastify.server.address().port}`)
   } catch (err) {
     fastify.log.error(err)
