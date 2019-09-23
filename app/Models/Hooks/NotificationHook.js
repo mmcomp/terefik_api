@@ -125,7 +125,7 @@ NotificationHook.send = async (notification) => {
                         console.log('Push Data')
                         console.log(pusheData)
     
-                        response = /*await*/ axios({
+                        /*response = await*/ axios({
                             method: 'POST',
                             headers: {
                                 'Authorization': 'Token ' + Env.get('PUSH_TOKEN'),
@@ -134,9 +134,14 @@ NotificationHook.send = async (notification) => {
                             },
                             url : Env.get('PUSH_URL'), 
                             data: pusheData,
+                        }).then(response=>{
+                            console.log('Push response')
+                            console.log(response.data)
+                        }).catch(e => {
+                            console.log('Push error')
+                            console.log(e)
                         })
-                        // console.log('Push response')
-                        // console.log(response.data)
+
                     }
                 }
             }else {
