@@ -51,13 +51,14 @@ try {
   Queue.process('terefiki_dashboard', DashboardStat.dashboard)
 
   // Parking Cron Workder
+  /*
   const parkingJob = Queue.createJob('parkings')
     .attempts(3)
     .priority('normal')
 
   Queue.every('15 minutes', parkingJob)
   Queue.process('parkings', DashboardStat.updateParkings)
-
+  */
 } catch (error) {
   // SentryException.captureException(error)
   console.log('Workers Error', error)
