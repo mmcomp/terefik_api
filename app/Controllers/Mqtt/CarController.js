@@ -931,7 +931,7 @@ class CarController {
       theZone.reports++
       theZone.save()
     }
-    
+
     let theRangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
     if(theRangerWork && theRangerWork.ranger_id==user.id) {
       let lastArrestTime = Time(theRangerWork.created_at)
@@ -962,6 +962,8 @@ class CarController {
       if(gift_id) {
         findable_gift = true
       }
+
+      console.log('Inspector Work', theRangerWork.toJSON())
 
       return [{
         status: 1,
