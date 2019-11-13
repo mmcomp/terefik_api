@@ -963,8 +963,7 @@ class CarController {
         findable_gift = true
       }
 
-      console.log('Inspector Work', theRangerWork.toJSON())
-      await rangerWork.save()
+      console.log('Inspector Work', rangerWork.toJSON())
 
       return [{
         status: 1,
