@@ -927,9 +927,11 @@ class CarController {
 
     carStatus = 'RegisteredByRanger'
 
-    theZone.reports++
-    theZone.save()
-
+    if(theZone) {
+      theZone.reports++
+      theZone.save()
+    }
+    
     let theRangerWork = await RangerWork.query().where('vehicle_id', car.id).orderBy('created_at', 'DESC').first()
     if(theRangerWork && theRangerWork.ranger_id==user.id) {
       let lastArrestTime = Time(theRangerWork.created_at)
