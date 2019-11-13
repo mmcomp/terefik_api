@@ -964,6 +964,7 @@ class CarController {
       }
 
       console.log('Inspector Work', theRangerWork.toJSON())
+      await rangerWork.save()
 
       return [{
         status: 1,
