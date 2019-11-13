@@ -918,6 +918,7 @@ class CarController {
           loot: loot,
           findable_gift: findable_gift,
           is_out: is_out,
+          arrest_id: rangerWork.id,
         }
       }]
     }
@@ -976,6 +977,7 @@ class CarController {
           findable_gift: findable_gift,
           is_out: is_out,
           last_park: theRangerWork,
+          arrest_id: rangerWork.id,
         }
       }]
     }
@@ -1067,6 +1069,7 @@ class CarController {
             findable_gift: findable_gift,
             is_out: is_out,
             last_park: theRangerWork,
+            arrest_id: rangerWork.id,
           }
         }]
       }else {
