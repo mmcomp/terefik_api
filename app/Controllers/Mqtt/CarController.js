@@ -820,7 +820,7 @@ class CarController {
     }
 
     let theZoneId = await Zone.zoneByCords(params.lon_gps, params.lat_gps)
-    if(theZoneId<=0) {
+    if(theZoneId<=0 && false) {
       return [{
         status: 0,
         messages: [{
