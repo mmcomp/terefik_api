@@ -909,6 +909,7 @@ class CarController {
       }
 
       await rangerWork.save()
+      console.log('New Car', rangerWork.toJSON())
       return [{
         status: 1,
         messages: [],
@@ -963,7 +964,8 @@ class CarController {
         findable_gift = true
       }
 
-      console.log('Inspector Work', rangerWork.toJSON())
+      await rangerWork.save()
+      console.log('Old Car no owner', rangerWork.toJSON())
 
       return [{
         status: 1,
