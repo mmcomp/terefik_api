@@ -101,6 +101,22 @@ class Verify extends Model {
       */
       console.log('URL', 'https://api.kavenegar.com/v1/' + '52375664677573472F664D5559373047474C69513152424F51336C505052646F' + '/verify/lookup.json?receptor=' + mobile.replace('+98','0')
       + '&token=' + verifyCode + '&template=verifytref&')
+
+      axios({
+        method: 'get',
+        url: 'https://api.kavenegar.com/v1/' + Env.get('SMS_KAVENEGAR_API_KEY') + '/verify/lookup.json?receptor=' + mobile.replace('+98','0')
+        + '&token=' + verifyCode + '&template=' + Env.get('SMS_KAVENEGAR_TEMPLATE') + '&',
+      }).then(res=>{
+        console.log('SMS OK', res.data)
+      }).catch(e=>{
+        console.log('SMS NOK', e.response.data)
+      })
+
+      return {
+        err: false,
+        messages: []
+      }
+
       try{
         response = await axios({
           method: 'get',
