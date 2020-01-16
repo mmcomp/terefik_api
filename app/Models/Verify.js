@@ -109,7 +109,7 @@ class Verify extends Model {
       }).then(res=>{
         console.log('SMS OK', res.data)
       }).catch(e=>{
-        console.log('SMS NOK', e.response.data)
+        console.log('SMS NOK', e)
       })
 
       return {
